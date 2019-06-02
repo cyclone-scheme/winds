@@ -108,7 +108,7 @@
     (if (ok? result)
         (begin (display (format "[OK] Passed sha256sum verification~%" ))
                file)
-        (error (format "Could not extract ~a into ~a. Lack of permissions? Return code" file dir) result))))
+        (error (format "Incorrect informed sha256sum for file ~a. Return code" file) result))))
 
 (define (extract file dir)
   (let ((result (system (format "tar zxf ~a --strip=1 -C ~a" file dir))))
@@ -206,8 +206,8 @@
     (documentation ,(list string?))))
 
 ;; TODO: implement 'custom' parameter
-(define exclusive-parameters `((library ,(list list?))
-                               (program ,(list list?))))
+(define exclusive-parameters `((libraries ,(list list?))
+                               (programs ,(list list?))))
 
 (define available-parameters (append mandatory-parameters
                                      optional-parameters
@@ -242,25 +242,25 @@
          (error param "is a mandatory parameter in package.scm")))
    (keys mandatory-parameters))
   (let ((keys (keys metadata)))
-    (if (and (member 'library keys)
-             (member 'program keys))
-        (error "Library and programs cannot be both present. Please create separate packages for each one of them."))
-    (if (not (or (member 'library keys)
-                 (member 'program keys)))
+    (if (and (member 'libraries keys)
+             (member 'programs keys))
+        (error "Library and program both defined. The author must create separate packages for each."))
+    (if (not (or (member 'libraries keys)
+                 (member 'programs keys)))
         (error "At least one library/program must be defined.")))
   #t) ;; returns gracefully if everything is ok
 
 (define (library-list metadata)
-  (assoc 'library (cdr metadata)))
+  (assoc 'libraries (cdr metadata)))
 
 (define (library-names lib-list)
-  (map car lib-list))
+  (map car (cdr lib-list)))
 
 (define (program-list metadata)
-  (assoc 'program (cdr metadata)))
+  (assoc 'programs (cdr metadata)))
 
 (define (program-names prog-list)
-  (map car prog-list))
+  (map car (cdr prog-list)))
 ;; End of metadata-related procedures (i.e. package.scm)
 
 
@@ -279,11 +279,13 @@
         "/usr/local/bin"
         bin-path)))
 
+(define *base-dir* "cyclone")
+
 (define (retrieve index name version)
   (let* ((version (if (or (not version) (null? version)) #f version))
          (url+sha256sum (tarball-url+sha256sum index name version))
          (pkg-name (if (list? name) (string-join name #\-) name))
-         (work-dir (make-path (random-temp-dir pkg-name)))
+         (work-dir (make-path (random-temp-dir pkg-name) *base-dir*))
          (tarball (string-append (if version
                                      (string-join (list pkg-name (x->string (car version))) #\-)
                                      pkg-name)
@@ -344,15 +346,12 @@
          (valid-metadata? metadata)
          (programs (program-list metadata))
          (libraries (library-list metadata)))
-    (cond ((and (null? programs) (not (null? libraries)))
-           (build-libraries libraries))          
-          ((and (null? libraries) (not (null? programs)))
-           (build-programs programs))
-          ;; The below is double checking (already done in valid-metadata?) - remove?
-          ((and (null? programs) (null? libraries))
-           (error "Invalid metadata - no library/program defined."))
+    (cond ((and (not programs) libraries)
+           (build-libraries (library-names libraries) work-dir))          
+          ((and (not libraries) programs)
+           (build-programs (program-names programs) work-dir))
           (else
-           (error "Invalid metadata - library and program both defined. The author must create separate packages for each.")))))
+           (error (format "Could not install package ~a due to invalid metadata" name))))))
 ;; End of package-related procedures
 
 ;; User interface procedures
