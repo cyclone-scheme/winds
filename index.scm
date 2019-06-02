@@ -1,3 +1,3 @@
 (cyclone-packages
  ((cyclone iset)
-  (0.1 "https://github.com/arthurmaciel/cyclone-iset/tarball/master" "5207356ede661de2ec45e7f16e44e35d790102248d4bdfc5d039621334145b3d")))
+  (0.1 "https://github.com/arthurmaciel/cyclone-iset/archive/master.tar.gz" "51b87beb21970192eccdd92b253c51ffd39cf70195e03c312b863ec81af53229")))
