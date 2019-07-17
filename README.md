@@ -1,5 +1,5 @@
 # cyclone-winds
-Package manager for[Cyclone Scheme](https://cyclone-scheme.org).
+Package manager for [Cyclone Scheme](https://cyclone-scheme.org).
 
 To find packages, please visit the [wiki](https://github.com/cyclone-scheme/cyclone-winds/wiki).
 
