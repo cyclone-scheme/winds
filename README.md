@@ -16,7 +16,7 @@ OPTIONS could be one of the following:
 - info PACKAGE - list all metadata about specified package
 - local-status - list all installed packages
 
-**PACKAGES should be a symbol or a string containing a list of symbols - i.e. `http-client` or `"(http-client)"`  **
+*PACKAGES should be a symbol or a string containing a list of symbols - i.e. `http-client` or `"(http-client)"`*
 
 ## package.scm parameters
 
@@ -31,14 +31,14 @@ OPTIONS could be one of the following:
 - tags: one or more strings
 - docs: string pointing to documentation
 
-### 'library' parameter
+### 'library' parameters
 
 *Note: more than one occurrence is allowed and libraries will be installed in the order they appear.*
 
 - name: list of one or more symbols. As with package name, note that 'cyclone' will be prepend to it, so `(example-package lib1)` will become `(cyclone example-package lib1)` and will be searched at package file structure as `"cyclone/example-package/lib1.sld"`
 - description: string
 
-### 'program' parameter
+### 'program' parameters
 
 *Note: more than one occurrence is allowed and programs will be installed in the order they appear.*
 
@@ -81,11 +81,11 @@ OPTIONS could be one of the following:
                        (fedora (libtommath-devel))))
 ```
 
-##Package files structure
+## Package files structure
 
 All packages should contain their file inside a `cyclone` directory (see the examples bellow).
 
-####Example 1
+#### Example 1
 
 If in `package.scm` we have a `(library (name (http-client))` then after installed it will be used as (import (cyclone http-client)).The package file structure should be:
 
@@ -95,7 +95,7 @@ cyclone/
 |- http-client.sld
 ```
 
-####Example 2
+#### Example 2
 
 If in `package.scm` we have a `(library (name (crypto md5))` then after installed it will be used as (import (cyclone crypto md5)).The package file structure should be:
 
@@ -106,7 +106,7 @@ cyclone/
    |- md5.sld
 ```
 
-####Example 3
+#### Example 3
 
 If in `package.scm` we have a `(program (name start-server))` then after installed it will be called by `$ /usr/local/bin/start-server`. The package file structure should be:
 
