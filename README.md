@@ -18,7 +18,7 @@ OPTIONS could be one of the following:
 - info PACKAGE - list all metadata about specified package
 - local-status - list all installed packages
 
-*PACKAGES should be a symbol or a string containing a list of symbols - i.e. `http-client` or `"(http-client)"`*
+*Attention! PACKAGES should be a symbol or a **quoted list of symbols** - i.e. `http-client` or `"(http-client)"`*
 
 ## package.scm parameters
 

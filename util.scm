@@ -1,3 +1,20 @@
+(define (random-temp-dir . prefix)
+  (let ((temp-dir (or (get-environment-variable "TMPDIR")
+                      (get-environment-variable "TEMP")
+                      (get-environment-variable "TMP")
+                      "/tmp")))
+    (x->path temp-dir
+             (string-append (if (null? prefix) "" (car prefix))
+                            (number->string (random-integer 10000000000000000000))))))
+
+(define (remove pred lst)
+  (filter (lambda (x) (not (pred x))) lst))
+
+(define (assoc-all-occurences symbol alist)
+  (filter (lambda (e)
+            (eq? symbol (car e)))
+          alist))
+
 ;; String procedures imported and adapted from Chibi Scheme
 (define (trim-trailing-slash s)
   (let* ((len (string-length s))

@@ -51,4 +51,8 @@
                file)
         (error (format "Could not copy file ~a into ~a. Lack of permissions? Return code" file to-dir) result))))
 
-
+(define (touch file)
+  (let ((result (system (format "touch ~a" file))))
+    (if (ok? result)
+        file
+        (error (format "Could not touch file ~a. Lack of permissions? Return code" file) result))))

@@ -1,27 +1,21 @@
 (import (scheme base)
         (scheme write)
         (scheme read)
+        (scheme file)
         (scheme process-context)
         (scheme cyclone pretty-print)
         (scheme cyclone util)
         (srfi 27)  ;; random numbers
         (srfi 28)  ;; basic format strings
-        (cyclone match)) 
+        (cyclone match))
 
 (include "system-calls.scm")
-(include "path.scm")
+(include "util.scm")
 
-(define (random-temp-dir . prefix)
-  (let ((temp-dir (or (get-environment-variable "TMPDIR")
-                      (get-environment-variable "TEMP")
-                      (get-environment-variable "TMP")
-                      "/tmp")))
-    (x->path temp-dir
-          (string-append (if (null? prefix) "" (car prefix))
-                         (number->string (random-integer 10000000000000000000))))))
+(define *cyclone-winds-version* "0.1")
 
 ;; Index-related procedures
-
+;;
 ;; Global index.scm has the format bellow. Note that package
 ;; latest version is always at first position and atm there is
 ;; no way to specify a version to install.
@@ -34,22 +28,21 @@
 ;;   (0.9 "url-to-package.scm" "url-to-tarball" "tarball-sha256sum")
 ;;   (0.8 "url-to-package.scm" "url-to-tarball" "tarball-sha256sum"))
 ;;  ...)
-
 (define *default-index-url* "https://raw.githubusercontent.com/cyclone-scheme/cyclone-winds/master/index.scm")
 
-(define (get-index url)
+(define (get-index)
   (let* ((tmp-dir (random-temp-dir))
          (index-path (x->path tmp-dir "index.scm")))
     (make-dir tmp-dir)
-    (display "~%Retrieving index file...~%")
-    (download url index-path)
+    (display (format "~%Retrieving index file...~%"))
+    (download *default-index-url* index-path)
     (let ((content (read (open-input-file index-path))))
       (delete tmp-dir)
       content)))
 
 (define (pkg-info index pkg-name)
   (match (assoc pkg-name (cdr index))
-    (#f (error (format "Could not locate package by name: ~a~%" name)))
+    (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
     ((pkg-name latest-version old-versions ...) latest-version)))
 
 (define (version pkg-info)
@@ -64,22 +57,50 @@
 (define (sha256sum pkg-info)
   (cadddr pkg-info))
 
-;; Local index
-(define *default-local-index-file*
-  (x->path (*library-installation-dir*) "local-index.scm"))
 
+;; Local index has the following format:
+;;      PKG-NAME   PKG-VERSION   CYCLONE-VERSION       LIBS                 PROGS
+;; (((cyclone pkg1)   0.8           "1.11.3"   ((cyclone libX) ...)    ((progamX) ...))
+;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
+;;  ...)
+(define *default-local-index*
+  (x->path (get-library-installation-dir) "cyclone-winds-index.scm"))
+
+(define (get-local-index)
+  (touch *default-local-index*)
+  (read (open-input-file *default-local-index*)))
+
+(define (register-installed-package! name version cyc-version libs progs)
+  (let ((local-index (get-local-index)))
+    (with-output-to-file *default-local-index*
+      (lambda ()
+        (write (cons (list name version cyc-version libs progs)
+                     (remove (lambda (pkg)
+                               (equal? (car pkg) name))
+                             local-index)))))
+    (display (format "~%Package ~a (version ~a) successfuly installed with Cyclone ~a.~%" name version cyc-version))))
+
+(define (unregister-installed-package! name)
+  (let* ((local-index (get-local-index)))
+    (with-output-to-file *default-local-index*
+      (lambda ()
+        (write (remove (lambda (pkg)
+                         (equal? (car pkg) name))
+                       local-index))))
+    (display (format "~%Package ~a successfuly uninstalled.~%" name))))
 ;; End of index-related procedures
 
 
 ;; Metadata-related procedures (i.e. package.scm)
-(define *default-metadata-file* "package.scm")
+(define *default-metadata-file* (x->path "cyclone" "package.scm"))
 
 (define (keys alist)
   (map car alist))
 
 ;; TODO: review this validation strategy - seems too naive.
 (define mandatory-parameters
-  `((version ,(list number?))
+  `((name ,(list (lambda (x) (or (symbol? x) (list? x)))))
+    (version ,(list number?))
     (license ,(list string?))
     (authors ,(list string?))
     (maintainers ,(list string?))
@@ -133,11 +154,6 @@
         (error "At least one library/program must be defined in package.scm.")))
   #t) ;; returns gracefully if everything is ok
 
-(define (assoc-all-occurences symbol alist)
-  (filter (lambda (e)
-            (eq? symbol (car e)))
-          alist))
-
 (define (libraries-list metadata)
   (match (assoc-all-occurences 'library (cdr metadata))
     (() '())
@@ -156,13 +172,13 @@
 ;; Package-related procedures
 (define *library-installable-extensions* '(".o" ".so" ".sld" ".meta"))
 
-(define (*library-installation-dir*)
+(define (get-library-installation-dir)
   (let ((lib-path (get-environment-variable "CYCLONE_LIBRARY_PATH")))
     (if lib-path
         (car (string-split lib-path #\:)) ;; return only the first path listed
         (Cyc-installation-dir 'sld))))
 
-(define (*program-installation-dir*)
+(define (get-program-installation-dir)
   (let ((bin-path (Cyc-installation-dir 'bin)))
     (if (string=? bin-path "")
         "/usr/local/bin"
@@ -185,7 +201,7 @@
          (for-each
           (lambda (ext)
             (copy-file (string-append full-lib-name-path ext)
-                       (x->path (*library-installation-dir*)
+                       (x->path (get-library-installation-dir)
                              (path-dir lib-name-path))))
           *library-installable-extensions*)))
      lib-list)))
@@ -203,7 +219,7 @@
     (for-each
      (lambda (prog)
        (let ((prog-name-path (x->path dir prog)))
-         (copy-file prog-name-path (*program-installation-dir*))))
+         (copy-file prog-name-path (get-program-installation-dir))))
      prog-list)))
 
 (define (retrieve-package index name . dir)
@@ -226,63 +242,103 @@
       (delete outfile)               
       work-dir)))
 
-
-(define (annotate-local-index . args)
-  #t)
-
 ;; TODO: check pointed metadata in index.scm with downloaded one.
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
-         (metadata (read (open-input-file (x->path work-dir *default-metadata-file*))))
-         (valid-metadata? metadata))
-    (if valid-metadata?
+         (metadata
+          (cdr (read
+                (open-input-file (x->path work-dir
+                                          *default-metadata-file*))))))
+    (if (valid-metadata? metadata)
         (let ((progs (programs-list metadata))
               (libs (libraries-list metadata))
               (deps (dependencies-list metadata)))
-          (and deps (install-packages deps))
-          (and libs
+          (and deps
+               (for-each
+                (lambda (dep)
+                  (install-package index dep))
+                deps))
+          (and (not (null? libs))
                (build-libraries libs work-dir)
                (install-libraries libs work-dir))          
-          (and progs
+          (and (not (null? progs))
                (build-programs progs work-dir)
                (install-programs progs work-dir))
-          (let ((cyc-version (Cyc-version))
-                (pkg-version (assoc 'version (cdr metadata))))
-            (annotate-local-index (list name pkg-version cyc-version))))
-        (error "Invalid package.scm"))
+          (let ((pkg-version (car (pkg-info index name)))
+                (cyc-version (Cyc-version)))
+            (register-installed-package! name pkg-version cyc-version libs progs)))
+        (error (format "~%Invalid package.scm in package ~a~%" name)))
     ;; TODO - use exceptions to clean work-dir even when failing.
     (delete work-dir)))
+
+(define (uninstall-package index name)
+  (let ((pkg (assoc name index)))
+    (if pkg
+        (let ((libs (cadddr pkg))
+              (progs (cadddr (cdr pkg))))
+          (for-each
+           (lambda (lib)
+             (for-each
+              (lambda (ext)
+                (delete (x->path (get-library-installation-dir)
+                                 (string-append (x->path lib) ext))))
+              *library-installable-extensions*))
+           libs)
+          (for-each
+           (lambda (prog)
+             (delete (x->path (get-program-installation-dir) prog)))
+           progs)
+          (unregister-installed-package! name))
+        (display (format "~%Package ~a not installed. Skipping...~%" name)))))
 ;; End of package-related procedures
 
+
 ;; User interface procedures
-(define (retrieve pkgs . dir)
-  (let ((index (get-index *default-index-url*)))
+(define (retrieve pkgs)
+  (let ((index (get-index)))
     (for-each
      (lambda (pkg)
-       (retrieve-package index pkg dir))
+       (display
+        (format "~%Package ~a retrieved into ~a~%"
+                pkg (retrieve-package index pkg "."))))
      pkgs)))
 
 (define (install pkgs)
-  (let ((index (get-index *default-index-url*)))
+  (let ((index (get-index)))
     (for-each
      (lambda (pkg)
        (install-package index pkg))
      pkgs)))
 
 (define (uninstall pkgs)
-  (let ((index (get-index *default-index-url*)))
+  (let ((index (get-local-index)))
     (for-each
      (lambda (pkg)
        (uninstall-package index pkg))
      pkgs)))
 
-(define (test name . version) #t)
 (define (search wildcard) #t)
 (define (info name . version) #t)
-(define (local-status) #t)
+
+(define (local-status)
+  (display (format "~a~%Installed packages:~%"
+                   *banner*))
+  (display (pretty-print (get-local-index))))
+
+(define (index)
+  (pretty-print (get-index)))
+
+(define *banner*
+  (format "~%Cyclone-winds - a package manager for Cyclone Scheme.~%Version: ~a~%https://github.com/cyclone-scheme/cyclone-winds~%"
+          *cyclone-winds-version*))
 
 (define (usage)
-  (display "Usage: cyclone-winds [OPTIONS [PACKAGES]]
+  (display
+   (format
+    "~a
+Usage: cyclone-winds [OPTIONS [PACKAGES]]
+
+OPTIONS:
      help  -  print usage
      retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
      install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
@@ -291,26 +347,23 @@
      info PACKAGE - list all metadata about specified package
      local-status - list all installed packages
      index - pretty-prints index.scm
- "))
+
+PACKAGES:
+     a symbol or a quoted list of symbols. Ex.: http-client or \"(cyclone iset)\" ~%~%"
+    *banner*)))
 
 (define (main)
-  (match (command-line)
-   ((_ . '()) (usage))
-   ((_ 'help) (usage))
-   ((_ 'index) (pretty-print (get-index *default-index-url*)))
-   ((_ 'search wildcard) #t) ;; TODO     
-   ((_ 'info name) #t)    ;; TODO
-   ((_ 'local-status) #t)    ;; TODO
-   ((_ 'retrieve pkgs ..1)
-    (let ((pkgs (map string->proper-symbol pkgs)))
-      (retrieve pkgs)))
-   ((_ 'install pkgs ..1)
-    (let ((pkgs (map string->proper-symbol pkgs)))
-      (install-packages pkgs)))
-   ((_ 'uninstall pkgs ..1)
-    (let ((pkgs (map string->proper-symbol pkgs)))
-      (uninstall-packages pkgs)))
-   (else (usage))))
+  (match (map string->proper-symbol (command-line))
+    ((_ . ()) (display (usage)))
+    ((_ 'help) (usage))
+    ((_ 'retrieve pkgs ..1) (retrieve pkgs))
+    ((_ 'install pkgs ..1) (install pkgs))
+    ((_ 'uninstall pkgs ..1) (uninstall pkgs))
+    ((_ 'search wildcard) #t) ;; TODO     
+    ((_ 'info name) #t)       ;; TODO
+    ((_ 'local-status) (local-status))
+    ((_ 'index) (index))    
+    (else (usage))))
 
 (main)
 ;; End of user interface procedures
