@@ -69,7 +69,10 @@
 
 (define (get-local-index)
   (touch *default-local-index*)
-  (read (open-input-file *default-local-index*)))
+  (let ((contents (read (open-input-file *default-local-index*))))
+    (if (eof-object? contents)
+        '()
+        contents)))
 
 (define (register-installed-package! name version cyc-version libs progs)
   (let ((local-index (get-local-index)))
