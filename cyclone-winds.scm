@@ -1,6 +1,7 @@
 (import (scheme base)
         (scheme write)
         (scheme read)
+        (scheme repl)
         (scheme file)
         (scheme process-context)
         (scheme cyclone pretty-print)
@@ -361,6 +362,7 @@ PACKAGES:
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
     ((_ 'search wildcard) #t) ;; TODO     
     ((_ 'info name) #t)       ;; TODO
+    ((_ 'repl) (repl))
     ((_ 'local-status) (local-status))
     ((_ 'index) (index))    
     (else (usage))))
