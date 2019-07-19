@@ -1,3 +1,5 @@
+[<img src="cyclone-winds.png" alt="cyclone-winds">](http://github.com/cyclone-scheme/cyclone-winds)
+
 # cyclone-winds
 Package manager for [Cyclone Scheme](https://cyclone-scheme.org).
 
