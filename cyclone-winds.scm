@@ -76,7 +76,7 @@
           (write (format "()" err))))
       '())
    (lambda ()
-     (read (open-input-file *default-local-index*))))))
+     (read (open-input-file *default-local-index*)))))
 
 (define (register-installed-package! name version cyc-version libs progs)
   (let ((local-index (get-local-index)))
