@@ -1,6 +1,7 @@
 (import (scheme base)
         (scheme write)
         (scheme read)
+        (scheme repl)
         (scheme file)
         (scheme process-context)
         (scheme cyclone pretty-print)
@@ -68,14 +69,14 @@
 
 (define (get-local-index)
   (with-exception-handler
-   ;; could not open file - if not found, create one
+   ;; could not open file - if not found, create one with empty list
    (lambda (err)
       (with-output-to-file *default-local-index*
         (lambda ()
-          (write (format "(~a)" err))))
+          (write (format "()" err))))
       '())
    (lambda ()
-     (read (open-input-file *default-local-index*)))))
+     (read (open-input-file *default-local-index*))))))
 
 (define (register-installed-package! name version cyc-version libs progs)
   (let ((local-index (get-local-index)))
@@ -382,6 +383,7 @@
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
     ((_ 'search wildcard) #t) ;; TODO     
     ((_ 'info name) #t)       ;; TODO
+    ((_ 'repl) (repl))
     ((_ 'local-status) (local-status))
     ((_ 'index) (index))    
     (else (usage))))
