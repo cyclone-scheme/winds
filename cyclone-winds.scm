@@ -64,11 +64,18 @@
 ;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
 ;;  ...)
 (define *default-local-index*
-  (x->path (get-library-installation-dir) "cyclone-winds-index.scm"))
+  (x->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
 
 (define (get-local-index)
-  (touch *default-local-index*)
-  (read (open-input-file *default-local-index*)))
+  (with-exception-handler
+   ;; could not open file - if not found, create one
+   (lambda (err)
+      (with-output-to-file *default-local-index*
+        (lambda ()
+          (write (format "(~a)" err))))
+      '())
+   (lambda ()
+     (read (open-input-file *default-local-index*)))))
 
 (define (register-installed-package! name version cyc-version libs progs)
   (let ((local-index (get-local-index)))
@@ -173,16 +180,12 @@
 (define *library-installable-extensions* '(".o" ".so" ".sld" ".meta"))
 
 (define (get-library-installation-dir)
-  (let ((lib-path (get-environment-variable "CYCLONE_LIBRARY_PATH")))
-    (if lib-path
-        (car (string-split lib-path #\:)) ;; return only the first path listed
-        (Cyc-installation-dir 'sld))))
+  (or (get-environment-variable "CYCLONE_LIBRARY_PATH")
+      (Cyc-installation-dir 'sld)))
 
 (define (get-program-installation-dir)
-  (let ((bin-path (Cyc-installation-dir 'bin)))
-    (if (string=? bin-path "")
-        "/usr/local/bin"
-        bin-path)))
+  (or (get-environment-variable "CYCLONE_PROGRAM_PATH")
+      (Cyc-installation-dir 'bin)))
 
 (define (build-libraries lib-list . dir)
   (let ((dir (if (null? dir) "." (car dir))))
@@ -202,7 +205,7 @@
           (lambda (ext)
             (copy-file (string-append full-lib-name-path ext)
                        (x->path (get-library-installation-dir)
-                             (path-dir lib-name-path))))
+                                (path-dir lib-name-path))))
           *library-installable-extensions*)))
      lib-list)))
 
@@ -281,7 +284,12 @@
              (for-each
               (lambda (ext)
                 (delete (x->path (get-library-installation-dir)
-                                 (string-append (x->path lib) ext))))
+                                 (string-append (x->path lib) ext)))
+                ;; Also delete directories if appropriate
+                (if (>= (length lib) 3)
+                    (delete (x->path (get-library-installation-dir)
+                                     (path-dir (x->path lib))))))
+              
               *library-installable-extensions*))
            libs)
           (for-each
@@ -321,35 +329,48 @@
 (define (info name . version) #t)
 
 (define (local-status)
-  (display (format "~a~%Installed packages:~%"
-                   *banner*))
-  (display (pretty-print (get-local-index))))
+  (let ((index (get-local-index)))
+    (display (format "~%  Installed packages: "))
+    (if (null? index)
+        (display (format "None~%~%"))
+        (for-each
+         (lambda (pkg)
+           (display
+            (format
+             "~%~%  Name: ~a       version: ~a       Cyclone version: ~a~%  Installed libraries: ~a~%  Installed programs: ~a~%"
+             (car pkg) (cadr pkg) (caddr pkg) (cadddr pkg) (cadddr (cdr pkg)))))
+         index))))
 
 (define (index)
   (pretty-print (get-index)))
 
 (define *banner*
-  (format "~%Cyclone-winds - a package manager for Cyclone Scheme.~%Version: ~a~%https://github.com/cyclone-scheme/cyclone-winds~%"
-          *cyclone-winds-version*))
+  (format
+   "
+  Cyclone-winds - a package manager for Cyclone Scheme 
+  https://github.com/cyclone-scheme/cyclone-winds 
+  (c) 2019 - Cyclone Team 
+  Version ~a~%"
+   *cyclone-winds-version*))
 
 (define (usage)
   (display
    (format
     "~a
-Usage: cyclone-winds [OPTIONS [PACKAGES]]
-
-OPTIONS:
-     help  -  print usage
-     retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
-     install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
-     uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-     search WILDCARD - search for packages that partially match the specified wildcard
-     info PACKAGE - list all metadata about specified package
-     local-status - list all installed packages
-     index - pretty-prints index.scm
-
-PACKAGES:
-     a symbol or a quoted list of symbols. Ex.: http-client or \"(cyclone iset)\" ~%~%"
+  Usage: cyclone-winds [OPTIONS [PACKAGES]]
+  
+  OPTIONS:
+       help  -  print usage
+       retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
+       install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
+       uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
+       TODO - search WILDCARD - search for packages that partially match the specified wildcard
+       TODO - info PACKAGE - list all metadata about specified package
+       local-status - list all installed packages
+       index - pretty-prints index.scm
+  
+  PACKAGES:
+       a quoted list of two or more symbols. Ex.: \"(cyclone iset)\"~%~%"
     *banner*)))
 
 (define (main)

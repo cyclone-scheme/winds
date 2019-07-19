@@ -17,8 +17,10 @@ DESTDIR = "/usr/local/bin/"
 # TESTS = $(basename $(TEST_SRC))
 
 # Primary rules (of interest to an end user)
-all : $(SOURCE)
+$(BINARY) : $(SOURCE)
 	$(CYCLONE) $^
+
+all : $(BINARY)
 
 # test : libs $(TESTS)
 
