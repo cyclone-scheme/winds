@@ -5,7 +5,7 @@
 #include Makefile.config
 
 # Commands
-CYCLONE = cyclone -A .
+CYCLONE = cyclone 
 INSTALL   ?= install
 RM        ?= rm -f
 

@@ -6,12 +6,16 @@
         (scheme process-context)
         (scheme cyclone pretty-print)
         (scheme cyclone util)
-        (srfi 27)  ;; random numbers
-        (srfi 28)  ;; basic format strings
+        (scheme cyclone libraries)
+        (srfi 27) ;; random numbers
+        (srfi 28) ;; basic format strings
         (cyclone match))
+
+(include-c-header "<dirent.h>")
 
 (include "system-calls.scm")
 (include "util.scm")
+(include "path.scm")
 
 (define *cyclone-winds-version* "0.1")
 
@@ -33,7 +37,7 @@
 
 (define (get-index)
   (let* ((tmp-dir (random-temp-dir))
-         (index-path (x->path tmp-dir "index.scm")))
+         (index-path (->path tmp-dir "index.scm")))
     (make-dir tmp-dir)
     (display (format "~%Retrieving index file...~%"))
     (download *default-index-url* index-path)
@@ -65,7 +69,7 @@
 ;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
 ;;  ...)
 (define *default-local-index*
-  (x->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
+  (->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
 
 (define (get-local-index)
   (if (file-exists? *default-local-index*)
@@ -94,7 +98,7 @@
 
 
 ;; Metadata-related procedures (i.e. package.scm)
-(define *default-metadata-file* (x->path "cyclone" "package.scm"))
+(define *default-metadata-file* (->path "cyclone" "package.scm"))
 
 (define (keys alist)
   (map car alist))
@@ -186,7 +190,7 @@
   (let ((dir (if (null? dir) "." (car dir))))
     (for-each
      (lambda (lib)
-       (let ((lib-name-path (x->path dir lib)))
+       (let ((lib-name-path (->path dir lib)))
          (compile (string-append lib-name-path ".sld") dir)))
      lib-list)))
 
@@ -194,12 +198,12 @@
   (let ((dir (if (null? dir) "." (car dir))))
     (for-each
      (lambda (lib)
-       (let* ((lib-name-path (x->path lib))
-              (full-lib-name-path (x->path dir lib)))
+       (let* ((lib-name-path (->path lib))
+              (full-lib-name-path (->path dir lib)))
          (for-each
           (lambda (ext)
             (copy-file (string-append full-lib-name-path ext)
-                       (x->path (get-library-installation-dir)
+                       (->path (get-library-installation-dir)
                                 (path-dir lib-name-path))))
           *library-installable-extensions*)))
      lib-list)))
@@ -208,7 +212,7 @@
   (let ((dir (if (null? dir) "." (car dir))))
     (for-each
      (lambda (prog)
-       (let ((prog-name-path (x->path dir prog)))
+       (let ((prog-name-path (->path dir prog)))
          (compile (string-append prog-name-path ".scm") dir)))
      prog-list)))
 
@@ -216,22 +220,22 @@
   (let ((dir (if (null? dir) "." (car dir))))
     (for-each
      (lambda (prog)
-       (let ((prog-name-path (x->path dir prog)))
+       (let ((prog-name-path (->path dir prog)))
          (copy-file prog-name-path (get-program-installation-dir))))
      prog-list)))
 
 (define (retrieve-package index name . dir)
   (match-let (((version _ tarball-url sha256sum) (pkg-info index name)))
     (let* ((pkg-name (if (list? name)
-                         (string-join (map x->string name) #\-)
-                         (x->string name)))
+                         (string-join (map ->string name) #\-)
+                         (->string name)))
            (work-dir (if (null? dir)
                          (random-temp-dir pkg-name)
-                         (x->path (car dir) pkg-name)))
+                         (->path (car dir) pkg-name)))
            (tarball
-            (string-append (string-join (list pkg-name (x->string version)) #\-)
+            (string-append (string-join (list pkg-name (->string version)) #\-)
                            ".tar.gz"))
-           (outfile (x->path work-dir tarball)))
+           (outfile (->path work-dir tarball)))
       (make-dir work-dir)
       (display (format "~%Downloading ~a (version ~a)...~%" name version))
       (download tarball-url outfile)
@@ -245,7 +249,7 @@
   (let* ((work-dir (retrieve-package index name))
          (metadata
           (cdr (read
-                (open-input-file (x->path work-dir
+                (open-input-file (->path work-dir
                                           *default-metadata-file*))))))
     (if (valid-metadata? metadata)
         (let ((progs (programs-list metadata))
@@ -278,18 +282,18 @@
            (lambda (lib)
              (for-each
               (lambda (ext)
-                (delete (x->path (get-library-installation-dir)
-                                 (string-append (x->path lib) ext)))
+                (delete (->path (get-library-installation-dir)
+                                 (string-append (->path lib) ext)))
                 ;; Also delete directories if appropriate
                 (if (>= (length lib) 3)
-                    (delete (x->path (get-library-installation-dir)
-                                     (path-dir (x->path lib))))))
+                    (delete (->path (get-library-installation-dir)
+                                     (path-dir (->path lib))))))
               
               *library-installable-extensions*))
            libs)
           (for-each
            (lambda (prog)
-             (delete (x->path (get-program-installation-dir) prog)))
+             (delete (->path (get-program-installation-dir) prog)))
            progs)
           (unregister-installed-package! name))
         (display (format "~%Package ~a not installed. Skipping...~%" name)))))
@@ -383,4 +387,5 @@
     (else (usage))))
 
 (main)
+
 ;; End of user interface procedures
