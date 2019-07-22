@@ -68,15 +68,9 @@
   (x->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
 
 (define (get-local-index)
-  (with-exception-handler
-   ;; could not open file - if not found, create one with empty list
-   (lambda (err)
-      (with-output-to-file *default-local-index*
-        (lambda ()
-          (write (format "()" err))))
-      '())
-   (lambda ()
-     (read (open-input-file *default-local-index*)))))
+  (if (file-exists? *default-local-index*)
+      (read (open-input-file *default-local-index*))
+      '()))
 
 (define (register-installed-package! name version cyc-version libs progs)
   (let ((local-index (get-local-index)))

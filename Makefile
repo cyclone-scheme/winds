@@ -2,10 +2,12 @@
 # Copyright (c) 2019, Arthur Maciel
 # All rights reserved.
 
-include Makefile.config
+#include Makefile.config
 
 # Commands
 CYCLONE = cyclone -A .
+INSTALL   ?= install
+RM        ?= rm -f
 
 # Files
 SOURCE = cyclone-winds.scm
@@ -17,10 +19,10 @@ DESTDIR = "/usr/local/bin/"
 # TESTS = $(basename $(TEST_SRC))
 
 # Primary rules (of interest to an end user)
-$(BINARY) : $(SOURCE)
-	$(CYCLONE) $^
-
 all : $(BINARY)
+
+$(BINARY) : $(SOURCE)
+	$(CYCLONE) $< 
 
 # test : libs $(TESTS)
 
@@ -35,7 +37,7 @@ uninstall :
 	$(RM) $(DESTDIR)$(BINARY)
 
 
-.PHONY: full
+.PHONY: all clean install uninstall full
 
 full : 
 	make clean; make && sudo make install
