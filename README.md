@@ -3,12 +3,21 @@
 # cyclone-winds
 Package manager for [Cyclone Scheme](https://cyclone-scheme.org).
 
-The official list of packages [wiki](https://github.com/cyclone-scheme/cyclone-winds/wiki).
+The official list of packages is on the [wiki](https://github.com/cyclone-scheme/cyclone-winds/wiki).
 
 ## Introduction
 
 A "package" for `cyclone-winds` is wrapper around libraries and/or programs. They are extensions to the core implemenation of Cyclone Scheme. 
 
+## Installation
+
+Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it with `sudo pkg install gmake`).
+
+   git clone https://github.com/cyclone-scheme/cyclone-winds.git
+   cd cyclone-winds
+   make
+   sudo make install
+   
 ## Usage
 
 ```

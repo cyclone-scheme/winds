@@ -2,10 +2,10 @@
 # Copyright (c) 2019, Arthur Maciel
 # All rights reserved.
 
-#include Makefile.config
+CW_PLATFORM := $(shell uname -s)
 
 # Commands
-CYCLONE = cyclone 
+CYCLONE    = cyclone #-CP -DCW_PLATFORM=\"$(CW_PLATFORM)\"
 INSTALL   ?= install
 RM        ?= rm -f
 
@@ -14,7 +14,8 @@ SOURCE = cyclone-winds.scm
 BINARY = cyclone-winds
 
 # Path
-DESTDIR = "/usr/local/bin/"
+PREFIX	?= /usr/local
+DESTDIR  = $(PREFIX)/bin
 
 # TESTS = $(basename $(TEST_SRC))
 
@@ -29,7 +30,7 @@ $(BINARY) : $(SOURCE)
 clean :
 	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta
 
-install : 
+install : $(BINARY)
 	$(INSTALL) -m0755 $(BINARY) $(DESTDIR)
 
 
@@ -40,4 +41,4 @@ uninstall :
 .PHONY: all clean install uninstall full
 
 full : 
-	make clean; make && sudo make install
+	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install
