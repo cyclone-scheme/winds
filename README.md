@@ -17,6 +17,12 @@ Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it wit
    cd cyclone-winds
    make
    sudo make install
+
+Optionally it is possible to pass `PREFIX` to set another destination directory.
+
+   make 
+   sudo make PREFIX=/home/joe/cyclone-winds install
+   /home/joe/cyclone-winds/bin/cyclone-winds --help
    
 ## Usage
 
