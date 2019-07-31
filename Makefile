@@ -1,11 +1,9 @@
 # Cyclone-winds - package manager for Cyclone Scheme
-# Copyright (c) 2019, Arthur Maciel
+# Copyright (c) 2019, Cyclone Team
 # All rights reserved.
 
-CW_PLATFORM := $(shell uname -s)
-
 # Commands
-CYCLONE    = cyclone #-CP -DCW_PLATFORM=\"$(CW_PLATFORM)\"
+CYCLONE    = cyclone
 INSTALL   ?= install
 RM        ?= rm -f
 
