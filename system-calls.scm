@@ -9,7 +9,7 @@
          (cond ((command-exists? "wget")
                 (system (format "wget --quiet --show-progress --progress=bar:force:noscroll -O ~a ~a" outfile url)))
                ((command-exists? "curl")
-                (system (format "curl -L ~a --output ~a" url outfile)))
+                (system (format "curl -s -L ~a --output ~a" url outfile)))
                (else (error (format "Could not find curl/wget. Please install one of those programs to continue~%"))))))
     (if (ok? result)
         (begin (display (format "[OK] Downloaded ~a~%" outfile))
