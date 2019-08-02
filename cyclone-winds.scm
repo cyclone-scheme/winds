@@ -62,7 +62,6 @@
 (define (sha256sum pkg-info)
   (cadddr pkg-info))
 
-
 ;; Local index has the following format:
 ;;      PKG-NAME   PKG-VERSION   CYCLONE-VERSION       LIBS                 PROGS
 ;; (((cyclone pkg1)   0.8           "1.11.3"   ((cyclone libX) ...)    ((progamX) ...))
@@ -98,7 +97,7 @@
 
 
 ;; Metadata-related procedures (i.e. package.scm)
-(define *default-metadata-file* (->path "cyclone" "package.scm"))
+(define *default-metadata-file* "package.scm")
 
 (define (keys alist)
   (map car alist))
@@ -112,7 +111,8 @@
     (maintainers ,(list string?))
     (description ,(list string?))
     (tags ,(list string?))
-    (docs ,(list string?))))
+    (docs ,(list string?))
+    (test ,(list string?))))
 
 (define optional-parameters
   `((dependencies ,(list string?))
@@ -160,6 +160,9 @@
         (error "At least one library/program must be defined in package.scm.")))
   #t) ;; returns gracefully if everything is ok
 
+(define (name metadata)
+  (assoc 'name (cdr metadata)))
+
 (define (libraries-list metadata)
   (match (assoc-all-occurences 'library (cdr metadata))
     (() '())
@@ -170,12 +173,21 @@
     (() '())
     (lst (map cadadr lst))))
 
+(define (version metadata)
+  (assoc 'version (cdr metadata)))
+
 (define (dependencies-list metadata)
   (assoc 'dependencies (cdr metadata)))
+
+(define (test-dependencies-list metadata)
+  (assoc 'test-dependencies (cdr metadata)))
+
+(define (test-file metadata)
+  (assoc 'test (cdr metadata)))
 ;; End of metadata-related procedures (i.e. package.scm)
 
 
-;; Package-related procedures
+;; Package-related procedures (non-exported)
 (define *library-installable-extensions* '(".o" ".so" ".sld" ".meta"))
 
 (define (get-library-installation-dir)
@@ -242,35 +254,49 @@
       (validate-sha256sum sha256sum outfile)
       (extract outfile work-dir)
       (delete outfile)               
-      work-dir)))
+      work-dir)
+      ;; (with-exception-handler
+      ;;     (lambda (e)
+      ;;       (delete outfile)
+      ;;       (display (format "Error while retrieving package ~a~%" name)))
+      ;;   (lambda ()
+      ;;     (download tarball-url outfile)
+      ;;     (validate-sha256sum sha256sum outfile)
+      ;;     (extract outfile work-dir)
+      ;;     (delete outfile)               
+      ;;     work-dir))
+      ))
 
-;; TODO: check pointed metadata in index.scm with downloaded one.
+(define (get-package-metadata index name . dir)
+  (let* ((work-dir (if (null? dir)
+                       (random-temp-dir (string-append (->string name) "-metadata"))
+                       (->path (car dir) (string-append (->string name) "-metadata"))))
+         (metadata-url (cadr (pkg-info index name)))
+         (metadata-path (->path work-dir *default-metadata-file*)))
+    (make-dir work-dir)
+    (download metadata-url metadata-path)
+    (let ((metadata (read (open-input-file metadata-path))))
+      (delete work-dir)
+      metadata)))
+
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
-         (metadata
-          (cdr (read
-                (open-input-file (->path work-dir
-                                          *default-metadata-file*))))))
-    (if (valid-metadata? metadata)
-        (let ((progs (programs-list metadata))
-              (libs (libraries-list metadata))
-              (deps (dependencies-list metadata)))
+         (local-metadata
+          (read (open-input-file (->path work-dir "cyclone"
+                                         *default-metadata-file*))))
+         (remote-metadata (get-package-metadata index name)))
+    (if (equal? local-metadata remote-metadata)
+        (let ((deps (dependencies-list (cdr remote-metadata))))
           (and deps
                (for-each
                 (lambda (dep)
                   (install-package index dep))
                 deps))
-          (and (not (null? libs))
-               (build-libraries libs work-dir)
-               (install-libraries libs work-dir))          
-          (and (not (null? progs))
-               (build-programs progs work-dir)
-               (install-programs progs work-dir))
-          (let ((pkg-version (car (pkg-info index name)))
-                (cyc-version (Cyc-version)))
-            (register-installed-package! name pkg-version cyc-version libs progs)))
-        (error (format "~%Invalid package.scm in package ~a~%" name)))
-    ;; TODO - use exceptions to clean work-dir even when failing.
+          (build-and-install (cdr local-metadata) work-dir))
+        (begin
+          (delete work-dir)
+          (error
+           (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
     (delete work-dir)))
 
 (define (uninstall-package index name)
@@ -283,11 +309,11 @@
              (for-each
               (lambda (ext)
                 (delete (->path (get-library-installation-dir)
-                                 (string-append (->path lib) ext)))
+                                (string-append (->path lib) ext)))
                 ;; Also delete directories if appropriate
                 (if (>= (length lib) 3)
                     (delete (->path (get-library-installation-dir)
-                                     (path-dir (->path lib))))))
+                                    (path-dir (->path lib))))))
               
               *library-installable-extensions*))
            libs)
@@ -297,6 +323,49 @@
            progs)
           (unregister-installed-package! name))
         (display (format "~%Package ~a not installed. Skipping...~%" name)))))
+
+;; Package authoring
+(define (test-local . dir)
+  (let* ((work-dir (if (null? dir) "." (->path (car dir))))
+         (metadata
+          (cdr (read
+                (open-input-file (->path work-dir
+                                         *default-metadata-file*)))))
+         (test-dependencies (test-dependencies metadata))
+         (test-file (if (null? dir) (test-file) (test-file dir))))
+    (for-each (lambda (test-dep)
+                (install test-dep))
+              test-dependencies)
+    #t)) ;; should run test-file with icyc -p or compile it run.
+
+(define (build-local . dir)
+  (let* ((work-dir (if (null? dir) "." (->path (car dir))))
+         (metadata
+          (cdr (read
+                (open-input-file (->path work-dir
+                                         *default-metadata-file*))))))
+    (if (valid-metadata? metadata)
+        (let ((progs (programs-list metadata))
+              (libs (libraries-list metadata)))
+          (and libs (build-libraries libs work-dir))          
+          (and progs (build-programs progs work-dir)))
+        (error (format "~%Invalid package.scm in package~%")))))
+
+(define (build-and-install metadata . dir)
+  (let ((work-dir (if (null? dir) "." (->path (car dir)))))
+    (if (valid-metadata? metadata)
+        (let ((name (name metadata))
+              (progs (programs-list metadata))
+              (libs (libraries-list metadata))
+              (version (version metadata)))
+          (and libs
+               (build-libraries libs work-dir)
+               (install-libraries libs work-dir))          
+          (and progs
+               (build-programs progs work-dir)
+               (install-programs progs work-dir))
+          (register-installed-package! name version (Cyc-version) libs progs))
+        (error (format "~%Invalid package.scm in package ~a~%" name)))))
 ;; End of package-related procedures
 
 

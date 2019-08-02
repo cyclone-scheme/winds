@@ -12,7 +12,7 @@
                 (system (format "curl -L ~a --output ~a" url outfile)))
                (else (error (format "Could not find curl/wget. Please install one of those programs to continue~%"))))))
     (if (ok? result)
-        (begin (display (format "[OK] File ~a downloaded~%" outfile))
+        (begin (display (format "[OK] Downloaded ~a~%" outfile))
                outfile)
         (error (format "Could not download ~a. Lack of permissions? Return code" outfile) result))))
 
