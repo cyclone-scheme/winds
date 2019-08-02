@@ -44,7 +44,7 @@
 
 (define (compile file . dir)
   (let* ((dir (if (null? dir) "." (car dir)))
-         (result (system (format "cyclone -A ~a -A ~a ~a" dir (path-dir file) file))))
+         (result (system (format "cyclone -Wno-unused-command-line-argument -A ~a -A ~a ~a" dir (path-dir file) file))))
     (if (ok? result)
         (begin (display (format "[OK] File ~a compiled~%" file))
                file)

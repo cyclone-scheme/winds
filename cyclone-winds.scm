@@ -13,9 +13,9 @@
 
 (include-c-header "<dirent.h>")
 
+(include "path.scm")
 (include "system-calls.scm")
 (include "util.scm")
-(include "path.scm")
 
 (define *cyclone-winds-version* "0.1")
 
@@ -273,18 +273,30 @@
                        (->path (car dir) (string-append (->string name) "-metadata"))))
          (metadata-url (cadr (pkg-info index name)))
          (metadata-path (->path work-dir *default-metadata-file*)))
+    
     (make-dir work-dir)
     (download metadata-url metadata-path)
     (let ((metadata (read (open-input-file metadata-path))))
-      (delete work-dir)
+      ;(delete work-dir)
+      (begin
+        (newline)
+        (display "Remote metadata:")
+        (newline)
+        (display metadata)
+        (newline))
       metadata)))
 
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
          (local-metadata
-          (read (open-input-file (->path work-dir "cyclone"
-                                         *default-metadata-file*))))
+          (read (open-input-file (->path work-dir *default-metadata-file*))))
          (remote-metadata (get-package-metadata index name)))
+    (newline)
+    (display local-metadata)
+    (newline)
+    (display remote-metadata)
+    (newline)
+    
     (if (equal? local-metadata remote-metadata)
         (let ((deps (dependencies-list (cdr remote-metadata))))
           (and deps
