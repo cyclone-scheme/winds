@@ -1,10 +1,16 @@
 (define (remove pred lst)
   (filter (lambda (x) (not (pred x))) lst))
 
-(define (assoc-all-occurences symbol alist)
+(define (get-parameter param metadata)
+  (let ((param (assoc param metadata)))
+    (if (and param (not (null? param)))
+        (cadr param)
+        #f)))
+
+(define (get-parameter-all-occurrences param metadata)
   (filter (lambda (e)
-            (eq? symbol (car e)))
-          alist))
+            (eq? param (car e)))
+          metadata))
 
 ;; String procedures imported and adapted from Chibi Scheme
 (define (trim-trailing-slash s)

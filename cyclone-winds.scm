@@ -41,12 +41,12 @@
     (make-dir tmp-dir)
     (display (format "~%Retrieving index file...~%"))
     (download *default-index-url* index-path)
-    (let ((content (read (open-input-file index-path))))
+    (let ((content (cdr (read (open-input-file index-path)))))
       (delete tmp-dir)
       content)))
 
 (define (pkg-info index pkg-name)
-  (match (assoc pkg-name (cdr index))
+  (match (assoc pkg-name index)
     (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
     ((pkg-name latest-version old-versions ...) latest-version)))
 
@@ -160,31 +160,32 @@
         (error "At least one library/program must be defined in package.scm.")))
   #t) ;; returns gracefully if everything is ok
 
-(define (name metadata)
-  (assoc 'name (cdr metadata)))
-
 (define (libraries-list metadata)
-  (match (assoc-all-occurences 'library (cdr metadata))
+  (match (get-parameter-all-occurrences 'library metadata)
     (() '())
     (lst (map cadadr lst))))
 
 (define (programs-list metadata)
-  (match (assoc-all-occurences 'program (cdr metadata))
+  (match (get-parameter-all-occurrences 'program metadata)
     (() '())
     (lst (map cadadr lst))))
 
+
+(define (name metadata)
+  (get-parameter 'name metadata))
+
 (define (version metadata)
-  (assoc 'version (cdr metadata)))
+  (get-parameter 'version metadata))
 
 (define (dependencies-list metadata)
-  (assoc 'dependencies (cdr metadata)))
+  (get-parameter 'dependencies metadata))
 
 (define (test-dependencies-list metadata)
-  (assoc 'test-dependencies (cdr metadata)))
+  (get-parameter 'test-dependencies metadata))
 
 (define (test-file metadata)
-  (assoc 'test (cdr metadata)))
-;; End of metadata-related procedures (i.e. package.scm)
+  (get-parameter 'test metadata))
+;; End of metadata-related procedures (i.e. package.sc)m
 
 
 ;; Package-related procedures (non-exported)
@@ -254,18 +255,7 @@
       (validate-sha256sum sha256sum outfile)
       (extract outfile work-dir)
       (delete outfile)               
-      work-dir)
-      ;; (with-exception-handler
-      ;;     (lambda (e)
-      ;;       (delete outfile)
-      ;;       (display (format "Error while retrieving package ~a~%" name)))
-      ;;   (lambda ()
-      ;;     (download tarball-url outfile)
-      ;;     (validate-sha256sum sha256sum outfile)
-      ;;     (extract outfile work-dir)
-      ;;     (delete outfile)               
-      ;;     work-dir))
-      ))
+      work-dir)))
 
 (define (get-package-metadata index name . dir)
   (let* ((work-dir (if (null? dir)
@@ -273,38 +263,42 @@
                        (->path (car dir) (string-append (->string name) "-metadata"))))
          (metadata-url (cadr (pkg-info index name)))
          (metadata-path (->path work-dir *default-metadata-file*)))
-    
     (make-dir work-dir)
     (download metadata-url metadata-path)
     (let ((metadata (read (open-input-file metadata-path))))
-      ;(delete work-dir)
-      (begin
-        (newline)
-        (display "Remote metadata:")
-        (newline)
-        (display metadata)
-        (newline))
+      (delete work-dir)
       metadata)))
+
+(define (build-and-install metadata . dir)
+  (let ((work-dir (if (null? dir) "." (->path (car dir)))))
+    (if (valid-metadata? metadata)
+        (let ((name (name metadata))
+              (progs (programs-list metadata))
+              (libs (libraries-list metadata))
+              (version (version metadata)))
+          (and libs
+               (build-libraries libs work-dir)
+               (install-libraries libs work-dir))          
+          (and progs
+               (build-programs progs work-dir)
+               (install-programs progs work-dir))
+          (register-installed-package! name version (Cyc-version) libs progs))
+        (error (format "~%Invalid package.scm in package ~a~%" name)))))
 
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
          (local-metadata
-          (read (open-input-file (->path work-dir *default-metadata-file*))))
-         (remote-metadata (get-package-metadata index name)))
-    (newline)
-    (display local-metadata)
-    (newline)
-    (display remote-metadata)
-    (newline)
-    
+          (cdr (read (open-input-file (->path work-dir *default-metadata-file*)))))
+         (remote-metadata (cdr (get-package-metadata index name))))
     (if (equal? local-metadata remote-metadata)
-        (let ((deps (dependencies-list (cdr remote-metadata))))
-          (and deps
-               (for-each
-                (lambda (dep)
-                  (install-package index dep))
-                deps))
-          (build-and-install (cdr local-metadata) work-dir))
+        (begin
+          (let ((deps (dependencies-list local-metadata)))
+            (and deps
+                 (for-each
+                  (lambda (dep)
+                    (install-package index dep))
+                  deps))
+            (build-and-install local-metadata work-dir)))
         (begin
           (delete work-dir)
           (error
@@ -334,15 +328,15 @@
              (delete (->path (get-program-installation-dir) prog)))
            progs)
           (unregister-installed-package! name))
-        (display (format "~%Package ~a not installed. Skipping...~%" name)))))
+        (display (format "Package ~a not installed. Skipping...~%" name)))))
 
 ;; Package authoring
 (define (test-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (metadata
-          (cdr (read
-                (open-input-file (->path work-dir
-                                         *default-metadata-file*)))))
+          (read
+           (open-input-file (->path work-dir
+                                    *default-metadata-file*))))
          (test-dependencies (test-dependencies metadata))
          (test-file (if (null? dir) (test-file) (test-file dir))))
     (for-each (lambda (test-dep)
@@ -353,31 +347,16 @@
 (define (build-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (metadata
-          (cdr (read
-                (open-input-file (->path work-dir
-                                         *default-metadata-file*))))))
+          (cdr
+           (read
+            (open-input-file (->path work-dir
+                                     *default-metadata-file*))))))
     (if (valid-metadata? metadata)
         (let ((progs (programs-list metadata))
               (libs (libraries-list metadata)))
           (and libs (build-libraries libs work-dir))          
           (and progs (build-programs progs work-dir)))
         (error (format "~%Invalid package.scm in package~%")))))
-
-(define (build-and-install metadata . dir)
-  (let ((work-dir (if (null? dir) "." (->path (car dir)))))
-    (if (valid-metadata? metadata)
-        (let ((name (name metadata))
-              (progs (programs-list metadata))
-              (libs (libraries-list metadata))
-              (version (version metadata)))
-          (and libs
-               (build-libraries libs work-dir)
-               (install-libraries libs work-dir))          
-          (and progs
-               (build-programs progs work-dir)
-               (install-programs progs work-dir))
-          (register-installed-package! name version (Cyc-version) libs progs))
-        (error (format "~%Invalid package.scm in package ~a~%" name)))))
 ;; End of package-related procedures
 
 
@@ -410,15 +389,13 @@
 
 (define (local-status)
   (let ((index (get-local-index)))
-    (display (format "~%  Installed packages: "))
     (if (null? index)
-        (display (format "None~%~%"))
+        (display (format "None~%"))
         (for-each
          (lambda (pkg)
            (display
-            (format
-             "~%~%  Name: ~a       version: ~a       Cyclone version: ~a~%  Installed libraries: ~a~%  Installed programs: ~a~%"
-             (car pkg) (cadr pkg) (caddr pkg) (cadddr pkg) (cadddr (cdr pkg)))))
+            (format "~%  ~a  Version: ~a  Cyclone: ~a~%  Libraries: ~a~%  Programs:  ~a~%"
+                    (car pkg) (cadr pkg) (caddr pkg) (cadddr pkg) (cadddr (cdr pkg)))))
          index))))
 
 (define (index)
