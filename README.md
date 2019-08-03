@@ -11,6 +11,7 @@ A "package" for `cyclone-winds` is wrapper around libraries and/or programs. The
 
 ## Installation
 
+
 Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it with `sudo pkg install gmake`).
 
    git clone https://github.com/cyclone-scheme/cyclone-winds.git
@@ -29,17 +30,24 @@ Optionally it is possible to pass `PREFIX` to set another destination directory.
 ```
 $ cyclone-winds [OPTIONS [PACKAGES]]
 ```
-OPTIONS could be one of the following:
+OPTIONS:
+
+ COMMON USE:
 - help  -  print usage
-- list  -  list the results
 - retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
 - install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
 - uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-- TODO: search WILDCARD - search for packages that partially match the specified wildcard
-- TODO: info PACKAGE - list all metadata about specified package
+- TODO - search WILDCARD - search for packages that partially match the specified wildcard
+- info PACKAGE - list all metadata about specified package
 - local-status - list all installed packages
+- index - pretty-prints index.scm
 
-*Attention! PACKAGES name should be a **quoted list of two or more symbols**. For example:
+ PACKAGE AUTHORING:
+- build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
+- test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
+- TODO - package - use current files to provide valid directory layout and package.scm (package scaffolding)
+  
+*Attention! PACKAGES name should be a **quoted** symbol or a list of two or more symbols*. For example:
 
 ```
 $ cyclone-winds install "(cyclone iset)"       
@@ -49,7 +57,7 @@ $ cyclone-winds install "(cyclone iset)"
 
 Libraries and programs can be installed into an alternative location using respectively the env vars `CYCLONE_LIBRARY_PATH` and `CYCLONE_PROGRAM_PATH`. 
 
-Example:
+Example on zsh:
 
 ```
 $ env CYCLONE_LIBRARY_PATH=/home/me/cyclone-libs cyclone-winds install "(cyclone iset)"
@@ -71,6 +79,7 @@ $ env CYCLONE_PROGRAM_PATH=/home/me/local/bin cyclone-winds install "(cyclone pr
 - description: string
 - tags: one or more strings
 - docs: string pointing to documentation
+- test: string pointing to a test file
 
 ### Code parameters
 
@@ -108,6 +117,7 @@ A `package.scm` file needs at least one `library` and/or `program`.
  (description "This is an example package only for demonstration purposes.")
  (tags "Misc" "Devel")
  (docs "https://github.com/cyclone-scheme/cyclone-winds/wiki/example-package.md")
+ (test "tests.scm")
  
  (library
   (name (cyclone example-package lib1))
@@ -131,15 +141,15 @@ A `package.scm` file needs at least one `library` and/or `program`.
 
 ## Package file structure
 
-All packages should contain their files inside a `cyclone` base directory (see examples bellow).
+All packages should contain their files inside a `cyclone` base directory, except `package.scm` and the test file, which should be places on base directory (see examples bellow).
 
 #### Example 1
 
 If in `package.scm` we have a `(library (name (cyclone http-client))` then after installed it will be used as (import (cyclone http-client)).The package file structure should be:
 
 ```
+package.scm
 cyclone/
-|- package.scm
 |- http-client.sld
 ```
 
@@ -148,8 +158,8 @@ cyclone/
 If in `package.scm` we have a `(library (name (cyclone crypto md5))` then after installed it will be used as (import (cyclone crypto md5)).The package file structure should be:
 
 ```
+package.scm
 cyclone/
-|- package.scm
 |- crypto/
    |- md5.sld
 ```
@@ -159,8 +169,8 @@ cyclone/
 If in `package.scm` we have a `(program (name start-server))` then after installed it will be called by `$ /usr/local/bin/start-server`. The package file structure should be:
 
 ```
+package.scm
 cyclone/
-|- package.scm
 |- start-server.scm
 ```
 
@@ -168,3 +178,12 @@ cyclone/
 
 - Packages will always have their latest version installed (there is no way to specify older versions)
 - No way to digitally sign packages - only tarball sha256sums are verified
+
+## Tips and tricks
+
+On FreeBSD `/tmp` is not writeable by default for non-root users. So set the environment variable `TMP` to a writeable directory. Example:
+
+```
+$ env TMP=/home/me/tmp cyclone-winds retrieve "(cyclone iset)"
+```
+

@@ -170,7 +170,6 @@
     (() '())
     (lst (map cadadr lst))))
 
-
 (define (name metadata)
   (get-parameter 'name metadata))
 
@@ -334,15 +333,22 @@
 (define (test-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (metadata
-          (read
-           (open-input-file (->path work-dir
-                                    *default-metadata-file*))))
-         (test-dependencies (test-dependencies metadata))
-         (test-file (if (null? dir) (test-file) (test-file dir))))
-    (for-each (lambda (test-dep)
-                (install test-dep))
-              test-dependencies)
-    #t)) ;; should run test-file with icyc -p or compile it run.
+          (cdr
+           (read
+            (open-input-file (->path work-dir
+                                     *default-metadata-file*)))))
+         (test-dependencies (test-dependencies-list metadata))
+         (test-file (test-file metadata)))
+    (and test-dependencies
+         (for-each
+          (lambda (test-dep)
+            (install test-dep))
+          test-dependencies))
+    (and test-file
+         (compile test-file)
+         (if (ok? (system (path-strip-extension (->path work-dir test-file))))
+             (display (format "[OK] Tests passed~%"))
+             (error (format "Could not run tests or tests failed. Running them without building package?~%"))))))
 
 (define (build-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
@@ -385,7 +391,9 @@
      pkgs)))
 
 (define (search wildcard) #t)
-(define (info name . version) #t)
+
+(define (info name . version)
+  (pretty-print (get-package-metadata (get-index) name)))
 
 (define (local-status)
   (let ((index (get-local-index)))
@@ -417,17 +425,23 @@
   Usage: cyclone-winds [OPTIONS [PACKAGES]]
   
   OPTIONS:
+       COMMON USE:
        help  -  print usage
        retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
        install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
        uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
        TODO - search WILDCARD - search for packages that partially match the specified wildcard
-       TODO - info PACKAGE - list all metadata about specified package
+       info PACKAGE - list all metadata about specified package
        local-status - list all installed packages
        index - pretty-prints index.scm
+
+       PACKAGE AUTHORING:
+       build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
+       test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
+       TODO - package - use current files to provide valid directory layout and package.scm (package scaffolding)
   
   PACKAGES:
-       a quoted list of two or more symbols. Ex.: \"(cyclone iset)\"~%~%"
+       a symbol or quoted list of two or more symbols. Ex.: my-package or \"(cyclone iset)\"~%~%"
     *banner*)))
 
 (define (main)
@@ -438,10 +452,14 @@
     ((_ 'install pkgs ..1) (install pkgs))
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
     ((_ 'search wildcard) #t) ;; TODO     
-    ((_ 'info name) #t)       ;; TODO
+    ((_ 'info name) (info name))       ;; TODO
     ((_ 'repl) (repl))
     ((_ 'local-status) (local-status))
-    ((_ 'index) (index))    
+    ((_ 'index) (index))
+    ((_ 'build-local) (build-local))
+    ((_ 'build-local dir) (build-local dir))    
+    ((_ 'test-local) (test-local))
+    ((_ 'test-local dir) (test-local dir))    
     (else (usage))))
 
 (main)

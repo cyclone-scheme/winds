@@ -51,6 +51,26 @@
                         "/"
                         (substring path start start2)))))))))
 
+(define (path-extension-pos path)
+  (let ((start 0)
+        (end (string-length path)))
+    (let lp ((i end) (dot #f))
+      (if (<= i start)
+          #f
+          (let* ((i2 (- i 1))
+                 (ch (string-ref path i2)))
+            (cond ((eqv? #\. ch)
+                   (and (< i end) (lp i2 (or dot i))))
+                  ((eqv? #\/ ch) #f)
+                  (dot)
+                  (else (lp i2 #f))))))))
+
+(define (path-strip-extension path)
+  (let ((i (path-extension-pos path)))
+    (if i
+        (substring path 0 (- i 1))
+        path)))
+
 (define (->path . args)
   (if (null? args)
       ""
