@@ -15,18 +15,21 @@ BINARY = cyclone-winds
 PREFIX	?= /usr/local
 DESTDIR  = $(PREFIX)/bin
 
-# TESTS = $(basename $(TEST_SRC))
-
-# Primary rules (of interest to an end user)
-all : $(BINARY)
+TEST = test.scm
+TEST_BINARY = test
 
 $(BINARY) : $(SOURCE)
 	$(CYCLONE) $< 
 
-# test : libs $(TESTS)
+# Primary rules (of interest to an end user)
+.PHONY: all clean install uninstall full test
+all : $(BINARY)
+
+test : all
+	$(CYCLONE) $(TEST) && ./$(TEST_BINARY)
 
 clean :
-	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta
+	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta $(TEST_BINARY)
 
 install : $(BINARY)
 	$(INSTALL) -m0755 $(BINARY) $(DESTDIR)
@@ -35,8 +38,5 @@ install : $(BINARY)
 uninstall :
 	$(RM) $(DESTDIR)$(BINARY)
 
-
-.PHONY: all clean install uninstall full
-
 full : 
-	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install
+	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install && $(MAKE) test

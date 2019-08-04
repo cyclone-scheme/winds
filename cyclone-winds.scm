@@ -62,6 +62,7 @@
 (define (sha256sum pkg-info)
   (cadddr pkg-info))
 
+
 ;; Local index has the following format:
 ;;      PKG-NAME   PKG-VERSION   CYCLONE-VERSION       LIBS                 PROGS
 ;; (((cyclone pkg1)   0.8           "1.11.3"   ((cyclone libX) ...)    ((progamX) ...))
@@ -100,7 +101,9 @@
 (define *default-metadata-file* "package.scm")
 
 (define (keys alist)
-  (map car alist))
+  (if (equal? 'package (car alist))
+      (map car (cdr alist))
+      (map car alist)))
 
 ;; TODO: review this validation strategy - seems too naive.
 (define mandatory-parameters
@@ -126,7 +129,51 @@
 (define essential-parameters (append mandatory-parameters code-parameters))
 (define available-parameters (append essential-parameters optional-parameters))
 
-(define (valid-metadata? metadata)
+(define-record-type pkg
+  (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
+            _dependencies _test-dependencies _foreign-dependencies
+            _libraries _programs)
+  pkg?
+  (_name name name!) 
+  (_version version version!)
+  (_license license license!)
+  (_maintainers maintainers maintainers!)
+  (_description description description!)
+  (_tags tags tags!)
+  (_docs docs docs!)
+  (_test test test!)
+  (_dependencies dependencies dependencies!)
+  (_test-dependencies test-dependencies test-dependencies!)
+  (_foreign-dependencies foreign-dependencies foreign-dependencies!)
+  (_libraries libraries libraries!)
+  (_programs programs programs!)
+  (_libraries-names libraries-names libraries-names!)
+  (_programs-names programs-names programs-names!))
+
+(define (metadata->pkg metadata)
+  (let* ((libraries (get-parameter-all-occurrences 'libraries metadata))
+         (programs (get-parameter-all-occurrences 'programs metadata))
+         (libraries-names (if (null? libraries) #f (map cadadr libraries)))
+         (programs-names (if (null? programs) #f (map cadadr programs))))
+    (make-pkg
+     (get-parameter-value 'name metadata)
+     (get-parameter-value 'version metadata)
+     (get-parameter-value 'license metadata)
+     (get-parameter-value 'authors metadata)
+     (get-parameter-value 'maintainers metadata)
+     (get-parameter-value 'description metadata)
+     (get-parameter-value 'tags metadata)
+     (get-parameter-value 'docs metadata)
+     (get-parameter-value 'test metadata)
+     (get-parameter-value 'dependencies metadata)
+     (get-parameter-value 'test-dependencies metadata)
+     (get-parameter-value 'foreign-dependencies metadata)
+     libraries
+     programs
+     libraries-names
+     programs-names)))
+
+(define (validate-metadata metadata)
   (for-each
    (lambda (key)
      (let ((parameter-content (cdr (assq key metadata)))
@@ -158,32 +205,32 @@
     (if (not (or (member 'library keys)
                  (member 'program keys)))
         (error "At least one library/program must be defined in package.scm.")))
-  #t) ;; returns gracefully if everything is ok
+  (metadata->pkg metadata)) ;; returns a pkg record if everything is ok
 
 (define (libraries-list metadata)
   (match (get-parameter-all-occurrences 'library metadata)
-    (() '())
+    (() '())  
     (lst (map cadadr lst))))
 
 (define (programs-list metadata)
   (match (get-parameter-all-occurrences 'program metadata)
-    (() '())
+    (() '())  
     (lst (map cadadr lst))))
 
 (define (name metadata)
-  (get-parameter 'name metadata))
+  (get-parameter-value 'name metadata))
 
 (define (version metadata)
-  (get-parameter 'version metadata))
+  (get-parameter-value 'version metadata))
 
 (define (dependencies-list metadata)
-  (get-parameter 'dependencies metadata))
+  (get-parameter-value 'dependencies metadata))
 
 (define (test-dependencies-list metadata)
-  (get-parameter 'test-dependencies metadata))
+  (get-parameter-value 'test-dependencies metadata))
 
 (define (test-file metadata)
-  (get-parameter 'test metadata))
+  (get-parameter-value 'test metadata))
 ;; End of metadata-related procedures (i.e. package.sc)m
 
 
@@ -256,7 +303,7 @@
       (delete outfile)               
       work-dir)))
 
-(define (get-package-metadata index name . dir)
+(define (get-package-remote-metadata index name . dir)
   (let* ((work-dir (if (null? dir)
                        (random-temp-dir (string-append (->string name) "-metadata"))
                        (->path (car dir) (string-append (->string name) "-metadata"))))
@@ -268,36 +315,35 @@
       (delete work-dir)
       metadata)))
 
-(define (build-and-install metadata . dir)
+(define (build-and-install pkg . dir)
   (let ((work-dir (if (null? dir) "." (->path (car dir)))))
-    (if (valid-metadata? metadata)
-        (let ((name (name metadata))
-              (progs (programs-list metadata))
-              (libs (libraries-list metadata))
-              (version (version metadata)))
-          (and libs
-               (build-libraries libs work-dir)
-               (install-libraries libs work-dir))          
-          (and progs
-               (build-programs progs work-dir)
-               (install-programs progs work-dir))
-          (register-installed-package! name version (Cyc-version) libs progs))
-        (error (format "~%Invalid package.scm in package ~a~%" name)))))
+    (let ((name (name pkg))
+          (progs (programs-names pkg))
+          (libs (libraries-names pkg))
+          (version (version pkg)))
+      (and libs
+           (build-libraries libs work-dir)
+           (install-libraries libs work-dir))          
+      (and progs
+           (build-programs progs work-dir)
+           (install-programs progs work-dir))
+      (register-installed-package! name version (Cyc-version) libs progs))
+    (error (format "~%Invalid package.scm in package ~a~%" name))))
 
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
-         (local-metadata
-          (cdr (read (open-input-file (->path work-dir *default-metadata-file*)))))
-         (remote-metadata (cdr (get-package-metadata index name))))
-    (if (equal? local-metadata remote-metadata)
-        (begin
-          (let ((deps (dependencies-list local-metadata)))
-            (and deps
-                 (for-each
-                  (lambda (dep)
-                    (install-package index dep))
-                  deps))
-            (build-and-install local-metadata work-dir)))
+         (local-pkg
+          (validate-metadata
+           (read (open-input-file (->path work-dir *default-metadata-file*)))))
+         (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
+    (if (equal? local-pkg remote-pkg)
+        (let ((deps (dependencies local-pkg)))
+          (and deps
+               (for-each
+                (lambda (dep)
+                  (install-package index dep))
+                deps))
+          (build-and-install local-pkg work-dir))
         (begin
           (delete work-dir)
           (error
@@ -332,13 +378,13 @@
 ;; Package authoring
 (define (test-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
-         (metadata
-          (cdr
+         (pkg
+          (validate-metadata
            (read
             (open-input-file (->path work-dir
                                      *default-metadata-file*)))))
-         (test-dependencies (test-dependencies-list metadata))
-         (test-file (test-file metadata)))
+         (test-dependencies (test-dependencies pkg))
+         (test-file (test pkg)))
     (and test-dependencies
          (for-each
           (lambda (test-dep)
@@ -347,22 +393,47 @@
     (and test-file
          (compile test-file)
          (if (ok? (system (path-strip-extension (->path work-dir test-file))))
-             (display (format "[OK] Tests passed~%"))
-             (error (format "Could not run tests or tests failed. Running them without building package?~%"))))))
+             (begin
+               (and test-dependencies
+                    (for-each
+                     (lambda (test-dep)
+                       (uninstall test-dep))
+                     test-dependencies))
+               (display (format "[OK] Tests passed~%")))
+             (error (format "Could not run tests or tests failed. Running them without building package first?~%"))))))
 
 (define (build-local . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
-         (metadata
-          (cdr
+         (pkg
+          (validate-metadata
            (read
             (open-input-file (->path work-dir
                                      *default-metadata-file*))))))
-    (if (valid-metadata? metadata)
-        (let ((progs (programs-list metadata))
-              (libs (libraries-list metadata)))
-          (and libs (build-libraries libs work-dir))          
-          (and progs (build-programs progs work-dir)))
-        (error (format "~%Invalid package.scm in package~%")))))
+    (let ((progs (programs-names pkg))
+          (libs (libraries-names pkg)))
+      (and libs (build-libraries libs work-dir))          
+      (and progs (build-programs progs work-dir)))))
+
+(define *default-code-directory* "cyclone")
+
+(define (package . dir)
+  (let* ((work-dir (if (null? dir) "." (->path (car dir))))
+         (metadata-path (->path work-dir *default-metadata-file*))
+         (pkg
+          (if (file-exists? metadata-path)
+              (metadata->pkg (read (open-input-file metadata-path)))
+              (metadata->pkg '())))
+         (current-directory-content (directory-content work-dir))
+         (files (car current-directory-content))
+         (code-files (remove (lambda (f)
+                               (or (equal? f *default-metadata-file*)
+                                   (equal? f (test pkg))))
+                             files))
+         (directories (cadr current-directory-content)))
+    (map (lambda (f)
+           (copy-file f (->path *default-code-directory*)))
+         code-files)
+    ))
 ;; End of package-related procedures
 
 
@@ -393,7 +464,7 @@
 (define (search wildcard) #t)
 
 (define (info name . version)
-  (pretty-print (get-package-metadata (get-index) name)))
+  (pretty-print (get-package-remote-metadata (get-index) name)))
 
 (define (local-status)
   (let ((index (get-local-index)))
@@ -438,7 +509,7 @@
        PACKAGE AUTHORING:
        build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
        test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-       TODO - package - use current files to provide valid directory layout and package.scm (package scaffolding)
+       TODO - package - scaffold directory layout and a package.scm stub
   
   PACKAGES:
        a symbol or quoted list of two or more symbols. Ex.: my-package or \"(cyclone iset)\"~%~%"
@@ -452,7 +523,7 @@
     ((_ 'install pkgs ..1) (install pkgs))
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
     ((_ 'search wildcard) #t) ;; TODO     
-    ((_ 'info name) (info name))       ;; TODO
+    ((_ 'info name) (info name))
     ((_ 'repl) (repl))
     ((_ 'local-status) (local-status))
     ((_ 'index) (index))
@@ -460,6 +531,8 @@
     ((_ 'build-local dir) (build-local dir))    
     ((_ 'test-local) (test-local))
     ((_ 'test-local dir) (test-local dir))    
+    ((_ 'package) (package))
+    ((_ 'package dir) (package dir))    
     (else (usage))))
 
 (main)

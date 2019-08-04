@@ -1,7 +1,7 @@
 (define (remove pred lst)
   (filter (lambda (x) (not (pred x))) lst))
 
-(define (get-parameter param metadata)
+(define (get-parameter-value param metadata)
   (let ((param (assoc param metadata)))
     (if (and param (not (null? param)))
         (cadr param)

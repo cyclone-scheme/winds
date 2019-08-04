@@ -1,4 +1,4 @@
-(define-c directory-list
+(define-c directory-content
   "(void *data, int argc, closure _, object k, object directory)"
   "object file_list = NULL;
    object dir_list = NULL;
@@ -99,7 +99,7 @@
   (let ((temp-dir (or (get-environment-variable "TMPDIR")
                       (get-environment-variable "TEMP")
                       (get-environment-variable "TMP")
-                      "/tmp")))
+                      ".")))
     (->path temp-dir
             (string-append (if (null? prefix) "" (car prefix))
                            (number->string (random-integer 10000000000000000000))))))
