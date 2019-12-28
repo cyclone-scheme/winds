@@ -71,6 +71,13 @@
         (substring path 0 (- i 1))
         path)))
 
+(define (path-extension path)
+  (let ((i (path-extension-pos path))
+        (len (string-length path)))
+    (if i
+        (substring path i len)
+        "")))
+
 (define (->path . args)
   (if (null? args)
       ""
