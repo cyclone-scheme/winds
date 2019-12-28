@@ -18,6 +18,6 @@
   (test 0 (system "cd cyclone-iset && cyclone-winds test-local"))
   (test 0 (system "cd cyclone-iset && cyclone-winds test-local \".\""))
   (test 0 (system "cd cyclone-iset && cyclone-winds package"))
-  (test 0 (system "cd cyclone-iset && cyclone-winds package \".\" && cd -")))
+  (test 0 (system "cd cyclone-iset && cyclone-winds package \".\" && cd .. && rm -Rf cyclone-iset")))
 
 (test-exit)
