@@ -208,32 +208,7 @@
                    (member 'program keys)))
           (error "At least one library/program must be defined in package.scm.")))
     (metadata->pkg metadata))) ;; returns a pkg record if everything is ok
-
-(define (libraries-list metadata)
-  (match (get-parameter-all-occurrences 'library metadata)
-    (() '())  
-    (lst (map cadadr lst))))
-
-(define (programs-list metadata)
-  (match (get-parameter-all-occurrences 'program metadata)
-    (() '())  
-    (lst (map cadadr lst))))
-
-(define (name metadata)
-  (get-parameter-value 'name metadata))
-
-(define (version metadata)
-  (get-parameter-value 'version metadata))
-
-(define (dependencies-list metadata)
-  (get-parameter-value 'dependencies metadata))
-
-(define (test-dependencies-list metadata)
-  (get-parameter-value 'test-dependencies metadata))
-
-(define (test-file metadata)
-  (get-parameter-value 'test metadata))
-;; End of metadata-related procedures (i.e. package.sc)m
+;; End of metadata-related procedures (i.e. package.scm)
 
 
 ;; Package-related procedures (non-exported)
