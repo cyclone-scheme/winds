@@ -134,16 +134,16 @@
             _dependencies _test-dependencies _foreign-dependencies
             _libraries _programs _libraries-names _program-names)
   pkg?
-  (_name get-name set-name! )
-  (_version get-version set-version)!
-  (_license get-license set-license)!
-  (_authors get-authors set-authors)!
-  (_maintainers get-maintainers set-maintainers)!
-  (_description get-description set-description)!
-  (_tags get-tags set-tags)!
-  (_docs get-docs set-docs)!
-  (_test get-test set-test)!
-  (_dependencies get-dependencies set-dependencies)!
+  (_name get-name set-name!)
+  (_version get-version set-version!)
+  (_license get-license set-license!)
+  (_authors get-authors set-authors!)
+  (_maintainers get-maintainers set-maintainers!)
+  (_description get-description set-description!)
+  (_tags get-tags set-tags!)
+  (_docs get-docs set-docs!)
+  (_test get-test set-test!)
+  (_dependencies get-dependencies set-dependencies!)
   (_test-dependencies get-test-dependencies set-test-dependencies!)
   (_foreign-dependencies get-foreign-dependencies set-foreign-dependencies!)
   (_libraries get-libraries set-libraries!)
@@ -320,8 +320,8 @@
 (define (build-and-install pkg . dir)
   (let ((work-dir (if (null? dir) "." (->path (car dir)))))
     (let ((name (get-name pkg))
-          (progs (programs-names pkg))
-          (libs (libraries-names pkg))
+          (progs (get-programs-names pkg))
+          (libs (get-libraries-names pkg))
           (version (get-version pkg)))
       (and libs
            (build-libraries libs work-dir)
@@ -339,7 +339,7 @@
            (read (open-input-file (->path work-dir *default-metadata-file*)))))
          (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
     (if (equal? local-pkg remote-pkg)
-        (let ((deps (dependencies local-pkg)))
+        (let ((deps (get-dependencies local-pkg)))
           (and deps
                (for-each
                 (lambda (dep)
