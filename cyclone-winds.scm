@@ -329,8 +329,7 @@
       (and progs
            (build-programs progs work-dir)
            (install-programs progs work-dir))
-      (register-installed-package! name version (Cyc-version) libs progs))
-    (error (format "~%Invalid package.scm in package ~a~%" name))))
+      (register-installed-package! name version (Cyc-version) libs progs))))
 
 (define (install-package index name)
   (let* ((work-dir (retrieve-package index name))
