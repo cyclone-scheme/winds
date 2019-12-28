@@ -357,23 +357,25 @@
     (if pkg
         (let ((libs (cadddr pkg))
               (progs (cadddr (cdr pkg))))
-          (for-each
-           (lambda (lib)
-             (for-each
-              (lambda (ext)
-                (delete (->path (get-library-installation-dir)
-                                (string-append (->path lib) ext)))
-                ;; Also delete directories if appropriate
-                (if (>= (length lib) 3)
-                    (delete (->path (get-library-installation-dir)
-                                    (path-dir (->path lib))))))
+          (and libs
+               (for-each
+                (lambda (lib)
+                  (for-each
+                   (lambda (ext)
+                     (delete (->path (get-library-installation-dir)
+                                     (string-append (->path lib) ext)))
+                     ;; Also delete directories if appropriate
+                     (if (>= (length lib) 3)
+                         (delete (->path (get-library-installation-dir)
+                                         (path-dir (->path lib))))))
               
-              *library-installable-extensions*))
-           libs)
-          (for-each
-           (lambda (prog)
-             (delete (->path (get-program-installation-dir) prog)))
-           progs)
+                   *library-installable-extensions*))
+                libs))
+          (and progs
+               (for-each
+                (lambda (prog)
+                  (delete (->path (get-program-installation-dir) prog)))
+                progs))
           (unregister-installed-package! name))
         (display (format "Package ~a not installed. Skipping...~%" name)))))
 
@@ -385,8 +387,8 @@
            (read
             (open-input-file (->path work-dir
                                      *default-metadata-file*)))))
-         (test-dependencies (test-dependencies pkg))
-         (test-file (test pkg)))
+         (test-dependencies (get-test-dependencies pkg))
+         (test-file (get-test pkg)))
     (and test-dependencies
          (for-each
           (lambda (test-dep)
@@ -429,7 +431,7 @@
          (files (car current-directory-content))
          (code-files (remove (lambda (f)
                                (or (equal? f *default-metadata-file*)
-                                   (equal? f (test pkg))))
+                                   (equal? f (get-test pkg))))
                              files))
          (directories (cadr current-directory-content)))
     (map (lambda (f)
