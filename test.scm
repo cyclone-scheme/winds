@@ -1,6 +1,8 @@
 (import (scheme base)
         (cyclone test))
 
+(system "cd ~/tmp")
+
 (test-group "Remote work (read-only procedures)"
   (test 0 (system "cyclone-winds index"))
   (test 0 (system "cyclone-winds local-status"))

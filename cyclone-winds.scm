@@ -413,8 +413,8 @@
            (read
             (open-input-file (->path work-dir
                                      *default-metadata-file*))))))
-    (let ((progs (programs-names pkg))
-          (libs (libraries-names pkg)))
+    (let ((progs (get-programs-names pkg))
+          (libs (get-libraries-names pkg)))
       (and libs (build-libraries libs work-dir))          
       (and progs (build-programs progs work-dir)))))
 
