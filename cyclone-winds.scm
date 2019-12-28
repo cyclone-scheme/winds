@@ -134,25 +134,26 @@
             _dependencies _test-dependencies _foreign-dependencies
             _libraries _programs _libraries-names _program-names)
   pkg?
-  (_name name name!) 
-  (_version version version!)
-  (_license license license!)
-  (_maintainers maintainers maintainers!)
-  (_description description description!)
-  (_tags tags tags!)
-  (_docs docs docs!)
-  (_test test test!)
-  (_dependencies dependencies dependencies!)
-  (_test-dependencies test-dependencies test-dependencies!)
-  (_foreign-dependencies foreign-dependencies foreign-dependencies!)
-  (_libraries libraries libraries!)
-  (_programs programs programs!)
-  (_libraries-names libraries-names libraries-names!)
-  (_programs-names programs-names programs-names!))
+  (_name get-name set-name! )
+  (_version get-version set-version)!
+  (_license get-license set-license)!
+  (_authors get-authors set-authors)!
+  (_maintainers get-maintainers set-maintainers)!
+  (_description get-description set-description)!
+  (_tags get-tags set-tags)!
+  (_docs get-docs set-docs)!
+  (_test get-test set-test)!
+  (_dependencies get-dependencies set-dependencies)!
+  (_test-dependencies get-test-dependencies set-test-dependencies!)
+  (_foreign-dependencies get-foreign-dependencies set-foreign-dependencies!)
+  (_libraries get-libraries set-libraries!)
+  (_programs get-programs set-programs!)
+  (_libraries-names get-libraries-names set-libraries-names!)
+  (_programs-names get-programs-names set-programs-names!))
 
 (define (metadata->pkg metadata)
-  (let* ((libraries (get-parameter-all-occurrences 'libraries metadata))
-         (programs (get-parameter-all-occurrences 'programs metadata))
+  (let* ((libraries (get-parameter-all-occurrences 'library metadata))
+         (programs (get-parameter-all-occurrences 'program metadata))
          (libraries-names (if (null? libraries) #f (map cadadr libraries)))
          (programs-names (if (null? programs) #f (map cadadr programs))))
     (make-pkg
@@ -174,38 +175,39 @@
      programs-names)))
 
 (define (validate-metadata metadata)
-  (for-each
-   (lambda (key)
-     (let ((parameter-content (cdr (assq key metadata)))
-           (check-procedures (cadr (assq key available-parameters))))
-       (cond
-        ;; Unknown parameters
-        ((not (member key (keys available-parameters)))
-         (error "Unknown parameter in package.scm" key))
-        ;; Empty mandatory parameters
-        ((and (member key (keys essential-parameters))
-              (null? parameter-content))
-         (error `(,key " should not be null in package.scm")))
-        ;; Check parameter type
-        ((for-each
-          (lambda (proc)
-            (if (not (null? parameter-content))
-                (if (not (apply proc parameter-content))
-                    (error
-                     (format "~a is expected to be of a type that satisfies ~a~%"
-                             key proc)))))
-          check-procedures)))))
-   (keys metadata))
-  (for-each
-   (lambda (param)
-     (if (not (member param (keys metadata)))
-         (error param "is a mandatory parameter in package.scm")))
-   (keys mandatory-parameters))
-  (let ((keys (keys metadata)))
-    (if (not (or (member 'library keys)
-                 (member 'program keys)))
-        (error "At least one library/program must be defined in package.scm.")))
-  (metadata->pkg metadata)) ;; returns a pkg record if everything is ok
+  (let ((metadata (cdr metadata)))
+    (for-each
+     (lambda (key)
+       (let ((parameter-content (cdr (assq key metadata)))
+             (check-procedures (cadr (assq key available-parameters))))
+         (cond
+          ;; Unknown parameters
+          ((not (member key (keys available-parameters)))
+           (error "Unknown parameter in package.scm" key))
+          ;; Empty mandatory parameters
+          ((and (member key (keys essential-parameters))
+                (null? parameter-content))
+           (error `(,key " should not be null in package.scm")))
+          ;; Check parameter type
+          ((for-each
+            (lambda (proc)
+              (if (not (null? parameter-content))
+                  (if (not (apply proc parameter-content))
+                      (error
+                       (format "~a is expected to be of a type that satisfies ~a~%"
+                               key proc)))))
+            check-procedures)))))
+     (keys metadata))
+    (for-each
+     (lambda (param)
+       (if (not (member param (keys metadata)))
+           (error param "is a mandatory parameter in package.scm")))
+     (keys mandatory-parameters))
+    (let ((keys (keys metadata)))
+      (if (not (or (member 'library keys)
+                   (member 'program keys)))
+          (error "At least one library/program must be defined in package.scm.")))
+    (metadata->pkg metadata))) ;; returns a pkg record if everything is ok
 
 (define (libraries-list metadata)
   (match (get-parameter-all-occurrences 'library metadata)
@@ -317,10 +319,10 @@
 
 (define (build-and-install pkg . dir)
   (let ((work-dir (if (null? dir) "." (->path (car dir)))))
-    (let ((name (name pkg))
+    (let ((name (get-name pkg))
           (progs (programs-names pkg))
           (libs (libraries-names pkg))
-          (version (version pkg)))
+          (version (get-version pkg)))
       (and libs
            (build-libraries libs work-dir)
            (install-libraries libs work-dir))          
@@ -504,7 +506,7 @@
        TODO - search WILDCARD - search for packages that partially match the specified wildcard
        info PACKAGE - list all metadata about specified package
        local-status - list all installed packages
-       index - pretty-prints index.scm
+       index - pretty-prints cyclone-winds packages index
 
        PACKAGE AUTHORING:
        build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
@@ -512,7 +514,7 @@
        TODO - package - scaffold directory layout and a package.scm stub
   
   PACKAGES:
-       a symbol or quoted list of two or more symbols. Ex.: my-package or \"(cyclone iset)\"~%~%"
+       a quoted list of two or more symbols, starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
     *banner*)))
 
 (define (main)

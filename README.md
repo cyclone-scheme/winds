@@ -31,23 +31,22 @@ Optionally it is possible to pass `PREFIX` to set another destination directory.
 $ cyclone-winds [OPTIONS [PACKAGES]]
 ```
 OPTIONS:
+       COMMON USE:
+       help  -  print usage
+       retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
+       install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
+       uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
+       TODO - search WILDCARD - search for packages that partially match the specified wildcard
+       info PACKAGE - list all metadata about specified package
+       local-status - list all installed packages
+       index - pretty-prints cyclone-winds packages index
 
- COMMON USE:
-- help  -  print usage
-- retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
-- install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
-- uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-- TODO - search WILDCARD - search for packages that partially match the specified wildcard
-- info PACKAGE - list all metadata about specified package
-- local-status - list all installed packages
-- index - pretty-prints index.scm
-
- PACKAGE AUTHORING:
-- build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
-- test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-- TODO - package - use current files to provide valid directory layout and package.scm (package scaffolding)
-  
-*Attention! PACKAGES name should be a **quoted** symbol or a list of two or more symbols*. For example:
+       PACKAGE AUTHORING:
+       build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
+       test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
+       TODO - package - scaffold directory layout and a package.scm stub
+       
+*Attention! PACKAGES name should be a a **quoted** list of two or more symbols, starting with 'cyclone'*. For example:
 
 ```
 $ cyclone-winds install "(cyclone iset)"       
