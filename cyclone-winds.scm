@@ -434,9 +434,9 @@
                              files))
          (directories (cadr current-directory-content)))
     (map (lambda (f)
-           (copy-file f (->path *default-code-directory*)))
-         code-files)
-    ))
+           (copy-file f (->path *default-code-directory*))
+           (delete f))
+         code-files)))
 ;; End of package-related procedures
 
 
