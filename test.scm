@@ -13,10 +13,10 @@
 
 (test-group "Local work (write procedures)"
   (test 0 (system "cyclone-winds retrieve \"(cyclone iset)\""))
-  (test 0 (system "cyclone-winds build-local"))
-  (test 0 (system "cyclone-winds build-local \".\""))
-  (test 0 (system "cyclone-winds test-local"))
-  (test 0 (system "cyclone-winds test-local \".\""))
+  (test 0 (system "cd cyclone-iset && cyclone-winds build-local"))
+  (test 0 (system "cd cyclone-iset && cyclone-winds build-local \".\""))
+  (test 0 (system "cd cyclone-iset && cyclone-winds test-local"))
+  (test 0 (system "cd cyclone-iset && cyclone-winds test-local \".\""))
   (test 0 (system "cd cyclone-iset && cyclone-winds package"))
   (test 0 (system "cd cyclone-iset && cyclone-winds package \".\" && cd -")))
 
