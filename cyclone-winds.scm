@@ -132,7 +132,7 @@
 (define-record-type pkg
   (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
             _dependencies _test-dependencies _foreign-dependencies
-            _libraries _programs)
+            _libraries _programs _libraries-names _program-names)
   pkg?
   (_name name name!) 
   (_version version version!)
