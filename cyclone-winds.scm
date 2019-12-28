@@ -424,7 +424,7 @@
          (metadata-path (->path work-dir *default-metadata-file*))
          (pkg
           (if (file-exists? metadata-path)
-              (metadata->pkg (read (open-input-file metadata-path)))
+              (metadata->pkg (cdr (read (open-input-file metadata-path))))
               (metadata->pkg '())))
          (current-directory-content (directory-content work-dir))
          (files (car current-directory-content))
