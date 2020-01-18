@@ -1,7 +1,6 @@
 (import (scheme base)
         (scheme write)
         (scheme read)
-        (scheme repl)
         (scheme file)
         (scheme process-context)
         (scheme cyclone pretty-print)
@@ -342,7 +341,6 @@
                      (if (>= (length lib) 3)
                          (delete (->path (get-library-installation-dir)
                                          (path-dir (->path lib))))))
-              
                    *library-installable-extensions*))
                 libs))
           (and progs
