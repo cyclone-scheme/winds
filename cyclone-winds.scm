@@ -404,17 +404,16 @@
          (directories (cadr current-directory-content))
          (files (car current-directory-content))
          (sld-files (filter (lambda (f)
-                              (string=? (path-extension f "sld")))
+                              (string=? (path-extension f) "sld"))
                             files))
-         (scm-files (filter (lambda (f)
-                              (string=? (path-extension f "scm")))
-                            files))
-         (code-files (lset-union sld-files scm-files))
-         (other-files (lset-difference string=?
-                                       (lset-union code-files
-                                                   *default-metadata-file*
-                                                   (or (get-test pkg) ""))
-                                       files)))
+         (scm-files (lset-difference string=?
+                                     (list *default-metadata-file*
+                                           (or (get-test pkg) ""))
+                                     (filter (lambda (f)
+                                               (string=? (path-extension f) "scm"))
+                                             files)))
+         (code-files (lset-union string=? sld-files scm-files))
+         (other-files (lset-difference string=? code-files files)))
     (map (lambda (f)
            (copy-file f (->path *default-code-directory*))
            (delete f))
@@ -509,7 +508,6 @@
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
     ((_ 'search wildcard) #t) ;; TODO     
     ((_ 'info name) (info name))
-    ((_ 'repl) (repl))
     ((_ 'local-status) (local-status))
     ((_ 'index) (index))
     ((_ 'build-local) (build-local))
