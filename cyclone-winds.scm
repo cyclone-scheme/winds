@@ -409,9 +409,9 @@
          (scm-files (filter (lambda (f)
                               (string=? (path-extension f "scm")))
                             files))
+         (code-files (lset-union sld-files scm-files))
          (other-files (lset-difference string=?
-                                       (lset-union sld-files
-                                                   scm-files
+                                       (lset-union code-files
                                                    *default-metadata-file*
                                                    (or (get-test pkg) ""))
                                        files)))
