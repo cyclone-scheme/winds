@@ -401,6 +401,7 @@
               (metadata->pkg (cdr (read (open-input-file metadata-path))))
               (metadata->pkg '())))
          (current-directory-content (directory-content work-dir))
+         (directories (cadr current-directory-content))
          (files (car current-directory-content))
          (sld-files (filter (lambda (f)
                               (string=? (path-extension f "sld")))
@@ -413,8 +414,7 @@
                                                    scm-files
                                                    *default-metadata-file*
                                                    (get-test pkg))
-                                       files))
-         (directories (cadr current-directory-content)))
+                                       files)))
     (map (lambda (f)
            (copy-file f (->path *default-code-directory*))
            (delete f))
