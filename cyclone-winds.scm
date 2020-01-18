@@ -6,6 +6,7 @@
         (scheme cyclone pretty-print)
         (scheme cyclone util)
         (scheme cyclone libraries)
+        (srfi 1)
         (srfi 27) ;; random numbers
         (srfi 28) ;; basic format strings
         (cyclone match))
@@ -401,10 +402,18 @@
               (metadata->pkg '())))
          (current-directory-content (directory-content work-dir))
          (files (car current-directory-content))
-         (code-files (remove (lambda (f)
-                               (or (equal? f *default-metadata-file*)
-                                   (equal? f (get-test pkg))))
-                             files))
+         (sld-files (filter (lambda (f)
+                              (string=? (path-extension f "sld")))
+                            files))
+         (scm-files (filter (lambda (f)
+                              (string=? (path-extension f "scm")))
+                            files))
+         (other-files (lset-difference string=?
+                                       (lset-union sld-files
+                                                   scm-files
+                                                   *default-metadata-file*
+                                                   (get-test pkg))
+                                       files))
          (directories (cadr current-directory-content)))
     (map (lambda (f)
            (copy-file f (->path *default-code-directory*))
