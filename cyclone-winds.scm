@@ -413,7 +413,7 @@
                                        (lset-union sld-files
                                                    scm-files
                                                    *default-metadata-file*
-                                                   (get-test pkg))
+                                                   (or (get-test pkg) ""))
                                        files)))
     (map (lambda (f)
            (copy-file f (->path *default-code-directory*))
