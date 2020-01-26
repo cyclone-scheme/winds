@@ -392,32 +392,43 @@
       (and progs (build-programs progs work-dir)))))
 
 (define *default-code-directory* "cyclone")
+(define *internal-cyclone-libs* '((cyclone concurrent) (cyclone match) (cyclone test)))
+(define (test-file? file) (string-contains file "test")) ; how to improve this strategy?
 
 (define (package . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
-         (metadata-path (->path work-dir *default-metadata-file*))
-         (pkg
-          (if (file-exists? metadata-path)
-              (metadata->pkg (cdr (read (open-input-file metadata-path))))
-              (metadata->pkg '())))
-         (current-directory-content (directory-content work-dir))
-         (directories (cadr current-directory-content))
-         (files (car current-directory-content))
-         (sld-files (filter (lambda (f)
-                              (string=? (path-extension f) "sld"))
-                            files))
-         (scm-files (lset-difference string=?
-                                     (list *default-metadata-file*
-                                           (or (get-test pkg) ""))
-                                     (filter (lambda (f)
-                                               (string=? (path-extension f) "scm"))
-                                             files)))
-         (code-files (lset-union string=? sld-files scm-files))
-         (other-files (lset-difference string=? code-files files)))
-    (map (lambda (f)
-           (copy-file f (->path *default-code-directory*))
-           (delete f))
-         code-files)))
+         (metadata-path (->path work-dir *default-metadata-file*)))
+    (if (file-exists? metadata-path)
+        (begin
+          (copy-file metadata-path (string-append metada-path ".old"))
+          (delete metadata-path)))
+    (let* ((current-directory-content (directory-content work-dir))
+           (directories (cadr current-directory-content))
+           (files (car current-directory-content))
+           (sld-files (filter (lambda (f)
+                                (string=? (path-extension f) "sld"))
+                              files))
+           (scm-files (filter (lambda (f)
+                                (and (string=? (path-extension f) "scm")
+                                     (not (test-file? f))
+                                     (not (string=? f *default-metadata-file*))))
+                              files))
+           (code-files (lset-union string=? sld-files scm-files))
+           (other-files (lset-difference string=? code-files files))
+           (map (lambda (f)
+                  (copy-file f (->path *default-code-directory*))
+                  (delete f))
+                code-files)
+           (map (lambda (sld)
+                  (let* ((content (read (open-input-file sld)))
+                         (imports (lib:imports content))
+                         (libs (lset-difference equal? *internal-cyclone-libs* imports))
+                         (includes (lib:includes code)))
+                    )
+                  ;; ler o conteúdo do arquivo e pegar os imports com (lib:imports ast) e ir appending
+                  ;; considerar usar fold em vez de map
+                  ))))))
+
 ;; End of package-related procedures
 
 

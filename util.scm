@@ -47,6 +47,15 @@
             ((char=? char (string-ref str end)) end)
             (else (lp (- end 1)))))))
 
+(define (string-contains a b . o)  ; very slow
+  (let ((alen (string-length a))
+        (blen (string-length b)))
+    (let lp ((i (if (pair? o) (car o) 0)))
+      (and (<= (+ i blen) alen)
+           (if (string=? b (substring a i (+ i blen)))
+               i
+               (lp (+ i 1)))))))
+
 ;; Convert command-line string list into proper list
 ;; i.e. "(crypto md5)" -> (crypto md5)
 (define (string->proper-symbol s)
@@ -56,4 +65,3 @@
     (if (and (equal? first-char #\( ) (equal? last-char #\) ))
         (map string->symbol (string-split (substring s 1 (- len 1)) #\space))
         (string->symbol s))))
-
