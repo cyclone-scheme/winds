@@ -218,7 +218,7 @@
     (maintainers           ,(or (get-maintainers pkg) ""))
     (description           ,(or (get-description pkg) ""))
     (tags                  ,(or (get-tags pkg) ""))
-    (docs                  ,(or (get-docs pkg) ""))
+    (docs                  ,(or (get-docs pkg) "https://github.com/cyclone-scheme/cyclone-winds/wiki/_____.md"))
     (test                  ,(or (get-test pkg) "test.scm"))
     (dependencies          ,(or (get-dependencies pkg) '()))
     (test-dependencies     ,(or (get-test-dependencies pkg) '()))
