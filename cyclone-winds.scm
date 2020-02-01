@@ -454,7 +454,7 @@
          (other-files (lset-difference string=? files code-files))
          (libs+includes (map (lambda (sld)
                                (let* ((content (read (open-input-file sld)))
-                                      (imports (lib:imports content))
+     
                                       (cyclone-libs (filter (lambda (imp)
                                                               (equal? (car imp) 'cyclone))
                                                             imports))
@@ -464,15 +464,16 @@
                              sld-files))
          (libs (remove null? (map car libs+includes)))
          (includes (remove null? (map cadr libs+includes)))
-         (programs (lset-difference string=? code-files includes)))
+         (progs (lset-difference string=? code-files includes)))
+    (set-libraries-names! pkg libs)
+    (set-programs-names! pkg progs)
     (write
-     
-     (call-output-port *default-metadata-file*))
+     (pkg->metadata pkg)
+     (call-output-file *default-metadata-file*))
     (for-each (lambda (f)
                 (copy-file f (->path *default-code-directory*))
                 (delete f))
               code-files)))
-
 ;; End of package-related procedures
 
 

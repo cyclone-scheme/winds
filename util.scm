@@ -1,12 +1,14 @@
 (define (remove pred lst)
   (filter (lambda (x) (not (pred x))) lst))
 
+;; Returns a list or false
 (define (get-parameter-value param metadata)
   (let ((param (assoc param metadata)))
     (if (and param (not (null? param)))
         (cadr param)
         #f)))
 
+;; Returns a list
 (define (get-parameter-all-occurrences param metadata)
   (filter (lambda (e)
             (eq? param (car e)))
