@@ -231,7 +231,7 @@
                    `(library
                         (name ,l)
                       (description "")))
-                 libs)))
+                 (car libs))))
     ,@(let ((progs (get-programs-names pkg)))
         (if (or (not progs) (null? progs))
             '()
@@ -239,7 +239,7 @@
                    `(program
                      (name ,p)
                      (description "")))
-                 progs)))))
+                 (car progs))))))
 ;; End of metadata-related procedures (i.e. package.scm)
 
 
@@ -427,7 +427,7 @@
 (define *internal-cyclone-libs* '((cyclone concurrent) (cyclone match) (cyclone test)))
 (define (test-file? file pkg)
   (or (string-contains file "test")
-      (string=? file (get-test pkg))))
+      (string=? file (or (get-test pkg) ""))))
 
 (define (structure-directory-tree! dir pkg)
   (let* ((dir-content (directory-content dir))
@@ -443,28 +443,30 @@
         (for-each (lambda (f)
                     (copy-file-to-dir f (->path *default-code-directory*))
                     (delete f))
-                  code-files))
-    
-    (if (not (member *default-code-directory* dirs))
-        (error "Sorry! Not able to package directory tree.")
-        (for-each (lambda (d)
-                    (copy-dir-to-dir d (->path *default-code-directory*))
-                    (delete d))
-                  (remove-member *default-code-directory* dirs)))
+                  code-files)
+        (if (not (member *default-code-directory* dirs))
+            (error "Sorry! Not able to package directory tree.")))
+
+    (for-each (lambda (d)
+                (copy-dir-to-dir d (->path *default-code-directory*))
+                (delete d))
+              (remove-member *default-code-directory* dirs))
 
     (let ((code-files (car (directory-content (->path dir *default-code-directory*)))))
-      (cons (map (lambda (f)
-                   (->path *default-code-directory* f))
-                 (filter (lambda (f)
-                           (string=? (path-extension f) "sld"))
-                         code-files))
-            (map (lambda (f)
-                   (->path *default-code-directory* f))
-                 (filter (lambda (f)
-                           (and (string=? (path-extension f) "scm")
-                                (not (test-file? f pkg))
-                                (not (string=? f *default-metadata-file*))))
-                         code-files))))))
+      (cons
+       ;; .sld files
+       (map (lambda (f)
+              ;; these files will be read - need correct path
+              (->path *default-code-directory* f))
+            (filter (lambda (f)
+                      (string=? (path-extension f) "sld"))
+                    code-files))
+       ;; .scm files (except test files and package.scm
+       (filter (lambda (f)
+                 (and (string=? (path-extension f) "scm")
+                      (not (test-file? f pkg))
+                      (not (string=? f *default-metadata-file*))))
+               code-files)))))
 
 (define (package . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
@@ -492,15 +494,14 @@
                          includes)))
                (car code-files)))
          (libs (remove null? (map car libs+includes)))
-         (includes (remove null? (map cadr libs+includes)))
+         (incl (remove null? (map cadr libs+includes)))
+         (includes (if (null? incl) '() (map car incl)))
          (progs (lset-difference string=? (cdr code-files) includes)))
-    (newline) (display "Code files: ") (display code-files)
-    (newline) (display "LIBS+PROGS: ") (display libs+includes)
-    (newline) (display "LIBS: ") (display libs)
-    (newline) (display "PROGS: ") (display progs) (newline)
     (set-libraries-names! pkg libs)
     (set-programs-names! pkg progs)
-    (write (pkg->metadata pkg) (open-output-file metadata-path))))
+    (touch metadata-path)
+    (pretty-print (pkg->metadata pkg) (open-output-file metadata-path))
+    (display (format "~%Scaffolded directory tree and generated a package.scm stub.~%"))))
 ;; End of package-related procedures
 
 
@@ -528,7 +529,12 @@
        (uninstall-package index pkg))
      pkgs)))
 
-(define (search wildcard) #t)
+(define (search term)
+  (pretty-print
+   (filter (lambda (pkg)
+             (if (and (not (null? pkg)))
+                 (string-contains (slist->string (car pkg)) (symbol->string term))))
+           (get-index))))
 
 (define (info name . version)
   (pretty-print (get-package-remote-metadata (get-index) name)))
@@ -552,7 +558,7 @@
    "
   Cyclone-winds - a package manager for Cyclone Scheme 
   https://github.com/cyclone-scheme/cyclone-winds 
-  (c) 2019 - Cyclone Team 
+  (c) 2020 - Cyclone Team 
   Version ~a~%"
    *cyclone-winds-version*))
 
@@ -568,7 +574,7 @@
        retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
        install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
        uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-       TODO - search WILDCARD - search for packages that partially match the specified wildcard
+       search TERM - search for packages whose name (partially) match the specified term
        info PACKAGE - list all metadata about specified package
        local-status - list all installed packages
        index - pretty-prints cyclone-winds packages index
@@ -576,7 +582,7 @@
        PACKAGE AUTHORING:
        build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
        test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-       TODO - package - scaffold directory layout and a package.scm stub
+       package - scaffold directory layout and a package.scm stub
   
   PACKAGES:
        a quoted list of two or more symbols, starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
@@ -589,7 +595,7 @@
     ((_ 'retrieve pkgs ..1) (retrieve pkgs))
     ((_ 'install pkgs ..1) (install pkgs))
     ((_ 'uninstall pkgs ..1) (uninstall pkgs))
-    ((_ 'search wildcard) #t) ;; TODO     
+    ((_ 'search term) (search term))
     ((_ 'info name) (info name))
     ((_ 'local-status) (local-status))
     ((_ 'index) (index))

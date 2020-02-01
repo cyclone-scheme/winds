@@ -36,7 +36,7 @@ OPTIONS:
        retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
        install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
        uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-       TODO - search WILDCARD - search for packages that partially match the specified wildcard
+       search TERM - search for packages whose name (partially) match the specified term
        info PACKAGE - list all metadata about specified package
        local-status - list all installed packages
        index - pretty-prints cyclone-winds packages index
@@ -44,7 +44,7 @@ OPTIONS:
        PACKAGE AUTHORING:
        build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
        test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-       TODO - package - scaffold directory layout and a package.scm stub
+       package - scaffold directory layout and a package.scm stub
        
 *Attention! PACKAGES name should be a a **quoted** list of two or more symbols, starting with 'cyclone'*. For example:
 
@@ -126,7 +126,7 @@ A `package.scm` file needs at least one `library` and/or `program`.
   (name (cyclone example-package lib2))
   (description "Another library"))
 
-(program
+ (program
   (name example-program)
   (description "A useless example program."))
  
