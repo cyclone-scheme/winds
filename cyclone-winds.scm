@@ -454,12 +454,12 @@
          (other-files (lset-difference string=? files code-files))
          (libs+includes (map (lambda (sld)
                                (let* ((content (read (open-input-file sld)))
-     
+                                      (imports (lib:imports content))
                                       (cyclone-libs (filter (lambda (imp)
                                                               (equal? (car imp) 'cyclone))
                                                             imports))
                                       (libs (lset-difference equal? cyclone-libs *internal-cyclone-libs*))
-                                      (includes (lib:includes code)))
+                                      (includes (lib:includes content)))
                                  (list libs includes)))
                              sld-files))
          (libs (remove null? (map car libs+includes)))
@@ -469,7 +469,7 @@
     (set-programs-names! pkg progs)
     (write
      (pkg->metadata pkg)
-     (call-output-file *default-metadata-file*))
+     (open-output-file *default-metadata-file*))
     (for-each (lambda (f)
                 (copy-file f (->path *default-code-directory*))
                 (delete f))
