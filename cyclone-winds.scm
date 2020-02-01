@@ -186,7 +186,8 @@
   (_programs-names get-programs-names set-programs-names!))
 
 (define (metadata->pkg metadata)
-  (let* ((libraries (get-parameter-all-occurrences 'library metadata))
+  (let* ((metadata (cdr metadata))
+         (libraries (get-parameter-all-occurrences 'library metadata))
          (programs (get-parameter-all-occurrences 'program metadata))
          (libraries-names (if (null? libraries) #f (map cadadr libraries)))
          (programs-names (if (null? programs) #f (map cadadr programs))))
