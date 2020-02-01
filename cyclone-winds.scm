@@ -569,21 +569,22 @@
   Usage: cyclone-winds [OPTIONS [PACKAGES]]
   
   OPTIONS:
-       COMMON USE:
-       help  -  print usage
-       retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified package(s)
-       install PACKAGE [PACKAGE2 ...] - retrieve and install specified package(s)
-       uninstall PACKAGE [PACKAGE2 ...] - remove specified package(s)
-       search TERM - search for packages whose name (partially) match the specified term
-       info PACKAGE - list all metadata about specified package
-       local-status - list all installed packages
-       index - pretty-prints cyclone-winds packages index
 
-       PACKAGE AUTHORING:
-       build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
-       test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-       package - scaffold directory layout and a package.scm stub
-  
+    COMMON USE:
+    help  -  print usage
+    retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified PACKAGE(s)
+    install PACKAGE [PACKAGE2 ...] - retrieve and install specified PACKAGE(s)
+    uninstall PACKAGE [PACKAGE2 ...] - remove specified PACKAGE(s)
+    search TERM - search for packages whose name (partially) match the specified TERM
+    info PACKAGE - list all metadata about specified PACKAGE
+    local-status - list all installed packages
+    index - pretty-prints cyclone-winds packages index
+
+    PACKAGE AUTHORING:
+    build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
+    test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
+    package [DIRECTORY] - scaffold DIRECTORY layout and a package.scm stub
+ 
   PACKAGES:
        a quoted list of two or more symbols, starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
     *banner*)))
