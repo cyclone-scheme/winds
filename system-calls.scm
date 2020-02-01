@@ -56,13 +56,28 @@
         path
         (error (format "Could not create path ~a. Lack of permissions? Return code" path) result))))
 
-(define (copy-file file to-dir)
+(define (copy-file-to-dir file to-dir)
   (make-dir to-dir)
   (let ((result (system (format "cp ~a ~a" file to-dir))))
     (if (ok? result)
-        (begin (display (format "[OK] File ~a copied to ~a~%" file to-dir))
+        (begin (display (format "[OK] File ~a copied into ~a~%" file to-dir))
                file)
         (error (format "Could not copy file ~a into ~a. Lack of permissions? Return code" file to-dir) result))))
+
+(define (copy-dir-to-dir dir to-dir)
+  (make-dir to-dir)
+  (let ((result (system (format "cp -Rf ~a ~a" dir to-dir))))
+    (if (ok? result)
+        (begin (display (format "[OK] Dir ~a copied into ~a~%" dir to-dir))
+               dir)
+        (error (format "Could not copy dir ~a into ~a. Lack of permissions? Return code" dir to-dir) result))))
+
+(define (copy-file file to-file)
+  (let ((result (system (format "cp ~a ~a" file to-file))))
+    (if (ok? result)
+        (begin (display (format "[OK] File ~a copied to ~a~%" file to-file))
+               file)
+        (error (format "Could not copy file ~a to ~a. Lack of permissions? Return code" file to-file) result))))
 
 (define (touch file)
   (let ((result (system (format "touch ~a" file))))

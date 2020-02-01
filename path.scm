@@ -51,6 +51,12 @@
                         "/"
                         (substring path start start2)))))))))
 
+(define (path-strip-directory path)
+  (let ((i (string-find-right path #\/)))
+    (if (= 0 i)
+        path
+        (substring path (+ 1 i) (string-length path)))))
+
 (define (path-extension-pos path)
   (let ((start 0)
         (end (string-length path)))

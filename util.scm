@@ -1,6 +1,11 @@
 (define (remove pred lst)
   (filter (lambda (x) (not (pred x))) lst))
 
+(define (remove-member mem lst)
+  (filter (lambda (e)
+            (not (equal? e mem)))
+          lst))
+
 ;; Returns a list or false
 (define (get-parameter-value param metadata)
   (let ((param (assoc param metadata)))
@@ -42,12 +47,15 @@
     (get-output-string out)))
 
 (define (string-find-right str char)
-  (let ((start 0)
-        (end (- (string-length str) 1)))
-    (let lp ((end end))
-      (cond ((eq? start end) start)
-            ((char=? char (string-ref str end)) end)
-            (else (lp (- end 1)))))))
+  (let ((len (string-length str)))
+    (if (= 0 len)
+        0
+        (let ((start 0)
+              (end (- (string-length str) 1)))
+          (let lp ((end end))
+            (cond ((eq? start end) start)
+                  ((char=? char (string-ref str end)) end)
+                  (else (lp (- end 1)))))))))
 
 (define (string-contains a b . o)  ; very slow
   (let ((alen (string-length a))
