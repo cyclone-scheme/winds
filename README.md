@@ -101,7 +101,7 @@ A `package.scm` file needs at least one `library` and/or `program`.
 ### Optional parameters
 - dependencies: zero or more list of symbols
 - test-dependencies: zero or more list of symbols
-- foreign-dependencies: zero o more list of symbols. It points to OS-level dependencies and is only informative
+- foreign-dependencies: zero or more list of symbols. It points to OS-level dependencies and is only informative
 
 ## package.scm example
 

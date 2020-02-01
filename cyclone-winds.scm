@@ -118,16 +118,50 @@
     (test ,(list string?))))
 
 (define optional-parameters
-  `((dependencies ,(list string?))
-    (test-dependencies ,(list string?))
-    (foreign-dependencies ,(list string?))))
+  `((dependencies ,(list list?))
+    (test-dependencies ,(list list?))
+    (foreign-dependencies ,(list list?))))
 
 ;; TODO: implement 'custom' parameter for specilized installation.
 (define code-parameters `((library ,(list list?))
                           (program ,(list symbol?))))
-
 (define essential-parameters (append mandatory-parameters code-parameters))
 (define available-parameters (append essential-parameters optional-parameters))
+
+(define (validate-metadata metadata)
+  (let ((metadata (cdr metadata)))
+    (for-each
+     (lambda (key)
+       (let ((parameter-content (cdr (assq key metadata)))
+             (check-procedures (cadr (assq key available-parameters))))
+         (cond
+          ;; Unknown parameters
+          ((not (member key (keys available-parameters)))
+           (error "Unknown parameter in package.scm" key))
+          ;; Empty mandatory parameters
+          ((and (member key (keys essential-parameters))
+                (null? parameter-content))
+           (error `(,key " should not be null in package.scm")))
+          ;; Check parameter type
+          ((for-each
+            (lambda (proc)
+              (if (not (null? parameter-content))
+                  (if (not (apply proc parameter-content))
+                      (error
+                       (format "~a is expected to be of a type that satisfies ~a~%"
+                               key proc)))))
+            check-procedures)))))
+     (keys metadata))
+    (for-each
+     (lambda (param)
+       (if (not (member param (keys metadata)))
+           (error param "is a mandatory parameter in package.scm")))
+     (keys mandatory-parameters))
+    (let ((keys (keys metadata)))
+      (if (not (or (member 'library keys)
+                   (member 'program keys)))
+          (error "At least one library/program must be defined in package.scm.")))
+    (metadata->pkg metadata))) ;; returns a pkg record if everything is ok
 
 (define-record-type pkg
   (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
@@ -174,40 +208,37 @@
      libraries-names
      programs-names)))
 
-(define (validate-metadata metadata)
-  (let ((metadata (cdr metadata)))
-    (for-each
-     (lambda (key)
-       (let ((parameter-content (cdr (assq key metadata)))
-             (check-procedures (cadr (assq key available-parameters))))
-         (cond
-          ;; Unknown parameters
-          ((not (member key (keys available-parameters)))
-           (error "Unknown parameter in package.scm" key))
-          ;; Empty mandatory parameters
-          ((and (member key (keys essential-parameters))
-                (null? parameter-content))
-           (error `(,key " should not be null in package.scm")))
-          ;; Check parameter type
-          ((for-each
-            (lambda (proc)
-              (if (not (null? parameter-content))
-                  (if (not (apply proc parameter-content))
-                      (error
-                       (format "~a is expected to be of a type that satisfies ~a~%"
-                               key proc)))))
-            check-procedures)))))
-     (keys metadata))
-    (for-each
-     (lambda (param)
-       (if (not (member param (keys metadata)))
-           (error param "is a mandatory parameter in package.scm")))
-     (keys mandatory-parameters))
-    (let ((keys (keys metadata)))
-      (if (not (or (member 'library keys)
-                   (member 'program keys)))
-          (error "At least one library/program must be defined in package.scm.")))
-    (metadata->pkg metadata))) ;; returns a pkg record if everything is ok
+(define (pkg->metadata pkg)
+  `(package
+    (name                  ,(or (get-name pkg) '(cyclone ____)))
+    (version               ,(or (get-version pkg) 0.1))
+    (license               ,(or (get-license pkg) "BSD"))
+    (authors               ,(or (get-authors pkg) ""))
+    (maintainers           ,(or (get-maintainers pkg) ""))
+    (description           ,(or (get-description pkg) ""))
+    (tags                  ,(or (get-tags pkg) ""))
+    (docs                  ,(or (get-docs pkg) ""))
+    (test                  ,(or (get-test pkg) "test.scm"))
+    (dependencies          ,(or (get-dependencies pkg) '()))
+    (test-dependencies     ,(or (get-test-dependencies pkg) '()))
+    (foreign-dependencies  ,(or (get-foreign-dependencies pkg) '()))
+    
+    ,@(let ((libs (get-libraries-names pkg)))
+        (if (or (not libs) (null? libs))
+            '()
+            (map (lambda (l)
+                   `(library
+                        (name ,l)
+                      (description "")))
+                 libs)))
+    ,@(let ((progs (get-programs-names pkg)))
+        (if (or (not progs) (null? progs))
+            '()
+            (map (lambda (p)
+                   `(program
+                     (name ,p)
+                     (description "")))
+                 progs)))))
 ;; End of metadata-related procedures (i.e. package.scm)
 
 
@@ -431,9 +462,12 @@
                                       (includes (lib:includes code)))
                                  (list libs includes)))
                              sld-files))
-         (libs (map car libs+includes))
-         (includes (map cadr libs+includes))
-         (programs (lset-difference string=? )))
+         (libs (remove null? (map car libs+includes)))
+         (includes (remove null? (map cadr libs+includes)))
+         (programs (lset-difference string=? code-files includes)))
+    (write
+     
+     (call-output-port *default-metadata-file*))
     (for-each (lambda (f)
                 (copy-file f (->path *default-code-directory*))
                 (delete f))
