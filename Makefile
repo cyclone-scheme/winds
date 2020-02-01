@@ -36,7 +36,7 @@ install : $(BINARY)
 
 
 uninstall :
-	$(RM) $(DESTDIR)$(BINARY)
+	$(RM) $(DESTDIR)/$(BINARY)
 
 full : 
 	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install && $(MAKE) test
