@@ -29,7 +29,7 @@ test : all
 	$(CYCLONE) $(TEST) && ./$(TEST_BINARY)
 
 clean :
-	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta $(TEST_BINARY)
+	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta tags $(TEST_BINARY)
 
 install : $(BINARY)
 	$(INSTALL) -m0755 $(BINARY) $(DESTDIR)
