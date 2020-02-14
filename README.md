@@ -14,16 +14,16 @@ A "package" for `cyclone-winds` is wrapper around libraries and/or programs. The
 
 Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it with `sudo pkg install gmake`).
 
-   git clone https://github.com/cyclone-scheme/cyclone-winds.git
-   cd cyclone-winds
-   make
-   sudo make install
+    git clone https://github.com/cyclone-scheme/cyclone-winds.git
+    cd cyclone-winds
+    make
+    sudo make install
 
 Optionally it is possible to pass `PREFIX` to set another destination directory.
 
-   make 
-   sudo make PREFIX=/home/joe/cyclone-winds install
-   /home/joe/cyclone-winds/bin/cyclone-winds --help
+    make 
+    sudo make PREFIX=/home/joe/cyclone-winds install
+    /home/joe/cyclone-winds/bin/cyclone-winds --help
    
 ## Usage
 
