@@ -12,7 +12,7 @@
   (test 0 (system "sudo cyclone-winds uninstall \"(cyclone iset)\" ")))
 
 (test-group "Local work (write procedures)"
-  (test 0 (system "cyclone-winds retrieve \"(cyclone array-list)\""))
+  (test 0 (system "cyclone-winds retrieve array-list"))
   (test 0 (system "cd array-list && cyclone-winds build-local"))
   (test 0 (system "cd array-list && cyclone-winds build-local \".\""))
   (test 0 (system "cd array-list && cyclone-winds test-local"))
