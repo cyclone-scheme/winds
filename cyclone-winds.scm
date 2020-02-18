@@ -3,6 +3,7 @@
         (scheme read)
         (scheme file)
         (scheme process-context)
+        (scheme repl)
         (scheme cyclone pretty-print)
         (scheme cyclone util)
         (scheme cyclone libraries)
@@ -586,7 +587,8 @@
     package [DIRECTORY] - scaffold DIRECTORY layout and a package.scm stub
  
   PACKAGES:
-       a quoted list of two or more symbols, starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
+       Name of the package. Note this can be a quoted list of two or more symbols, 
+       starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
     *banner*)))
 
 (define (main)
@@ -606,6 +608,7 @@
     ((_ 'test-local dir) (test-local dir))    
     ((_ 'package) (package))
     ((_ 'package dir) (package dir))    
+    ;((_ 'repl) (repl)) ;; Allow interactive debugging
     (else (usage))))
 
 (main)
