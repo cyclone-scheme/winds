@@ -608,7 +608,7 @@
     ((_ 'test-local dir) (test-local dir))    
     ((_ 'package) (package))
     ((_ 'package dir) (package dir))    
-    ;((_ 'repl) (repl)) ;; Allow interactive debugging
+    ((_ 'repl) (repl)) ;; Allow interactive debugging
     (else (usage))))
 
 (main)
