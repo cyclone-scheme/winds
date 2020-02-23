@@ -4,12 +4,12 @@
 (test-group "Remote work (read-only procedures)"
   (test 0 (system "cyclone-winds index"))
   (test 0 (system "cyclone-winds local-status"))
-  (test 0 (system "cyclone-winds info \"(cyclone iset)\"")))
+  (test 0 (system "cyclone-winds info iset")))
 
 (test-group "Remote work (read and write procedures)"
-  (test 0 (system "sudo cyclone-winds install \"(cyclone iset)\" "))
+  (test 0 (system "sudo cyclone-winds install iset"))
   (test 0 (system "cyclone-winds local-status"))
-  (test 0 (system "sudo cyclone-winds uninstall \"(cyclone iset)\" ")))
+  (test 0 (system "sudo cyclone-winds uninstall iset")))
 
 (test-group "Local work (write procedures)"
   (test 0 (system "cyclone-winds retrieve array-list"))
