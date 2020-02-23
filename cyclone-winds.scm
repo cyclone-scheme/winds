@@ -212,14 +212,14 @@
 
 (define (pkg->metadata pkg)
   `(package
-    (name                  ,(or (get-name pkg) '(cyclone ____)))
+    (name                  ,(or (get-name pkg) '____))
     (version               ,(or (get-version pkg) 0.1))
     (license               ,(or (get-license pkg) "BSD"))
     (authors               ,(or (get-authors pkg) ""))
     (maintainers           ,(or (get-maintainers pkg) ""))
     (description           ,(or (get-description pkg) ""))
     (tags                  ,(or (get-tags pkg) ""))
-    (docs                  ,(or (get-docs pkg) "https://github.com/cyclone-scheme/cyclone-winds/wiki/_____.md"))
+    (docs                  ,(or (get-docs pkg) (string-append "https://github.com/cyclone-scheme/cyclone-winds/wiki/" (symbol->string (or (get-name pkg) '____)))))
     (test                  ,(or (get-test pkg) "test.scm"))
     (dependencies          ,(or (get-dependencies pkg) '()))
     (test-dependencies     ,(or (get-test-dependencies pkg) '()))
