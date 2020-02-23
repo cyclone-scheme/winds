@@ -6,5 +6,5 @@
  (iset
   (0.1 "https://github.com/cyclone-scheme/iset/raw/v0.1/package.scm" "https://github.com/cyclone-scheme/iset/archive/v0.1.tar.gz" "6D87365E4A454219095DCC2D3736E1449ADDA746A6E1571582E49FFA47F8A4E5"))
  (string
-  (0.1 "https://github.com/cyclone-scheme/string/raw/v0.1/package.scm" "https://github.com/cyclone-scheme/string/archive/v0.1.tar.gz" "FB1FC9BB214926825DB2D3D1C9108E3B5E275986AEF0E79777F589F1338AFE03"))
+  (0.1 "https://github.com/cyclone-scheme/string/raw/v0.1/package.scm" "https://github.com/cyclone-scheme/string/archive/v0.1.tar.gz" "73945445AB0A5C607B501B84136E388F579F9DF6D1052F84FE880CD68B87BC6A"))
 )
