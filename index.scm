@@ -27,4 +27,8 @@
   (0.1 "https://github.com/cyclone-scheme/string/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/string/archive/v0.1.tar.gz" 
        "73945445AB0A5C607B501B84136E388F579F9DF6D1052F84FE880CD68B87BC6A"))
+ (sxml
+  (0.1 "https://github.com/cyclone-scheme/sxml/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
+       "dabd1188875aa223c1613ce5c61da9dd2164caea9f2ded34f5ab9c864f725c79"))
 )
