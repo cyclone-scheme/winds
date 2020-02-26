@@ -7,6 +7,10 @@
   (0.1 "https://github.com/cyclone-scheme/char-set/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/char-set/archive/v0.1.tar.gz" 
        "49CC8391DFC5E957B6036B7AA007B5FD1F922214DE03A8825A8CB842002AB784"))
+ (curl
+  (0.1 "https://github.com/cyclone-scheme/curl/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/curl/archive/v0.1.tar.gz" 
+       "CB0FB34CB5E27A45AD452A2C06CD7FFFB3EDC12C6E30F96823033DF081975219"))
  (irregex
   (0.1 "https://github.com/cyclone-scheme/irregex/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/irregex/archive/v0.1.tar.gz" 
