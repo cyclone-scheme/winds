@@ -19,6 +19,10 @@
   (0.1 "https://github.com/cyclone-scheme/iset/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/iset/archive/v0.1.tar.gz" 
        "6D87365E4A454219095DCC2D3736E1449ADDA746A6E1571582E49FFA47F8A4E5"))
+ (packrat
+  (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
+       "cb39b3b893ad8b114a938d1e9d996c6341b846b84a5d03ca8381db2a86f809bd"))
  (srfi-26
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
