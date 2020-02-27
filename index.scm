@@ -31,6 +31,10 @@
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
        "F6E1B98E29743AD7ACD2743F2B2E4C8A2C595CC6672D26C4DA6E46D575D14FB7"))
+ (srfi-152
+  (0.1 "https://github.com/cyclone-scheme/srfi-152/raw/master/package.scm" 
+       "https://github.com/cyclone-scheme/srfi-152/archive/v0.1.tar.gz" 
+       "ce550cb87014432e7ca45a09b282d1eab3bbde26d2112db53eb8e8a52a66c326"))
  (string
   (0.1 "https://github.com/cyclone-scheme/string/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/string/archive/v0.1.tar.gz" 
