@@ -19,6 +19,10 @@
   (0.1 "https://github.com/cyclone-scheme/iset/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/iset/archive/v0.1.tar.gz" 
        "6D87365E4A454219095DCC2D3736E1449ADDA746A6E1571582E49FFA47F8A4E5"))
+ (json
+  (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
+       "5a0263ffdae56e9d3199d7ee96dc6735217431f2243c1c28af4f4c54e248ef6f"))
  (packrat
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
