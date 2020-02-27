@@ -22,7 +22,7 @@
  (json
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
-       "7965ec9fbe8a35689fc17de3c593f32ea0832d5392cef959d3d45d00730ef786"))
+       "08deeba553c023a1af641e78887630ab3ff20c40f5f9c021fcb8a68c89d0e859"))
  (packrat
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
