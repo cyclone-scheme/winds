@@ -48,8 +48,8 @@
 
 (define (pkg-info index pkg-name)
   (match (assoc pkg-name index)
-    (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
-    ((pkg-name latest-version old-versions ...) latest-version)))
+	 (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
+	 ((pkg-name latest-version old-versions ...) latest-version)))
 
 (define (version pkg-info)
   (car pkg-info))
@@ -210,7 +210,17 @@
      libraries-names
      programs-names)))
 
+(define *default-doc-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
+
 (define (pkg->metadata pkg)
+  (newline) (display *internal-cyclone-libs*) (newline)
+  (newline) (display (get-libraries-names pkg)) (newline)
+  (newline) (display (get-programs-names pkg)) (newline)
+
+
+
+
+
   `(package
     (name                  ,(or (get-name pkg) '____))
     (version               ,(or (get-version pkg) 0.1))
@@ -219,28 +229,38 @@
     (maintainers           ,(or (get-maintainers pkg) ""))
     (description           ,(or (get-description pkg) ""))
     (tags                  ,(or (get-tags pkg) ""))
-    (docs                  ,(or (get-docs pkg) (string-append "https://github.com/cyclone-scheme/cyclone-winds/wiki/" (symbol->string (or (get-name pkg) '____)))))
+    (docs                  ,(or (get-docs pkg)
+				(string-append *default-doc-url*
+					       (symbol->string (or (get-name pkg) '____)))))
     (test                  ,(or (get-test pkg) "test.scm"))
     (dependencies          ,(or (get-dependencies pkg) '()))
     (test-dependencies     ,(or (get-test-dependencies pkg) '()))
     (foreign-dependencies  ,(or (get-foreign-dependencies pkg) '()))
+
     
-    ,@(let ((libs (get-libraries-names pkg)))
+    ,@(let ((libs (get-libraries-names pkg))
+	    (progs (get-programs-names pkg)))
         (if (or (not libs) (null? libs))
-            '()
-            (map (lambda (l)
-                   `(library
-                        (name ,l)
-                      (description "")))
-                 (car libs))))
-    ,@(let ((progs (get-programs-names pkg)))
-        (if (or (not progs) (null? progs))
-            '()
-            (map (lambda (p)
-                   `(program
-                     (name ,p)
-                     (description "")))
-                 (car progs))))))
+	    (if (or (not progs) (null? libs))
+		'((library (name ____) (description "")))
+		'())
+	    (map (lambda (l)
+		   `(library
+			(name ,l)
+		      (description "")))
+		 libs)))
+    
+    ,@(let ((progs (get-programs-names pkg))
+	    (libs (get-libraries-names pkg)))
+	(if (or (not progs) (null? progs))
+	    (if (or (not libs) (null? libs))
+		'((program (name ____) (description "")))
+		'())
+	    (map (lambda (p)
+		   `(program
+		     (name ,p)
+		     (description "")))
+		 progs)))))
 ;; End of metadata-related procedures (i.e. package.scm)
 
 
@@ -267,13 +287,13 @@
   (let ((dir (if (null? dir) "." (car dir))))
     (for-each
      (lambda (lib)
-       (let* ((lib-name-path (->path lib))
-              (full-lib-name-path (->path dir lib)))
+       (let ((lib-name-path (->path lib))
+	     (full-lib-name-path (->path dir lib)))
          (for-each
           (lambda (ext)
             (copy-file-to-dir (string-append full-lib-name-path ext)
-                       (->path (get-library-installation-dir)
-                               (path-dir lib-name-path))))
+			      (->path (get-library-installation-dir)
+				      (path-dir lib-name-path))))
           *library-installable-extensions*)))
      lib-list)))
 
@@ -295,23 +315,23 @@
 
 (define (retrieve-package index name . dir)
   (match-let (((version _ tarball-url sha256sum) (pkg-info index name)))
-    (let* ((pkg-name (if (list? name)
-                         (string-join (map ->string name) #\-)
-                         (->string name)))
-           (work-dir (if (null? dir)
-                         (random-temp-dir pkg-name)
-                         (->path (car dir) pkg-name)))
-           (tarball
-            (string-append (string-join (list pkg-name (->string version)) #\-)
-                           ".tar.gz"))
-           (outfile (->path work-dir tarball)))
-      (make-dir work-dir)
-      (display (format "~%Downloading ~a (version ~a)...~%" name version))
-      (download tarball-url outfile)
-      (validate-sha256sum sha256sum outfile)
-      (extract outfile work-dir)
-      (delete outfile)               
-      work-dir)))
+	     (let* ((pkg-name (if (list? name)
+				  (string-join (map ->string name) #\-)
+				  (->string name)))
+		    (work-dir (if (null? dir)
+				  (random-temp-dir pkg-name)
+				  (->path (car dir) pkg-name)))
+		    (tarball
+		     (string-append (string-join (list pkg-name (->string version)) #\-)
+				    ".tar.gz"))
+		    (outfile (->path work-dir tarball)))
+	       (make-dir work-dir)
+	       (display (format "~%Downloading ~a (version ~a)...~%" name version))
+	       (download tarball-url outfile)
+	       (validate-sha256sum sha256sum outfile)
+	       (extract outfile work-dir)
+	       (delete outfile)               
+	       work-dir)))
 
 (define (get-package-remote-metadata index name . dir)
   (let* ((work-dir (if (null? dir)
@@ -424,86 +444,124 @@
       (and libs (build-libraries libs work-dir))          
       (and progs (build-programs progs work-dir)))))
 
-(define *default-code-directory* "cyclone")
-(define *internal-cyclone-libs* '((cyclone concurrent) (cyclone match) (cyclone test)))
+;; The only global variable that is a parameter
+(define *default-code-directory* (make-parameter "cyclone"))
+
+(define *default-doc-file* "README")
+
+(define *internal-cyclone-libs*
+  ;; No need to list (scheme ...) libs because they are obviously internal.
+  `(,@(map (lambda (s) `(srfi ,s))
+	   '(1 2 8 18 27 28 60 69 106 111 113 117 121 128 132 133 143))
+    (cyclone concurrent) (cyclone match) (cyclone test)))
+
 (define (test-file? file pkg)
   (or (string-contains file "test")
       (string=? file (or (get-test pkg) ""))))
 
 (define (structure-directory-tree! dir pkg)
+  ;; (directory-content dir) returns '((file1 file2 ...) (dir1 dir2 ...))
   (let* ((dir-content (directory-content dir))
          (dirs (cadr dir-content))
-         (code-files (filter (lambda (f)
-                               (or (string=? (path-extension f) "sld")
-                                   (and (string=? (path-extension f) "scm")
-                                        (not (test-file? f pkg))
-                                        (not (string=? f *default-metadata-file*)))))
-                             (car dir-content))))
-    
-    (if (not (null? code-files))
-        (for-each (lambda (f)
-                    (copy-file-to-dir f (->path dir *default-code-directory*))
-                    (delete f))
-                  code-files)
-        (if (not (member *default-code-directory* dirs))
-            (error "Sorry! Not able to package directory tree.")))
+         (code-files
+	  (filter (lambda (f)
+                    (or (string=? (path-extension f) "sld")
+                        (and (string=? (path-extension f) "scm")
+                             (not (test-file? f pkg))
+                             (not (string=? f *default-metadata-file*)))))
+                  (car dir-content))))
 
+    ;; Move directories into *default-code-directory* (except itself and
+    ;; hidden directories).
     (for-each (lambda (d)
-                (copy-dir-to-dir d (->path dir *default-code-directory*))
+                (copy-dir-to-dir d (->path dir (*default-code-directory*)))
                 (delete d))
-              (remove-member *default-code-directory* dirs))
+              (remove (lambda (d)
+			(or (string=? d (*default-code-directory*))
+			    (char=? (string-ref d 0) #\.)))
+		      dirs))
 
-    (let ((code-files (car (directory-content (->path dir *default-code-directory*)))))
-      (cons
-       ;; .sld files
-       (map (lambda (f)
-              ;; these files will be read - need correct path
-              (->path dir *default-code-directory* f))
-            (filter (lambda (f)
-                      (string=? (path-extension f) "sld"))
-                    code-files))
-       ;; .scm files (except test files and package.scm)
-       (filter (lambda (f)
-                 (and (string=? (path-extension f) "scm")
-                      (not (test-file? f pkg))
-                      (not (string=? f *default-metadata-file*))))
-               code-files)))))
+    ;; Move code files into *default-code-directory* (except hidden ones).
+    (for-each (lambda (f)
+		(copy-file-to-dir f (->path dir (*default-code-directory*)))
+		(delete f))
+	      (remove (lambda (f)
+			(char=? (string-ref f 0) #\.))
+		      code-files))
+
+    ;; Return a list contaning code files from within *default-code-directory*. 
+    ;; This is needed because maybe the packager had already manually put code
+    ;; files in *default-code-directory* before running 'cyclone-winds package'.
+    (filter (lambda (f)
+	      (or (string=? (path-extension f) "sld")
+		  (and (string=? (path-extension f) "scm")
+		       (not (test-file? f pkg))
+		       (not (string=? f *default-metadata-file*)))))
+	    (car (directory-content (->path dir (*default-code-directory*)))))))
 
 (define (package . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
-         (metadata-path (->path work-dir *default-metadata-file*))
-         (pkg (if (file-exists? metadata-path)
-                  (let ((md (cdr (read (open-input-file metadata-path)))))
-                    (copy-file metadata-path (string-append metadata-path ".old"))
-                    (delete metadata-path)
-                    (metadata->pkg md))
-                  (metadata->pkg '())))
-         (code-files (structure-directory-tree! work-dir pkg)) ;; ((sld-files) . (scm-files))
-         (libs+includes
-          (map (lambda (sld)
-                 (let* ((content (read (open-input-file sld)))
-                        (imports (lib:imports content))
-                        (cyclone-libs (filter (lambda (imp)
-                                                (equal? (car imp) 'cyclone))
-                                              imports))
-                        (libs (lset-difference equal? cyclone-libs *internal-cyclone-libs*))
-                        (includes (lib:includes content)))
-                   (list (cons (list (string->symbol *default-code-directory*)
-                                     (string->symbol (path-strip-extension
-						      (path-strip-directory sld))))
-                               libs)
-                         includes)))
-               (car code-files)))
-         (libs (remove null? (map car libs+includes)))
-         (incl (remove null? (map cadr libs+includes)))
-         (includes (if (null? incl) '() (map car incl)))
-         (progs (lset-difference string=? (cdr code-files) includes)))
+	 (metadata-path (->path work-dir *default-metadata-file*))
+	 (pkg (if (file-exists? metadata-path)
+		  ;; reads 'package.scm' skipping the initial (package ...) tag
+		  (let ((md (cdr (read (open-input-file metadata-path))))) 
+		    (copy-file metadata-path (string-append metadata-path ".old")) ;; backup old one
+		    (delete metadata-path)
+		    (metadata->pkg md))
+		  (metadata->pkg '())))
+
+	 ;; Work only with .sld and .scm files (except 'package.scm' and test files)
+	 ;; after reorganizing the directory tree.
+	 (code-files (structure-directory-tree! work-dir pkg))
+
+	 ;; Find imported libraries and included scheme files by looking at .sld files.
+	 ;; Returns a list of pairs of type (((libraries list) . (files list)) ...)
+
+	 ;; eg.:  |---------- libraries lists -----------|   |-------- files list ----------|
+	 ;;      (((cyclone iset) (cyclone iset base) ...) . ("base.scm" "iterators.scm" ...)
+	 ;;       ((cyclone arrary-list)              ...) . ("array-list"               ...))
+	 (libs+includes
+	  (map (lambda (sld)
+		 (let* ((content
+			 (read (open-input-file
+				(->path work-dir (*default-code-directory*) sld))))
+			(lib-name (lib:name content))
+			(imports (lib:imports content))
+			(libs
+			 ;; TODO - Remove internal libraries from lib list - not working (ex. srfi)!
+			 (lset-difference equal?
+					  (filter (lambda (i)
+						    (not (equal? (car i) 'scheme)))
+						  ;; Pre-process imports to get actual import name
+						  (map (lambda (i)
+							 (if (member (car i) '(only rename except prefix))
+							     (cadr i)
+							     i))
+						       imports))
+					  *internal-cyclone-libs*))
+			(includes (lib:includes content)))
+		   (cons (cons lib-name libs) (list includes))))
+	       (filter (lambda (f) (string=? (path-extension f) "sld")) code-files)))
+	 
+	 (libs (remove null? (fold-right append '() (map car libs+includes))))
+	 (includes (flatten (map cdr libs+includes)))
+
+	 ;; We can consider 'programs' those .scm files that are not included by .sld ones.
+	 (progs
+	  (lset-difference string=?
+			   (filter (lambda (f) (string=? (path-extension f) "scm")) code-files)
+			   includes)))
+
     (set-libraries-names! pkg libs)
     (set-programs-names! pkg progs)
-    (if (not (get-name pkg))
-	(set-name! pkg (if (null? (cdaar libs)) ;; is the first library name not compound?
-			   (caaar libs)         ;; (((libA) ...)) -> libA
-			   (cadaar libs))))     ;; (((cyclone libA) ...))) -> libA
+
+    ;; Try to guess package name if not already present in an old 'package.scm' file.
+    (if (and (not (get-name pkg)) (not (or (null? libs) (null? (car libs)))))
+	(set-name! pkg (if (null? (cdar libs)) ;; is the first library name not compound?
+			   (caar libs)         ;; ((libA) ...) -> libA
+			   (cadar libs))))     ;; ((cyclone libA) ...)) -> libA
+
+    ;; Write a brand new 'package.scm' file.
     (touch metadata-path)
     (pretty-print (pkg->metadata pkg) (open-output-file metadata-path))
     (display (format "~%Scaffolded directory tree and generated a package.scm stub.~%"))))
@@ -516,8 +574,8 @@
     (for-each
      (lambda (pkg)
        (display
-        (format "~%Package ~a retrieved into ~a~%"
-                pkg (retrieve-package index pkg "."))))
+	(format "~%Package ~a retrieved into ~a~%"
+		pkg (retrieve-package index pkg "."))))
      pkgs)))
 
 (define (install pkgs)
@@ -597,23 +655,23 @@
 
 (define (main)
   (match (map string->proper-symbol (command-line))
-    ((_ . ()) (display (usage)))
-    ((_ 'help) (usage))
-    ((_ 'retrieve pkgs ..1) (retrieve pkgs))
-    ((_ 'install pkgs ..1) (install pkgs))
-    ((_ 'uninstall pkgs ..1) (uninstall pkgs))
-    ((_ 'search term) (search term))
-    ((_ 'info name) (info name))
-    ((_ 'local-status) (local-status))
-    ((_ 'index) (index))
-    ((_ 'build-local) (build-local))
-    ((_ 'build-local dir) (build-local dir))    
-    ((_ 'test-local) (test-local))
-    ((_ 'test-local dir) (test-local dir))    
-    ((_ 'package) (package))
-    ((_ 'package dir) (package dir))    
-    ((_ 'repl) (repl)) ;; Allow interactive debugging
-    (else (usage))))
+	 ((_ . ()) (display (usage)))
+	 ((_ 'help) (usage))
+	 ((_ 'retrieve pkgs ..1) (retrieve pkgs))
+	 ((_ 'install pkgs ..1) (install pkgs))
+	 ((_ 'uninstall pkgs ..1) (uninstall pkgs))
+	 ((_ 'search term) (search term))
+	 ((_ 'info name) (info name))
+	 ((_ 'local-status) (local-status))
+	 ((_ 'index) (index))
+	 ((_ 'build-local) (build-local))
+	 ((_ 'build-local dir) (build-local dir))    
+	 ((_ 'test-local) (test-local))
+	 ((_ 'test-local dir) (test-local dir))    
+	 ((_ 'package) (package))
+	 ((_ 'package dir) (package dir))    
+	 ((_ 'repl) (repl)) ;; Allow interactive debugging
+	 (else (usage))))
 
 (main)
 ;; End of user interface procedures
