@@ -500,6 +500,10 @@
          (progs (lset-difference string=? (cdr code-files) includes)))
     (set-libraries-names! pkg libs)
     (set-programs-names! pkg progs)
+    (if (not (get-name pkg))
+	(set-name! pkg (if (null? (cdaar libs)) ;; is the first library name not compound?
+			   (caaar libs)         ;; (((libA) ...)) -> libA
+			   (cadaar libs))))     ;; (((cyclone libA) ...))) -> libA
     (touch metadata-path)
     (pretty-print (pkg->metadata pkg) (open-output-file metadata-path))
     (display (format "~%Scaffolded directory tree and generated a package.scm stub.~%"))))
