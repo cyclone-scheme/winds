@@ -34,7 +34,7 @@
  (pathname
   (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
-       "72ea72211071921a1862ab05d5a29148a7fda76ebbbd1683e246fa72dcc9b3a9"))
+       "63aed8cef0f73f508f809fa99942d064ee619d71d8914e4b83b3a44c94e41b4e"))
  (srfi-26
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
