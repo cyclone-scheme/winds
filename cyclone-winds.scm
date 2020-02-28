@@ -401,7 +401,7 @@
             (install test-dep))
           test-dependencies))
     (and test-file
-         (compile test-file)
+         (compile (->path work-dir test-file))
          (if (ok? (system (path-strip-extension (->path work-dir test-file))))
              (begin
                (and test-dependencies
@@ -409,7 +409,7 @@
                      (lambda (test-dep)
                        (uninstall test-dep))
                      test-dependencies))
-               (display (format "[OK] Tests passed~%")))
+               (display (format "[OK] Tests performed~%")))
              (error (format "Could not run tests or tests failed. Running them without building package first?~%"))))))
 
 (define (build-local . dir)
@@ -442,14 +442,14 @@
     
     (if (not (null? code-files))
         (for-each (lambda (f)
-                    (copy-file-to-dir f (->path *default-code-directory*))
+                    (copy-file-to-dir f (->path dir *default-code-directory*))
                     (delete f))
                   code-files)
         (if (not (member *default-code-directory* dirs))
             (error "Sorry! Not able to package directory tree.")))
 
     (for-each (lambda (d)
-                (copy-dir-to-dir d (->path *default-code-directory*))
+                (copy-dir-to-dir d (->path dir *default-code-directory*))
                 (delete d))
               (remove-member *default-code-directory* dirs))
 
@@ -458,11 +458,11 @@
        ;; .sld files
        (map (lambda (f)
               ;; these files will be read - need correct path
-              (->path *default-code-directory* f))
+              (->path dir *default-code-directory* f))
             (filter (lambda (f)
                       (string=? (path-extension f) "sld"))
                     code-files))
-       ;; .scm files (except test files and package.scm
+       ;; .scm files (except test files and package.scm)
        (filter (lambda (f)
                  (and (string=? (path-extension f) "scm")
                       (not (test-file? f pkg))
@@ -489,8 +489,8 @@
                         (libs (lset-difference equal? cyclone-libs *internal-cyclone-libs*))
                         (includes (lib:includes content)))
                    (list (cons (list (string->symbol *default-code-directory*)
-                                     (path-strip-extension
-                                      (path-strip-directory sld)))
+                                     (string->symbol (path-strip-extension
+						      (path-strip-directory sld))))
                                libs)
                          includes)))
                (car code-files)))
