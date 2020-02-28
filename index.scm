@@ -59,4 +59,8 @@
   (0.1 "https://github.com/cyclone-scheme/sxml/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
        "dabd1188875aa223c1613ce5c61da9dd2164caea9f2ded34f5ab9c864f725c79"))
+ (uri
+  (0.1 "https://github.com/cyclone-scheme/uri/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/uri/archive/v0.1.tar.gz" 
+       "772258786f9a4ae7c949791eab930948e4d09d265472cf5310d9d5f93d804363"))
 )
