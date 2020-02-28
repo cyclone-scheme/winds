@@ -31,6 +31,10 @@
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
        "cb39b3b893ad8b114a938d1e9d996c6341b846b84a5d03ca8381db2a86f809bd"))
+ (pathname
+  (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
+       "72ea72211071921a1862ab05d5a29148a7fda76ebbbd1683e246fa72dcc9b3a9"))
  (srfi-26
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
