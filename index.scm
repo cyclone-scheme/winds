@@ -30,7 +30,7 @@
  (packrat
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
-       "cb39b3b893ad8b114a938d1e9d996c6341b846b84a5d03ca8381db2a86f809bd"))
+       "363c7703076c8d52e90fec4f5de6a9d904b2c8bdc962a81d52dcf776540a4cea"))
  (pathname
   (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
