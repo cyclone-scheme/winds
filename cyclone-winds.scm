@@ -125,7 +125,7 @@
 
 ;; TODO: implement 'custom' parameter for specilized installation.
 (define code-parameters `((library ,(list list?))
-                          (program ,(list symbol?))))
+                          (program ,(list list?))))
 (define essential-parameters (append mandatory-parameters code-parameters))
 (define available-parameters (append essential-parameters optional-parameters))
 
