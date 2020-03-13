@@ -35,6 +35,10 @@
   (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
        "63aed8cef0f73f508f809fa99942d064ee619d71d8914e4b83b3a44c94e41b4e"))
+ (quoted-printable
+  (0.1 "https://github.com/cyclone-scheme/quoted-printable/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/quoted-printable/archive/v0.1.tar.gz" 
+       "d02ff1fa701a2993460a65a5634e8a1a921567b136524072abf99b98187ead10"))
  (sha2
   (0.1 "https://github.com/cyclone-scheme/sha2/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/sha2/archive/v0.1.tar.gz" 
