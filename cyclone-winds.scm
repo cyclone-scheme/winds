@@ -72,6 +72,17 @@
 (define *default-local-index*
   (->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
 
+;; Does the local index contain a record for given package/version/compiler?
+(define (local-index-contains? index name pkg-ver cyc-ver)
+  (let ((metadata (assoc name index)))
+    (cond
+      ((pair? metadata)
+       (let ((idx-pkg-ver (cadr metadata))
+             (idx-cyc-ver (caddr metadata)))
+         (and (equal? pkg-ver idx-pkg-ver)
+              (equal? idx-cyc-ver cyc-ver))))
+      (else #f))))
+
 (define (get-local-index)
   (if (file-exists? *default-local-index*)
       (read (open-input-file *default-local-index*))
@@ -358,13 +369,23 @@
            (read (open-input-file (->path work-dir *default-metadata-file*)))))
          (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
     (if (equal? local-pkg remote-pkg)
-        (let ((deps (get-dependencies local-pkg)))
-          (and deps
-               (for-each
-                (lambda (dep)
-                  (install-package index dep))
-                deps))
-          (build-and-install local-pkg work-dir))
+        (let ((deps (get-dependencies local-pkg))
+              (pkg-ver (get-version local-pkg)))
+          (cond
+            ((local-index-contains? 
+               (get-local-index) 
+               name 
+               pkg-ver 
+               (Cyc-version))
+             (display (format "Package ~a version ~a already installed. Skipping...~%" 
+                              name pkg-ver)))
+            (else
+              (and deps
+                   (for-each
+                    (lambda (dep)
+                      (install-package index dep))
+                    deps))
+              (build-and-install local-pkg work-dir))))
         (begin
           (delete work-dir)
           (error
