@@ -392,6 +392,27 @@
            (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
     (delete work-dir)))
 
+;; Similar to install, but do not check package versions. Always build+install
+(define (reinstall-package index name)
+  (let* ((work-dir (retrieve-package index name))
+         (local-pkg
+          (validate-metadata
+           (read (open-input-file (->path work-dir *default-metadata-file*)))))
+         (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
+    (if (equal? local-pkg remote-pkg)
+        (let ((deps (get-dependencies local-pkg)))
+          (and deps
+               (for-each
+                (lambda (dep)
+                  (reinstall-package index dep))
+                deps))
+          (build-and-install local-pkg work-dir))
+        (begin
+          (delete work-dir)
+          (error
+           (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
+    (delete work-dir)))
+
 (define (uninstall-package index name)
   (let ((pkg (assoc name index)))
     (if pkg
@@ -598,6 +619,13 @@
        (install-package index pkg))
      pkgs)))
 
+(define (reinstall pkgs)
+  (let ((index (get-index)))
+    (for-each
+     (lambda (pkg)
+       (reinstall-package index pkg))
+     pkgs)))
+
 (define (uninstall pkgs)
   (let ((index (get-local-index)))
     (for-each
@@ -650,6 +678,7 @@
     help  -  print usage
     retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified PACKAGE(s)
     install PACKAGE [PACKAGE2 ...] - retrieve and install specified PACKAGE(s)
+    reinstall PACKAGE [PACKAGE2 ...] - retrieve and reinstall specified PACKAGE(s)
     uninstall PACKAGE [PACKAGE2 ...] - remove specified PACKAGE(s)
     search TERM - search for packages whose name (partially) match the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
@@ -672,6 +701,7 @@
 	 ((_ 'help) (usage))
 	 ((_ 'retrieve pkgs ..1) (retrieve pkgs))
 	 ((_ 'install pkgs ..1) (install pkgs))
+	 ((_ 'reinstall pkgs ..1) (reinstall pkgs))
 	 ((_ 'uninstall pkgs ..1) (uninstall pkgs))
 	 ((_ 'search term) (search term))
 	 ((_ 'info name) (info name))
