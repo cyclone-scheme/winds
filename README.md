@@ -38,6 +38,7 @@ $ cyclone-winds [OPTIONS [PACKAGES]]
     retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified PACKAGE(s)
     install PACKAGE [PACKAGE2 ...] - retrieve and install specified PACKAGE(s)
     reinstall PACKAGE [PACKAGE2 ...] - retrieve and reinstall specified PACKAGE(s)
+    upgrade [PACKAGE ...] - upgrade all installed packages or specified PACKAGE(s)
     uninstall PACKAGE [PACKAGE2 ...] - remove specified PACKAGE(s)
     search TERM - search for packages whose name (partially) match the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
