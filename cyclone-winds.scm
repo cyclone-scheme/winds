@@ -616,21 +616,29 @@
   (let ((index (get-index)))
     (for-each
      (lambda (pkg)
-       (install-package index pkg))
+       (with-handler
+         (lambda (e)
+           (format "An error occurred ~a" e))
+         (install-package index pkg)))
      pkgs)))
 
 (define (reinstall pkgs)
   (let ((index (get-index)))
     (for-each
      (lambda (pkg)
-       (reinstall-package index pkg))
+       (with-handler
+         (lambda (e)
+           (format "An error occurred ~a" e))
+         (reinstall-package index pkg)))
      pkgs)))
 
 (define (upgrade . pkgs)
-  (if (pair? pkgs)
-      (display `(Upgrade ,(car pkgs)))
-      (display `(Upgrade all packages)))
-  (newline))
+  (cond
+   ((pair? pkgs)
+    (install (car pkgs)))
+   (else
+    ;; Update all installed packages
+    (install (map car (get-local-index))))))
 
 (define (uninstall pkgs)
   (let ((index (get-local-index)))
