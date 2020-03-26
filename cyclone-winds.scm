@@ -626,6 +626,12 @@
        (reinstall-package index pkg))
      pkgs)))
 
+(define (upgrade . pkgs)
+  (if (pair? pkgs)
+      (display `(Upgrade ,(car pkgs)))
+      (display `(Upgrade all packages)))
+  (newline))
+
 (define (uninstall pkgs)
   (let ((index (get-local-index)))
     (for-each
@@ -679,6 +685,7 @@
     retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified PACKAGE(s)
     install PACKAGE [PACKAGE2 ...] - retrieve and install specified PACKAGE(s)
     reinstall PACKAGE [PACKAGE2 ...] - retrieve and reinstall specified PACKAGE(s)
+    upgrade [PACKAGE ...] - upgrade installed PACKAGE(s)
     uninstall PACKAGE [PACKAGE2 ...] - remove specified PACKAGE(s)
     search TERM - search for packages whose name (partially) match the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
@@ -702,6 +709,8 @@
 	 ((_ 'retrieve pkgs ..1) (retrieve pkgs))
 	 ((_ 'install pkgs ..1) (install pkgs))
 	 ((_ 'reinstall pkgs ..1) (reinstall pkgs))
+	 ((_ 'upgrade) (upgrade))
+	 ((_ 'upgrade pkgs ..1) (upgrade pkgs))
 	 ((_ 'uninstall pkgs ..1) (uninstall pkgs))
 	 ((_ 'search term) (search term))
 	 ((_ 'info name) (info name))
