@@ -64,9 +64,9 @@
        "https://github.com/cyclone-scheme/srfi-173/archive/v0.3.tar.gz" 
        "33bcdf819b6d68ee66877503776ebb34891244c192601a3b8a0532d3c5012067"))
  (string
-  (0.2 "https://github.com/cyclone-scheme/string/raw/v0.2/package.scm" 
-       "https://github.com/cyclone-scheme/string/archive/v0.2.tar.gz" 
-       "26349ff539afb1240b40b47d47b80558658cad9617c0619760669298b8d9937d"))
+  (0.3 "https://github.com/cyclone-scheme/string/raw/v0.3/package.scm" 
+       "https://github.com/cyclone-scheme/string/archive/v0.3.tar.gz" 
+       "e7adc808988606fffdcbfc0bd753f9072707aac8307f664eb0faa53fb5384ced"))
  (sxml
   (0.1 "https://github.com/cyclone-scheme/sxml/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
