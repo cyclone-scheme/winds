@@ -146,7 +146,7 @@
      (lambda (key)
        (let ((parameter-content (cdr (assq key metadata)))
              (check-procedures (cadr (assq key available-parameters))))
-         (cond
+         (cond 
           ;; Unknown parameters
           ((not (member key (keys available-parameters)))
            (error "Unknown parameter in package.scm" key))
@@ -178,7 +178,7 @@
 (define-record-type pkg
   (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
             _dependencies _test-dependencies _foreign-dependencies
-            _libraries _programs _libraries-names _program-names)
+            _libraries _programs _libraries-names _program-names _exports)
   pkg?
   (_name get-name set-name!)
   (_version get-version set-version!)
@@ -195,7 +195,8 @@
   (_libraries get-libraries set-libraries!)
   (_programs get-programs set-programs!)
   (_libraries-names get-libraries-names set-libraries-names!)
-  (_programs-names get-programs-names set-programs-names!))
+  (_programs-names get-programs-names set-programs-names!)
+  (_exports get-exports set-exports!))
 
 (define (metadata->pkg metadata)
   (let* ((md (if (null? metadata) metadata (cdr metadata)))
@@ -219,7 +220,8 @@
      libraries
      programs
      libraries-names
-     programs-names)))
+     programs-names
+     (get-parameter-value 'exports metadata))))
 
 (define *default-doc-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
 
@@ -481,7 +483,16 @@
 ;; The only global variable that is a parameter
 (define *default-code-directory* (make-parameter "cyclone"))
 
-(define *default-doc-file* "README")
+(define *default-doc-file* "README.md")
+(define *possible-doc-candidates* '("README" "Readme" "readme"))
+(define (doc-file? file)
+  (any (lambda (e) (not (eq? e #f)))
+       (map (lambda (c) (string-contains file c)))) *possible-doc-candidates*)
+
+(define (write-doc pkg . dir)
+  (let* ((work-dir (if (null? dir) "." (->path (car dir))))
+         (doc-path (->path wor-dir *default-doc-file*)))
+    ))
 
 (define *internal-cyclone-libs*
   ;; No need to list (scheme ...) libs because they are obviously internal.
@@ -554,13 +565,14 @@
 	 ;; eg.:  |---------- libraries lists -----------|   |-------- files list ----------|
 	 ;;      (((cyclone iset) (cyclone iset base) ...) . ("base.scm" "iterators.scm" ...)
 	 ;;       ((cyclone arrary-list)              ...) . ("array-list"               ...))
-	 (libs+includes
+	 (libs+includes+exports
 	  (map (lambda (sld)
 		 (let* ((content
 			 (read (open-input-file
 				(->path work-dir (*default-code-directory*) sld))))
 			(lib-name (lib:name content))
 			(imports (lib:imports content))
+                        (exports ())
 			(libs
 			 ;; TODO - Remove internal libraries from lib list - not working (ex. srfi)!
 			 (lset-difference equal?
@@ -574,11 +586,11 @@
 						       imports))
 					  *internal-cyclone-libs*))
 			(includes (lib:includes content)))
-		   (cons (cons lib-name libs) (list includes))))
+		   (list (cons lib-name libs) (list includes))))
 	       (filter (lambda (f) (string=? (path-extension f) "sld")) code-files)))
 	 
-	 (libs (remove null? (fold-right append '() (map car libs+includes))))
-	 (includes (flatten (map cdr libs+includes)))
+	 (libs (remove null? (fold-right append '() (map car libs+includes+exports))))
+	 (includes (flatten (map cadr libs+includes+exports)))
 
 	 ;; We can consider 'programs' those .scm files that are not included by .sld ones.
 	 (progs
@@ -593,12 +605,12 @@
     (if (and (not (get-name pkg)) (not (or (null? libs) (null? (car libs)))))
 	(set-name! pkg (if (null? (cdar libs)) ;; is the first library name not compound?
 			   (caar libs)         ;; ((libA) ...) -> libA
-			   (cadar libs))))     ;; ((cyclone libA) ...)) -> libA
+			   (cadar libs)))) ;; ((cyclone libA) ...)) -> libA
 
     ;; Write a brand new 'package.scm' file.
     (touch metadata-path)
     (pretty-print (pkg->metadata pkg) (open-output-file metadata-path))
-    (display (format "~%Scaffolded directory tree and generated a package.scm stub.~%"))))
+    (display (format "~%Scaffolded directory tree, generated a package.scm and README.md stubs.~%"))))
 ;; End of package-related procedures
 
 
