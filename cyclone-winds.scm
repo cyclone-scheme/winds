@@ -489,10 +489,20 @@
   (any (lambda (e) (not (eq? e #f)))
        (map (lambda (c) (string-contains file c)))) *possible-doc-candidates*)
 
-(define (write-doc pkg . dir)
+(define (write-doc-file pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
-         (doc-path (->path wor-dir *default-doc-file*)))
-    ))
+         (doc-path (->path wor-dir *default-doc-file*))
+         ;; zippar os lib-names com os exports - pensar se só libraries têm exports    
+         ;; ou se programas também.    
+         (markdown #t)) ;; compor ele
+    
+    (if (file-exists? doc-path?) 
+        (begin 
+          (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
+          (delete doc-path)))
+    
+    (touch doc-path)
+    (write markdown (open-output-file metadata-path))))
 
 (define *internal-cyclone-libs*
   ;; No need to list (scheme ...) libs because they are obviously internal.
@@ -555,16 +565,17 @@
 		    (metadata->pkg md))
 		  (metadata->pkg '())))
 
-	 ;; Work only with .sld and .scm files (except 'package.scm' and test files)
-	 ;; after reorganizing the directory tree.
+	 ;; Work only with .sld and .scm files (except 'package.scm' and test files),
+	 ;; AFTER reorganizing the directory tree.
 	 (code-files (structure-directory-tree! work-dir pkg))
 
-	 ;; Find imported libraries and included scheme files by looking at .sld files.
-	 ;; Returns a list of pairs of type (((libraries list) . (files list)) ...)
+	 ;; Find (1) imported libraries, (2) included scheme files and (3) exported symbols
+         ;; by looking at .sld files.
+	 ;; Returns a list of type (((libraries-list) (files-list) (exports-list) ...)
 
-	 ;; eg.:  |---------- libraries lists -----------|   |-------- files list ----------|
-	 ;;      (((cyclone iset) (cyclone iset base) ...) . ("base.scm" "iterators.scm" ...)
-	 ;;       ((cyclone arrary-list)              ...) . ("array-list"               ...))
+	 ;; eg.:  |----- libraries list -----|  |-- files list --|  |---------- exports list ----------|
+  	 ;;      (((cyclone iset)         ...)  ("base.scm"   ...)  (%make-iset make-iset iset?     ...)
+         ;;       ((cyclone arrary-list)  ...)  ("array-list" ...)  (array-list? array-list-delete! ...))
 	 (libs+includes+exports
 	  (map (lambda (sld)
 		 (let* ((content
@@ -572,7 +583,7 @@
 				(->path work-dir (*default-code-directory*) sld))))
 			(lib-name (lib:name content))
 			(imports (lib:imports content))
-                        (exports ())
+                        (exports (lib:exports content))
 			(libs
 			 ;; TODO - Remove internal libraries from lib list - not working (ex. srfi)!
 			 (lset-difference equal?
@@ -590,27 +601,31 @@
 	       (filter (lambda (f) (string=? (path-extension f) "sld")) code-files)))
 	 
 	 (libs (remove null? (fold-right append '() (map car libs+includes+exports))))
-	 (includes (flatten (map cadr libs+includes+exports)))
-
+         (exps (remove null? (map caddr libs+includes+exports)))         
 	 ;; We can consider 'programs' those .scm files that are not included by .sld ones.
-	 (progs
+         (includes (flatten (map cadr libs+includes+exports)))	 
+         (progs
 	  (lset-difference string=?
 			   (filter (lambda (f) (string=? (path-extension f) "scm")) code-files)
 			   includes)))
 
     (set-libraries-names! pkg libs)
     (set-programs-names! pkg progs)
+    (set-exports! pkg exps) 
 
     ;; Try to guess package name if not already present in an old 'package.scm' file.
     (if (and (not (get-name pkg)) (not (or (null? libs) (null? (car libs)))))
 	(set-name! pkg (if (null? (cdar libs)) ;; is the first library name not compound?
 			   (caar libs)         ;; ((libA) ...) -> libA
-			   (cadar libs)))) ;; ((cyclone libA) ...)) -> libA
+			   (cadar libs))))     ;; ((cyclone libA) ...)) -> libA
 
     ;; Write a brand new 'package.scm' file.
     (touch metadata-path)
     (pretty-print (pkg->metadata pkg) (open-output-file metadata-path))
-    (display (format "~%Scaffolded directory tree, generated a package.scm and README.md stubs.~%"))))
+
+    (write-doc-file pkg work-dir)
+    
+    (display (format "~%Scaffolded directory tree and generated stubs for package.scm and README.md.~%"))))
 ;; End of package-related procedures
 
 
