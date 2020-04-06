@@ -31,6 +31,10 @@
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
        "08deeba553c023a1af641e78887630ab3ff20c40f5f9c021fcb8a68c89d0e859"))
+ (mime
+  (0.1 "https://github.com/cyclone-scheme/mime/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/mime/archive/v0.1.tar.gz" 
+       "e7c977420d997915af01ec9fadca174511d3d9d48ee05dd0ca5c497e8a11a938"))
  (packrat
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
