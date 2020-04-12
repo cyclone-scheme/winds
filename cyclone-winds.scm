@@ -247,7 +247,9 @@
 	    (progs (get-programs-names pkg)))
         (if (or (not libs) (null? libs))
 	    (if (or (not progs) (null? libs))
-		'((library (name ____) (description "")))
+		'((library
+                      (name ____)
+                    (description "")))
 		'())
 	    (map (lambda (l)
 		   `(library
@@ -484,17 +486,64 @@
 (define *default-code-directory* (make-parameter "cyclone"))
 
 (define *default-doc-file* "README.md")
-(define *possible-doc-candidates* '("README" "Readme" "readme"))
+(define *doc-candidates* '("README" "Readme" "readme"))
 (define (doc-file? file)
-  (any (lambda (e) (not (eq? e #f)))
-       (map (lambda (c) (string-contains file c)))) *possible-doc-candidates*)
+  (any (lambda (e)
+         (not (eq? e #f)))
+       (map (lambda (c)
+              (string-contains file c))
+            *doc-candidates*)))
 
 (define (write-doc-file pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path wor-dir *default-doc-file*))
-         ;; zippar os lib-names com os exports - pensar se só libraries têm exports    
-         ;; ou se programas também.    
-         (markdown #t)) ;; compor ele
+         (lib+exports (zip (get-libraries-names pkg) (get-exports pkg)))
+         (lib+exports-included-libs
+          (map (get-libraries-names pkg)))
+
+         (markdown
+          (string-append
+           "# " (get-name pkg) "\n"
+           "\n"
+           "## Index" "\n"
+           "- [Intro](#Intro)" "\n"
+           "- [API](#API)" "\n"
+           "- [Examples](#Examples)" "\n"
+           "- [Author(s)](#Author(s))" "\n"           
+           "- [Maintainer(s)](#Maintainer(s))" "\n"           
+           "- [Version](#Version)" "\n"
+           "- [License](#License)" "\n"           
+           "- [Tags](#Tags)" "\n"
+           "\n"
+           "## Intro" "\n"
+           (get-description pkg)
+           "\n"
+           "## API" "\n"
+           (apply string-append
+                  (map ))
+           "\n"
+           "## Examples" "\n"
+           "```scheme"
+           "(import (scheme base) "  ")"
+           
+
+           "```"
+           "\n"
+           "## Author(s)" "\n"
+           (get-authors pkg)
+           "\n"
+           "## Maintainer(s)" "\n"
+           (get-maintainers pkg)
+           "\n"
+           "## Version" "\n"
+           (get-version pkg)
+           "\n"
+           "## License" "\n"
+           (get-license pkg)
+           "\n"
+           "## Tags" "\n"
+           (get-tags pkg)
+           )))
     
     (if (file-exists? doc-path?) 
         (begin 
@@ -544,7 +593,14 @@
 			(char=? (string-ref f 0) #\.))
 		      code-files))
 
-    ;; Return a list contaning code files from within *default-code-directory*. 
+    ;; ------------------------------------------------------------------------
+    ;; TODO - no need to return!! Create another procedure that starts looking
+    ;; recursively at *default-code-directory* for ALL .sld and .scm files to
+    ;; return them to 'package' procedure.
+    ;; ------------------------------------------------------------------------
+    ;; ------------------------------------------------------------------------
+    
+    ;; Return a list contaning code files from within *default-code-directory*.
     ;; This is needed because maybe the packager had already manually put code
     ;; files in *default-code-directory* before running 'cyclone-winds package'.
     (filter (lambda (f)
@@ -565,8 +621,8 @@
 		    (metadata->pkg md))
 		  (metadata->pkg '())))
 
-	 ;; Work only with .sld and .scm files (except 'package.scm' and test files),
-	 ;; AFTER reorganizing the directory tree.
+	 ;; Work only with .sld and .scm files (except 'package.scm' and test files)
+         ;; placed at *default-code-directory* AFTER reorganizing the directory tree.
 	 (code-files (structure-directory-tree! work-dir pkg))
 
 	 ;; Find (1) imported libraries, (2) included scheme files and (3) exported symbols
@@ -574,7 +630,7 @@
 	 ;; Returns a list of type (((libraries-list) (files-list) (exports-list) ...)
 
 	 ;; eg.:  |----- libraries list -----|  |-- files list --|  |---------- exports list ----------|
-  	 ;;      (((cyclone iset)         ...)  ("base.scm"   ...)  (%make-iset make-iset iset?     ...)
+         ;;      (((cyclone iset)         ...)  ("base.scm"   ...)  (%make-iset make-iset iset?     ...)
          ;;       ((cyclone arrary-list)  ...)  ("array-list" ...)  (array-list? array-list-delete! ...))
 	 (libs+includes+exports
 	  (map (lambda (sld)
