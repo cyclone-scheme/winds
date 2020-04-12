@@ -125,7 +125,7 @@
     (authors ,(list string?))
     (maintainers ,(list string?))
     (description ,(list string?))
-    (tags ,(list string?))
+    (tags ,(list (lambda (t) (or (string? t) (list? t)))))
     (docs ,(list string?))
     (test ,(list string?))))
 
@@ -497,53 +497,79 @@
 (define (write-doc-file pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path wor-dir *default-doc-file*))
-         (lib+exports (zip (get-libraries-names pkg) (get-exports pkg)))
-         (lib+exports-included-libs
-          (map (get-libraries-names pkg)))
-
+         (libraries+exports (zip (get-libraries-names pkg) (get-exports pkg)))
          (markdown
-          (string-append
-           "# " (get-name pkg) "\n"
-           "\n"
-           "## Index" "\n"
-           "- [Intro](#Intro)" "\n"
-           "- [API](#API)" "\n"
-           "- [Examples](#Examples)" "\n"
-           "- [Author(s)](#Author(s))" "\n"           
-           "- [Maintainer(s)](#Maintainer(s))" "\n"           
-           "- [Version](#Version)" "\n"
-           "- [License](#License)" "\n"           
-           "- [Tags](#Tags)" "\n"
-           "\n"
-           "## Intro" "\n"
-           (get-description pkg)
-           "\n"
-           "## API" "\n"
-           (apply string-append
-                  (map ))
-           "\n"
-           "## Examples" "\n"
-           "```scheme"
-           "(import (scheme base) "  ")"
-           
+          (string-join
+           '("# " (get-name pkg)
+             "
+              ## Index
+              - [Intro](#Intro)
+              - [API](#API)
+              - [Examples](#Examples)
+              - [Author(s)](#Author(s))    
+              - [Maintainer(s)](#Maintainer(s))
+              - [Version](#Version)
+              - [License](#License)
+              - [Tags](#Tags)
+                          
+              ## Intro
+              "
+              (get-description pkg)
+                          
+              "
+              ## API
+              "
+              (apply string-append
+                     (map (lambda (lib+exp)
+                            (string-append
+                             "### " (car lib+exp)
+                             "
+                             "
+                             (map (lambda (exp)
+                                    (string-append
+                                     "#### " exp "
+                                     `(" exp "    )
 
-           "```"
-           "\n"
-           "## Author(s)" "\n"
-           (get-authors pkg)
-           "\n"
-           "## Maintainer(s)" "\n"
-           (get-maintainers pkg)
-           "\n"
-           "## Version" "\n"
-           (get-version pkg)
-           "\n"
-           "## License" "\n"
-           (get-license pkg)
-           "\n"
-           "## Tags" "\n"
-           (get-tags pkg)
-           )))
+                                     "))
+                                  (cadr lib+exp))))
+                          libraries+exports))
+              
+              "
+              ## Examples
+              ```scheme
+              (import (scheme base)
+                      (cyclone " (get-name pkg) "))
+
+              
+              ```
+              
+              ## Author(s)
+              "
+              (get-authors pkg)
+                        
+              "
+              ## Maintainer(s)
+              "
+              (get-maintainers pkg)
+              
+              
+              "
+              ## Version
+              "
+              (->string (get-version pkg))
+              
+              "
+              ## License
+              "
+              (get-license pkg)
+              
+              "
+              ## Tags
+              "
+              (let ((tags (get-tags pkg)))
+                (if (string? tags)
+                    tags
+                    (string-join tags " ")))))))
     
     (if (file-exists? doc-path?) 
         (begin 
