@@ -536,7 +536,7 @@
            (string-join
             (map (lambda (lib+exp)
                    (string-append
-                    "### " (->string (car lib+exp)) "\n\n"
+                    "### (" (string-join (car lib+exp) " ") ")\n\n"
                     (string-join
                      (map (lambda (exp)
                             (string-append
@@ -619,58 +619,45 @@
 (define (find-code-files-recursively . dir)
   (let* ((work-dir (if (null? dir)
                        (*default-code-directory*)
-                       (->path (car dir (*default-code-directory*))))))
+                       (car dir))))
     (define (traverse dir)
       (let ((dir-content (directory-content dir)))
         (if (null? (cadr dir-content)) ;; no more directories to traverse beyond current one
-            (code-files (car dir-content))
-            (append (code-files (car dir-content))
+            (code-files (map (lambda (f)
+                               (->path dir f))
+                             (car dir-content)))
+            (append (code-files (map (lambda (f)
+                                       (->path dir f))
+                                     (car dir-content)))
                     (reduce-right cons '() (map traverse
                                                 (map (lambda (d)
                                                        (->path dir d))
-                                                     (cadr dir-content))))))))))
+                                                     (cadr dir-content))))))))
+    (let ((sld+scm (traverse work-dir)))
+      (values (sld-files sld+scm) (scm-files sld+scm)))))
 
 (define (libraries+exports+programs . dir)
-  (let* ((work-dir (if (null? dir)
-                       (*default-code-directory*)
-                       (->path (car dir) (*default-code-directory*))))
-         ;; Ugly code for a depth-first search for .sld files in order to retrieve
-         ;; libraries names, libraries exports and libraries includes from each one of them.
-         (libs+exps+incls
-          (append
-           (map (lambda (sld)
-                  (let ((content
-                         (read (open-input-file (->path work-dir sld)))))
-                    (list (lib:name content) (lib:exports content) (lib:includes content))))
-                (sld-files (car (directory-content work-dir))))
-           (let traverse ((current-dir work-dir))
-             (let ((dir-content (directory-content current-dir)))
-               (cond ((null? (cadr dir-content)) ;; no more directories to process beyond current one
-                      (map (lambda (sld)
-                             (let ((content
-                                    (read (open-input-file (->path current-dir sld)))))
-                               (list (lib:name content) (lib:exports content) (lib:includes content))))
-                           (sld-files (car dir-content))))
-                     (else
-                      (reduce-right cons
-                                    '()
-                                    (map traverse
-                                         (map (lambda (d)
-                                                (->path current-dir d))
-                                              (cadr dir-content))))))))))
-         ;; (libs (remove null? (fold-right append '() (map car libs+exps+incls))))
-         ;; (exps (remove null? (map cadr libs+exps+incls)))   
-         ;; ;; We can consider 'programs' those .scm files that are not included by .sld ones.
-         ;; (includes (flatten (map caddr libs+exps+incls)))	 
-         ;; (progs
-         ;;  (lset-difference string=?
-         ;;                   (filter (lambda (f) (string=? (path-extension f) "scm")) code-files)
-         ;;                   includes))
-         )
-
-    (newline) (pretty-print libs+exps+incls) (newline)
-    (values '((cyclone iset)) '((make-iset iset-diff)) '("test"))
-    ))
+  (let ((work-dir (if (null? dir)
+                      (*default-code-directory*)
+                      (->path (car dir) (*default-code-directory*)))))
+    (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
+      (let* ((libs+exps+incls
+             (map (lambda (sld)
+                    (let ((content
+                           (read (open-input-file sld))))
+                      (list (lib:name content) (lib:exports content) (lib:includes content))))
+                  sld-files))
+            (libs (remove null? (fold-right cons '() (map car libs+exps+incls))))
+            (exps (remove null? (map cadr libs+exps+incls)))   
+            ;; We can consider 'programs' those .scm files that are not included by .sld ones.
+            (includes (flatten (map caddr libs+exps+incls)))	 
+            (progs
+             (lset-difference string=? scm-files includes))
+            )
+        (newline) (pretty-print (list libs exps progs)) (newline)
+        ;; (newline) (pretty-print libs+exps+incls) (newline)    
+        ;; (values '((cyclone iset)) '((make-iset iset-diff)) '("test"))
+        (values libs exps progs)))))
 ;; End of package-related procedures
 
 
