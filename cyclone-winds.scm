@@ -241,7 +241,6 @@
     (dependencies          ,(or (get-dependencies pkg) '()))
     (test-dependencies     ,(or (get-test-dependencies pkg) '()))
     (foreign-dependencies  ,(or (get-foreign-dependencies pkg) '()))
-
     
     ,@(let ((libs (get-libraries-names pkg))
 	    (progs (get-programs-names pkg)))
@@ -518,7 +517,7 @@
          (libraries+exports (zip (get-libraries-names pkg) (get-exports pkg)))
          (markdown
           (string-append
-           "# " (->string (get-name pkg)) "\n"
+           "# " (->string (or (get-name pkg) "")) "\n"
            "## Index \n
 - [Intro](#Intro)
 - [API](#API)
@@ -530,42 +529,42 @@
 - [Tags](#Tags)
 
 ## Intro \n"
-           (get-description pkg) "\n\n" 
+           (or (get-description pkg) "") "\n\n" 
 
            "## API \n\n"
            (string-join
             (map (lambda (lib+exp)
                    (string-append
-                    "### (" (string-join (car lib+exp) " ") ")\n\n"
+                    "### (" (string-join (or (car lib+exp) "") " ") ")\n\n"
                     (string-join
                      (map (lambda (exp)
                             (string-append
-                             "#### " (->string exp) "\n"
-                             "`(" (->string exp) "   )` \n\n"))
+                             "#### " (->string (or exp "")) "\n"
+                             "`(" (->string (or exp "")) "   )` \n\n"))
                           (cadr lib+exp)))))
                  libraries+exports))
 
            "## Examples
 ```scheme
 (import (scheme base)
-        (cyclone " (->string (get-name pkg)) "))
+        (cyclone " (->string (or (get-name pkg) "")) "))
  
 ```
 
 ## Author(s) \n"
-        (get-authors pkg) "\n\n"
+        (or (get-authors pkg) "") "\n\n"
 
         "## Maintainer(s) \n"
-        (get-maintainers pkg) "\n\n" 
+        (or (get-maintainers pkg) "") "\n\n" 
 
         "## Version \n"
-        (->string (get-version pkg)) "\n\n"
+        (->string (or (get-version pkg) "")) "\n\n"
 
         "## License \n"
-        (get-license pkg) "\n\n"
+        (or (get-license pkg) "") "\n\n"
 
         "## Tags \n"
-        (let ((tags (get-tags pkg)))
+        (let ((tags (or (get-tags pkg) "")))
           (if (string? tags)
               tags
               (string-join tags " "))))))
@@ -634,6 +633,7 @@
                                                        (->path dir d))
                                                      (cadr dir-content))))))))
     (let ((sld+scm (traverse work-dir)))
+      (newline) (pretty-print sld+scm) (newline)
       (values (sld-files sld+scm) (scm-files sld+scm)))))
 
 (define (libraries+exports+programs . dir)
@@ -652,9 +652,9 @@
             ;; We can consider 'programs' those .scm files that are not included by .sld ones.
             (includes (flatten (map caddr libs+exps+incls)))	 
             (progs
-             (lset-difference string=? scm-files includes))
-            )
-        (newline) (pretty-print (list libs exps progs)) (newline)
+             (lset-difference (lambda (f1 f2)
+                                (string=? (path-strip-directory f1) f2)) scm-files includes)))
+        ;; (newline) (pretty-print (list libs exps progs)) (newline)
         ;; (newline) (pretty-print libs+exps+incls) (newline)    
         ;; (values '((cyclone iset)) '((make-iset iset-diff)) '("test"))
         (values libs exps progs)))))
