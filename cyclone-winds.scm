@@ -631,10 +631,12 @@
                        (car dir))))
     (define (traverse dir)
       (let ((dir-content (directory-content dir)))
-        (if (null? (cadr dir-content)) ;; no more directories to traverse beyond current one
+        (if (null? (cadr dir-content))
+            ;; no more directories to traverse beyond current one
             (code-files (map (lambda (f)
                                (->path dir f))
                              (car dir-content)))
+            ;; keep traversing remaining directories...
             (append (code-files (map (lambda (f)
                                        (->path dir f))
                                      (car dir-content)))
