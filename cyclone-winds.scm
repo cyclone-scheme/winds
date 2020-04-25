@@ -260,7 +260,9 @@
 	    (libs (get-libraries-names pkg)))
 	(if (or (not progs) (null? progs))
 	    (if (or (not libs) (null? libs))
-		'((program (name ____) (description "")))
+		'((program
+                   (name ____)
+                   (description "")))
 		'())
 	    (map (lambda (p)
 		   `(program
@@ -497,7 +499,6 @@
           (string=? file (or (get-test pkg) "")))))
 
 (define (write-metadata-file! pkg metadata-path)
-  (newline) (display "Inside write-metadata-file!") (newline)
   (touch metadata-path)
   (pretty-print (pkg->metadata pkg) (open-output-file metadata-path)))
 
@@ -511,25 +512,36 @@
             *doc-candidates*)))
 
 (define (write-doc-file! pkg . dir)
-  (newline) (display "Inside write-doc-file!") (newline) (newline)    
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path work-dir *default-doc-file*))
          (libraries+exports (zip (get-libraries-names pkg) (get-exports pkg)))
          (markdown
           (string-append
            "# " (->string (or (get-name pkg) "")) "\n"
-           "## Index \n
-- [Intro](#Intro)
-- [API](#API)
-- [Examples](#Examples)
-- [Author(s)](#Author(s))    
-- [Maintainer(s)](#Maintainer(s))
-- [Version](#Version)
-- [License](#License)
-- [Tags](#Tags)
+           "## Index \n"
+           "- [Intro](#Intro)\n"
+           "- [Dependencies](#Dependencies)\n"
+           "- [Test dependencies](#Test-dependencies)\n"
+           "- [Foreign dependencies](#Foreign-dependencies)\n"
+           "- [API](#API)\n"
+           "- [Examples](#Examples)\n"
+           "- [Author(s)](#Author(s))\n"
+           "- [Maintainer(s)](#Maintainer(s))\n"
+           "- [Version](#Version) \n"
+           "- [License](#License) \n"
+           "- [Tags](#Tags) \n\n"
 
-## Intro \n"
+           "## Intro \n"
            (or (get-description pkg) "") "\n\n" 
+
+           "## Dependencies \n"
+           (or (get-dependencies pkg) "None") "\n\n" 
+
+           "## Test-dependencies \n"
+           (or (get-test-description pkg) "None") "\n\n" 
+
+           "## Foreign-dependencies \n"
+           (or (get-foreign-description pkg) "None") "\n\n" 
 
            "## API \n\n"
            (string-join
@@ -544,36 +556,34 @@
                           (cadr lib+exp)))))
                  libraries+exports))
 
-           "## Examples
-```scheme
-(import (scheme base)
-        (cyclone " (->string (or (get-name pkg) "")) "))
- 
-```
+           "## Examples\n"
+           "```scheme\n"
+           (import (scheme base)
+                   (cyclone " (->string (or (get-name pkg) "")) "))
+           "\n```\n\n"
 
-## Author(s) \n"
-        (or (get-authors pkg) "") "\n\n"
+           "## Author(s)\n"
+           (or (get-authors pkg) "") "\n\n"
 
-        "## Maintainer(s) \n"
-        (or (get-maintainers pkg) "") "\n\n" 
+           "## Maintainer(s) \n"
+           (or (get-maintainers pkg) "") "\n\n" 
 
-        "## Version \n"
-        (->string (or (get-version pkg) "")) "\n\n"
+           "## Version \n"
+           (->string (or (get-version pkg) "")) "\n\n"
 
-        "## License \n"
-        (or (get-license pkg) "") "\n\n"
+           "## License \n"
+           (or (get-license pkg) "") "\n\n"
 
-        "## Tags \n"
-        (let ((tags (or (get-tags pkg) "")))
-          (if (string? tags)
-              tags
-              (string-join tags " "))))))
-    
-    (if (file-exists? doc-path) 
+           "## Tags \n"
+           (let ((tags (or (get-tags pkg) "")))
+             (if (string? tags)
+                 tags
+                 (string-join tags " "))))))
+
+    (if (file-exists? doc-path)
         (begin 
           (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
           (delete doc-path)))
-    
     (touch doc-path)
     (pretty-print markdown (open-output-file doc-path))))
 
@@ -642,18 +652,18 @@
                       (->path (car dir) (*default-code-directory*)))))
     (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
       (let* ((libs+exps+incls
-             (map (lambda (sld)
-                    (let ((content
-                           (read (open-input-file sld))))
-                      (list (lib:name content) (lib:exports content) (lib:includes content))))
-                  sld-files))
-            (libs (remove null? (fold-right cons '() (map car libs+exps+incls))))
-            (exps (remove null? (map cadr libs+exps+incls)))   
-            ;; We can consider 'programs' those .scm files that are not included by .sld ones.
-            (includes (flatten (map caddr libs+exps+incls)))	 
-            (progs
-             (lset-difference (lambda (f1 f2)
-                                (string=? (path-strip-directory f1) f2)) scm-files includes)))
+              (map (lambda (sld)
+                     (let ((content
+                            (read (open-input-file sld))))
+                       (list (lib:name content) (lib:exports content) (lib:includes content))))
+                   sld-files))
+             (libs (remove null? (fold-right cons '() (map car libs+exps+incls))))
+             (exps (remove null? (map cadr libs+exps+incls)))   
+             ;; We can consider 'programs' those .scm files that are not included by .sld ones.
+             (includes (flatten (map caddr libs+exps+incls)))	 
+             (progs
+              (lset-difference (lambda (f1 f2)
+                                 (string=? (path-strip-directory f1) f2)) scm-files includes)))
         ;; (newline) (pretty-print (list libs exps progs)) (newline)
         ;; (newline) (pretty-print libs+exps+incls) (newline)    
         ;; (values '((cyclone iset)) '((make-iset iset-diff)) '("test"))
