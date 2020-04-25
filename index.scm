@@ -31,6 +31,10 @@
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
        "08deeba553c023a1af641e78887630ab3ff20c40f5f9c021fcb8a68c89d0e859"))
+ (mime
+  (0.1 "https://github.com/cyclone-scheme/mime/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/mime/archive/v0.1.tar.gz" 
+       "e7c977420d997915af01ec9fadca174511d3d9d48ee05dd0ca5c497e8a11a938"))
  (packrat
   (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
@@ -64,9 +68,9 @@
        "https://github.com/cyclone-scheme/srfi-173/archive/v0.3.tar.gz" 
        "33bcdf819b6d68ee66877503776ebb34891244c192601a3b8a0532d3c5012067"))
  (string
-  (0.1 "https://github.com/cyclone-scheme/string/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/string/archive/v0.1.tar.gz" 
-       "73945445AB0A5C607B501B84136E388F579F9DF6D1052F84FE880CD68B87BC6A"))
+  (0.3 "https://github.com/cyclone-scheme/string/raw/v0.3/package.scm" 
+       "https://github.com/cyclone-scheme/string/archive/v0.3.tar.gz" 
+       "e7adc808988606fffdcbfc0bd753f9072707aac8307f664eb0faa53fb5384ced"))
  (sxml
   (0.1 "https://github.com/cyclone-scheme/sxml/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
