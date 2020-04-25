@@ -535,13 +535,13 @@
            (or (get-description pkg) "") "\n\n" 
 
            "## Dependencies \n"
-           (or (get-dependencies pkg) "None") "\n\n" 
+           (->string (or (get-dependencies pkg) "None")) "\n\n" 
 
            "## Test-dependencies \n"
-           (or (get-test-dependencies pkg) "None") "\n\n" 
+           (->string (or (get-test-dependencies pkg) "None")) "\n\n" 
 
            "## Foreign-dependencies \n"
-           (or (get-foreign-dependencies pkg) "None") "\n\n" 
+           (->string (or (get-foreign-dependencies pkg) "None")) "\n\n" 
 
            "## API \n\n"
            (string-join
@@ -578,7 +578,8 @@
            (let ((tags (or (get-tags pkg) "")))
              (if (string? tags)
                  tags
-                 (string-join tags " "))))))
+                 (string-join tags " "))))
+          ))
 
     (if (file-exists? doc-path)
         (begin 
@@ -643,7 +644,6 @@
                                                        (->path dir d))
                                                      (cadr dir-content))))))))
     (let ((sld+scm (traverse work-dir)))
-      (newline) (pretty-print sld+scm) (newline)
       (values (sld-files sld+scm) (scm-files sld+scm)))))
 
 (define (libraries+exports+programs . dir)
@@ -664,9 +664,6 @@
              (progs
               (lset-difference (lambda (f1 f2)
                                  (string=? (path-strip-directory f1) f2)) scm-files includes)))
-        ;; (newline) (pretty-print (list libs exps progs)) (newline)
-        ;; (newline) (pretty-print libs+exps+incls) (newline)    
-        ;; (values '((cyclone iset)) '((make-iset iset-diff)) '("test"))
         (values libs exps progs)))))
 ;; End of package-related procedures
 
