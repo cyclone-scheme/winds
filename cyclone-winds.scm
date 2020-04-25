@@ -532,7 +532,7 @@
            "- [Tags](#Tags) \n\n"
 
            "## Intro \n"
-           (or (get-description pkg) "") "\n\n" 
+           (->string (or (get-description pkg) "")) "\n\n" 
 
            "## Dependencies \n"
            (->string (or (get-dependencies pkg) "None")) "\n\n" 
@@ -563,23 +563,22 @@
            "\n```\n\n"
 
            "## Author(s)\n"
-           (or (get-authors pkg) "") "\n\n"
+           (->string (or (get-authors pkg) "")) "\n\n"
 
            "## Maintainer(s) \n"
-           (or (get-maintainers pkg) "") "\n\n" 
+           (->string (or (get-maintainers pkg) "")) "\n\n" 
 
            "## Version \n"
            (->string (or (get-version pkg) "")) "\n\n"
 
            "## License \n"
-           (or (get-license pkg) "") "\n\n"
+           (->string (or (get-license pkg) "")) "\n\n"
 
            "## Tags \n"
            (let ((tags (or (get-tags pkg) "")))
              (if (string? tags)
                  tags
-                 (string-join tags " "))))
-          ))
+                 (string-join tags " "))))))
 
     (if (file-exists? doc-path)
         (begin 
