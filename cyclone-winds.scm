@@ -538,10 +538,10 @@
            (or (get-dependencies pkg) "None") "\n\n" 
 
            "## Test-dependencies \n"
-           (or (get-test-description pkg) "None") "\n\n" 
+           (or (get-test-dependencies pkg) "None") "\n\n" 
 
            "## Foreign-dependencies \n"
-           (or (get-foreign-description pkg) "None") "\n\n" 
+           (or (get-foreign-dependencies pkg) "None") "\n\n" 
 
            "## API \n\n"
            (string-join
@@ -558,8 +558,8 @@
 
            "## Examples\n"
            "```scheme\n"
-           (import (scheme base)
-                   (cyclone " (->string (or (get-name pkg) "")) "))
+           "(import (scheme base)
+                    (cyclone " (->string (or (get-name pkg) "____")) "))"
            "\n```\n\n"
 
            "## Author(s)\n"
