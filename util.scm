@@ -67,7 +67,7 @@
                (lp (+ i 1)))))))
 
 (define (slist->string slst)
-  (string-join (map symbol->string slst) " "))
+  (string-join (map ->string slst) " "))
 
 ;; Convert command-line string list into proper list
 ;; i.e. "(crypto md5)" -> (crypto md5)
