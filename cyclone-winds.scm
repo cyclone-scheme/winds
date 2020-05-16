@@ -48,8 +48,8 @@
 
 (define (pkg-info index pkg-name)
   (match (assoc pkg-name index)
-	 (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
-	 ((pkg-name latest-version old-versions ...) latest-version)))
+    (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
+    ((pkg-name latest-version old-versions ...) latest-version)))
 
 (define (version pkg-info)
   (car pkg-info))
@@ -76,21 +76,21 @@
 (define (local-index-contains? index name pkg-ver cyc-ver)
   (define (->num obj)
     (cond
-      ((string? obj)
-       (string->number obj))
-      ((number? obj)
-       obj)
-      (else
-       (error "Unable to convert to number" obj))))
+     ((string? obj)
+      (string->number obj))
+     ((number? obj)
+      obj)
+     (else
+      (error "Unable to convert to number" obj))))
 
   (let ((metadata (assoc name index)))
     (cond
-      ((pair? metadata)
-       (let ((idx-pkg-ver (cadr metadata))
-             (idx-cyc-ver (caddr metadata)))
-         (and (>= (->num idx-pkg-ver) (->num pkg-ver))
-              (>= (->num idx-cyc-ver) (->num cyc-ver)))))
-      (else #f))))
+     ((pair? metadata)
+      (let ((idx-pkg-ver (cadr metadata))
+            (idx-cyc-ver (caddr metadata)))
+        (and (>= (->num idx-pkg-ver) (->num pkg-ver))
+             (>= (->num idx-cyc-ver) (->num cyc-ver)))))
+     (else #f))))
 
 (define (get-local-index)
   (if (file-exists? *default-local-index*)
@@ -332,23 +332,23 @@
 
 (define (retrieve-package index name . dir)
   (match-let (((version _ tarball-url sha256sum) (pkg-info index name)))
-	     (let* ((pkg-name (if (list? name)
-				  (string-join (map ->string name) #\-)
-				  (->string name)))
-		    (work-dir (if (null? dir)
-				  (random-temp-dir pkg-name)
-				  (->path (car dir) pkg-name)))
-		    (tarball
-		     (string-append (string-join (list pkg-name (->string version)) #\-)
-				    ".tar.gz"))
-		    (outfile (->path work-dir tarball)))
-	       (make-dir work-dir)
-	       (display (format "~%Downloading ~a (version ~a)...~%" name version))
-	       (download tarball-url outfile)
-	       (validate-sha256sum sha256sum outfile)
-	       (extract outfile work-dir)
-	       (delete outfile)               
-	       work-dir)))
+    (let* ((pkg-name (if (list? name)
+                         (string-join (map ->string name) #\-)
+                         (->string name)))
+           (work-dir (if (null? dir)
+                         (random-temp-dir pkg-name)
+                         (->path (car dir) pkg-name)))
+           (tarball
+            (string-append (string-join (list pkg-name (->string version)) #\-)
+                           ".tar.gz"))
+           (outfile (->path work-dir tarball)))
+      (make-dir work-dir)
+      (display (format "~%Downloading ~a (version ~a)...~%" name version))
+      (download tarball-url outfile)
+      (validate-sha256sum sha256sum outfile)
+      (extract outfile work-dir)
+      (delete outfile)               
+      work-dir)))
 
 (define (get-package-remote-metadata index name . dir)
   (let* ((work-dir (if (null? dir)
@@ -477,7 +477,7 @@
                      (lambda (test-dep)
                        (uninstall test-dep))
                      test-dependencies))
-               (display (format "[OK] Tests performed~%")))
+               (display (format "Tests performed~%")))
              (error (format "Could not run tests or tests failed. Running them without building package first?~%"))))))
 
 (define (build-local . dir)
@@ -569,25 +569,25 @@
            "```scheme\n"
            "(import (scheme base)
                     (cyclone " (->string (or (get-name pkg) "____")) "))"
-           "\n```\n\n"
+                    "\n```\n\n"
 
-           "## Author(s)\n"
-           (->string (or (get-authors pkg) "")) "\n\n"
+                    "## Author(s)\n"
+                    (->string (or (get-authors pkg) "")) "\n\n"
 
-           "## Maintainer(s) \n"
-           (->string (or (get-maintainers pkg) "")) "\n\n" 
+                    "## Maintainer(s) \n"
+                    (->string (or (get-maintainers pkg) "")) "\n\n" 
 
-           "## Version \n"
-           (->string (or (get-version pkg) "")) "\n\n"
+                    "## Version \n"
+                    (->string (or (get-version pkg) "")) "\n\n"
 
-           "## License \n"
-           (->string (or (get-license pkg) "")) "\n\n"
+                    "## License \n"
+                    (->string (or (get-license pkg) "")) "\n\n"
 
-           "## Tags \n"
-           (let ((tags (or (get-tags pkg) "")))
-             (if (string? tags)
-                 tags
-                 (string-join tags " "))))))
+                    "## Tags \n"
+                    (let ((tags (or (get-tags pkg) "")))
+                      (if (string? tags)
+                          tags
+                          (string-join tags " "))))))
 
     (if (file-exists? doc-path)
         (begin 
@@ -816,26 +816,27 @@
 
 (define (main)
   (match (map string->proper-symbol (command-line))
-	 ((_ . ()) (display (usage)))
-	 ((_ 'help) (usage))
-	 ((_ 'retrieve pkgs ..1) (retrieve pkgs))
-	 ((_ 'install pkgs ..1) (install pkgs))
-	 ((_ 'reinstall pkgs ..1) (reinstall pkgs))
-	 ((_ 'upgrade) (upgrade))
-	 ((_ 'upgrade pkgs ..1) (upgrade pkgs))
-	 ((_ 'uninstall pkgs ..1) (uninstall pkgs))
-	 ((_ 'search term) (search term))
-	 ((_ 'info name) (info name))
-	 ((_ 'local-status) (local-status))
-	 ((_ 'index) (index))
-	 ((_ 'build-local) (build-local))
-	 ((_ 'build-local dir) (build-local dir))    
-	 ((_ 'test-local) (test-local))
-	 ((_ 'test-local dir) (test-local dir))    
-	 ((_ 'package) (package))
-	 ((_ 'package dir) (package dir))    
-	 ((_ 'repl) (repl)) ;; Allow interactive debugging
-	 (else (usage))))
+    ((_ 'debug rest)
+     (parameterize ((*log-level* 'debug))
+       (match rest
+         ((_ 'retrieve pkgs ..1) (retrieve pkgs))
+         ((_ 'install pkgs ..1) (install pkgs))
+         ((_ 'reinstall pkgs ..1) (reinstall pkgs))
+         ((_ 'upgrade) (upgrade))
+         ((_ 'upgrade pkgs ..1) (upgrade pkgs))
+         ((_ 'uninstall pkgs ..1) (uninstall pkgs))
+         ((_ 'search term) (search term))
+         ((_ 'info name) (info name))
+         ((_ 'local-status) (local-status))
+         ((_ 'index) (index))
+         ((_ 'build-local) (build-local))
+         ((_ 'build-local dir) (build-local dir))    
+         ((_ 'test-local) (test-local))
+         ((_ 'test-local dir) (test-local dir))    
+         ((_ 'package) (package))
+         ((_ 'package dir) (package dir))    
+         ((_ 'repl) (repl)) ;; Allow interactive debugging
+         (else (usage)))))))
 
 (main)
 ;; End of user interface procedures
