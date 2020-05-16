@@ -14,7 +14,7 @@
   (eq? 0 return-code))
 
 (define (command-exists? command)
-  (ok? (system (format "command -v ~a" command))))
+  (ok? (system (format "command -v ~a > /dev/null" command))))
 
 (define (download url outfile)
   (let ((result
