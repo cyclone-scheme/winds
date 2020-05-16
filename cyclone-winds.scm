@@ -815,11 +815,11 @@
     *banner*)))
 
 (define (main)
-  (match (map string->proper-symbol (command-line))
-    ((_ 'debug rest)
-     (parameterize ((*log-level* 'debug))
-       (dispatch rest)))
-    (else (dispatch rest))))
+  (let ((cmd-line (map string->proper-symbol (command-line))))
+    (if (eq? (cadr cmd-line) 'debug)
+        (parameterize ((*log-level* 'debug))
+          (dispatch cmd-line))
+        (dispatch cmd-line))))
 
 (define (dispatch cmds)
   (match cmds
