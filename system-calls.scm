@@ -1,11 +1,15 @@
-;; Primitive log system
-(define *log-level* 'warning)
+;; Minimal log system
+(define *log-level* (make-parameter 'warning))
 
 (define-syntax DEBUG
   (syntax-rules ()
     ((_ cmd)
      (if (eq? *log-level* 'debug)
-         cmd))))
+         cmd
+         ""))))
+
+(define (DEBUG?)
+  (eq? (*log-level*) 'debug))
 
 (define (ok? return-code)
   (eq? 0 return-code))
@@ -16,9 +20,13 @@
 (define (download url outfile)
   (let ((result
          (cond ((command-exists? "wget")
-                (system (format "wget --quiet --show-progress --progress=bar:force:noscroll -O ~a ~a" outfile url)))
+                (if (DEBUG?)
+                    (system (format "wget --progress=bar:force:noscroll -O ~a ~a" outfile url))
+                    (system (format "wget --progress=bar:force:noscroll -O ~a ~a > /dev/null" outfile url))))
                ((command-exists? "curl")
-                (system (format "curl -s -L ~a --output ~a" url outfile)))
+                (if (DEBUG?)
+                    (system (format "curl -L ~a --output ~a" url outfile))
+                    (system (format "curl -s -L ~a --output ~a" url outfile))))
                (else (error (format "Could not find curl/wget. Please install one of those programs to continue~%"))))))
     (if (ok? result)
         (begin (DEBUG (display (format "[OK] Downloaded ~a~%" outfile)))
@@ -28,9 +36,13 @@
 (define (validate-sha256sum sha256sum file)
   (let ((result
          (cond ((command-exists? "sha256sum")
-                (system (format "echo ~a ~a | sha256sum --status --check -" sha256sum file)))
+                (if (DEBUG?)
+                    (system (format "echo ~a ~a | sha256sum --status --check -" sha256sum file))
+                    (system (format "echo ~a ~a | sha256sum --status --check - > /dev/null" sha256sum file))))
                ((command-exists? "sha256")
-                (system (format "sha256 -q -c ~a ~a" sha256sum file)))
+                (if (DEBUG?)
+                    (system (format "sha256 -c ~a ~a" sha256sum file))
+                    (system (format "sha256 -c ~a ~a > /dev/null" sha256sum file))))
                (else (error (format "Could not find sha256/sha256sum. Please install one of those programs to continue~%"))))))
     (if (ok? result)
         (begin (DEBUG (display (format "[OK] Passed sha256sum verification~%" )))
@@ -53,7 +65,7 @@
 
 (define (compile file . dir)
   (let* ((dir (if (null? dir) "." (car dir)))
-         (result (system (format "cyclone -Wno-unused-command-line-argument -A ~a -A ~a ~a" dir (path-dir file) file))))
+         (result (system (format "cyclone -A ~a -A ~a ~a" dir (path-dir file) file))))
     (if (ok? result)
         (begin (DEBUG (display (format "[OK] File ~a compiled~%" file)))
                file)
@@ -62,7 +74,8 @@
 (define (make-dir path)
   (let ((result (system (format "mkdir -p ~a" path))))
     (if (ok? result)
-        path
+        (begin (DEBUG (display (format "[OK] Created dir ~a~%" path)))
+               path)
         (error (format "Could not create path ~a. Lack of permissions? Return code" path) result))))
 
 (define (copy-file-to-dir file to-dir)
@@ -77,9 +90,9 @@
   (make-dir to-dir)
   (let ((result (system (format "cp -Rf ~a ~a" dir to-dir))))
     (if (ok? result)
-        (begin (DEBUG (display (format "[OK] Dir ~a copied into ~a~%" dir to-dir)))
+        (begin (DEBUG (display (format "[OK] Directory ~a copied into ~a~%" dir to-dir)))
                dir)
-        (error (format "Could not copy dir ~a into ~a. Lack of permissions? Return code" dir to-dir) result))))
+        (error (format "Could not copy directory ~a into ~a. Lack of permissions? Return code" dir to-dir) result))))
 
 (define (copy-file file to-file)
   (let ((result (system (format "cp ~a ~a" file to-file))))
@@ -91,5 +104,6 @@
 (define (touch file)
   (let ((result (system (format "touch ~a" file))))
     (if (ok? result)
-        file
+        (begin (DEBUG (display (format "[OK] Touched file ~a~%" file)))
+               file)
         (error (format "Could not touch file ~a. Lack of permissions? Return code" file) result))))
