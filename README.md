@@ -28,7 +28,7 @@ Optionally it is possible to pass `PREFIX` to set another destination directory.
 ## Usage
 
 ```
-$ cyclone-winds [OPTIONS [PACKAGES]]
+$ cyclone-winds [-v] COMMAND [PACKAGES]
 ```
     
     COMMANDS:

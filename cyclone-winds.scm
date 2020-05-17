@@ -788,7 +788,7 @@
   (display
    (format
     "~a
-  Usage: cyclone-winds [-v] [COMMANDS [PACKAGES]]
+  Usage: cyclone-winds [-v] COMMAND [PACKAGES]
   
   COMMANDS:
 
