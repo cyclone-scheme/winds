@@ -40,7 +40,7 @@
   (let* ((tmp-dir (random-temp-dir))
          (index-path (->path tmp-dir "index.scm")))
     (make-dir tmp-dir)
-    (display (format "~%Retrieving index file...~%"))
+    (display (format "Retrieving index file...~%"))
     (download *default-index-url* index-path)
     (let ((content (cdr (read (open-input-file index-path)))))
       (delete tmp-dir)
@@ -105,7 +105,7 @@
                      (remove (lambda (pkg)
                                (equal? (car pkg) name))
                              local-index)))))
-    (display (format "~%Package ~a (version ~a) successfuly installed with Cyclone ~a.~%" name version cyc-version))))
+    (display (format "Package ~a (version ~a) successfuly installed with Cyclone ~a.~%" name version cyc-version))))
 
 (define (unregister-installed-package! name)
   (let* ((local-index (get-local-index)))
@@ -114,7 +114,7 @@
         (write (remove (lambda (pkg)
                          (equal? (car pkg) name))
                        local-index))))
-    (display (format "~%Package ~a successfuly uninstalled.~%" name))))
+    (display (format "Package ~a successfuly uninstalled.~%" name))))
 ;; End of index-related procedures
 
 
@@ -343,7 +343,7 @@
                            ".tar.gz"))
            (outfile (->path work-dir tarball)))
       (make-dir work-dir)
-      (display (format "~%Downloading ~a (version ~a)...~%" name version))
+      (display (format "Downloading ~a (version ~a)...~%" name version))
       (download tarball-url outfile)
       (validate-sha256sum sha256sum outfile)
       (extract outfile work-dir)
@@ -704,7 +704,7 @@
 
       (write-metadata-file! pkg metadata-path)
       (write-doc-file! pkg work-dir)
-      (display (format "~%Scaffolded directory tree and generated stubs for ~a and ~a.~%"
+      (display (format "Scaffolded directory tree and generated stubs for ~a and ~a.~%"
                        *default-metadata-file* *default-doc-file*)))))
 
 (define (retrieve pkgs)
@@ -712,7 +712,7 @@
     (for-each
      (lambda (pkg)
        (display
-	(format "~%Package ~a retrieved into ~a~%"
+	(format "Package ~a retrieved into ~a~%"
 		pkg (retrieve-package index pkg "."))))
      pkgs)))
 
@@ -811,7 +811,7 @@
  
   PACKAGES:
        Name of the package. Note this can be a symbol or a quoted list of 
-       two or more symbols, e.g. \"(cyclone iset)\"~%~%"
+       two or more symbols, e.g. \"(cyclone iset)\"~%"
     *banner*)))
 
 (define (main)
