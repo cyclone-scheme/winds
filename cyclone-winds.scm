@@ -788,58 +788,65 @@
   (display
    (format
     "~a
-  Usage: cyclone-winds [OPTIONS [PACKAGES]]
+  Usage: cyclone-winds [-v] [COMMANDS [PACKAGES]]
   
-  OPTIONS:
+  COMMANDS:
 
     COMMON USE:
     help  -  print usage
-    retrieve PACKAGE [PACKAGE2 ...]  - downloads and extracts specified PACKAGE(s)
-    install PACKAGE [PACKAGE2 ...] - retrieve and install specified PACKAGE(s)
-    reinstall PACKAGE [PACKAGE2 ...] - retrieve and reinstall specified PACKAGE(s)
+    retrieve PACKAGE [...]  - downloads and extracts specified PACKAGE(s)
+    install PACKAGE [...] - retrieve and install specified PACKAGE(s)
+    reinstall PACKAGE [...] - retrieve and reinstall specified PACKAGE(s)
     upgrade [PACKAGE ...] - upgrade all installed packages or specified PACKAGE(s)
-    uninstall PACKAGE [PACKAGE2 ...] - remove specified PACKAGE(s)
+    uninstall PACKAGE [...] - remove specified PACKAGE(s)
     search TERM - search for packages whose name (partially) match the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
     local-status - list all installed packages
     index - pretty-prints cyclone-winds packages index
 
     PACKAGE AUTHORING:
-    build-local [DIRECTORY] - build local package using package.scm from DIRECTORY or \".\"
-    test-local [DIRECTORY] - test local package using (test ...) from package.scm in DIRECTORY or \".\"
-    package [DIRECTORY] - scaffold DIRECTORY layout and a package.scm stub
+    build-local [DIR] - build local package using package.scm from DIR or \".\"
+    test-local [DIR] - test local package using package.scm in DIR or \".\"
+    package [DIR] - scaffold DIR layout and a package.scm stub
  
   PACKAGES:
-       Name of the package. Note this can be a quoted list of two or more symbols, 
-       starting with 'cyclone'. Ex.: \"(cyclone iset)\"~%~%"
+       Name of the package. Note this can be a symbol or a quoted list of 
+       two or more symbols, e.g. \"(cyclone iset)\"~%~%"
     *banner*)))
 
 (define (main)
-  (let ((cmd-line (map string->proper-symbol (command-line))))
-    (if (eq? (cadr cmd-line) 'debug)
-        (parameterize ((*log-level* 'debug))
-          (dispatch cmd-line))
-        (dispatch cmd-line))))
+  (match (map string->proper-symbol (command-line))
+    ((_ '-v . rest)
+     (parameterize ((*log-level* 'debug))
+       (dispatch rest)))
+    ((_ . rest)
+     (dispatch rest))))
 
 (define (dispatch cmds)
   (match cmds
-    ((_ 'retrieve pkgs ..1) (retrieve pkgs))
-    ((_ 'install pkgs ..1) (install pkgs))
-    ((_ 'reinstall pkgs ..1) (reinstall pkgs))
-    ((_ 'upgrade) (upgrade))
-    ((_ 'upgrade pkgs ..1) (upgrade pkgs))
-    ((_ 'uninstall pkgs ..1) (uninstall pkgs))
-    ((_ 'search term) (search term))
-    ((_ 'info name) (info name))
-    ((_ 'local-status) (local-status))
-    ((_ 'index) (index))
-    ((_ 'build-local) (build-local))
-    ((_ 'build-local dir) (build-local dir))    
-    ((_ 'test-local) (test-local))
-    ((_ 'test-local dir) (test-local dir))    
-    ((_ 'package) (package))
-    ((_ 'package dir) (package dir))    
-    ((_ 'repl) (repl)) ;; Allow interactive debugging
+    (('retrieve pkgs ..1) (retrieve pkgs))
+    (('install pkgs ..1) (install pkgs))
+    (('reinstall pkgs ..1) (reinstall pkgs))
+    (('upgrade) (upgrade))
+    (('upgrade pkgs ..1) (upgrade pkgs))
+    (('uninstall pkgs ..1) (uninstall pkgs))
+    (('search term) (search term))
+    (('info name) (info name))
+    (('local-status) (local-status))
+    (('index) (index))
+    (('build-local) (build-local))
+    (('build-local dir) (build-local dir))    
+    (('test-local) (test-local))
+    (('test-local dir) (test-local dir))    
+    (('package) (package))
+    (('package dir) (package dir))    
+    (('package-srfi)
+     (parameterize ((*default-code-directory* "srfi"))
+       (package)))
+    (('package-srfi dir)
+     (parameterize ((*default-code-directory* "srfi"))
+       (package dir)))    
+    (('repl) (repl)) ;; Allow interactive debugging
     (else (usage))))
 
 (main)

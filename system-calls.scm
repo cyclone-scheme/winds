@@ -4,9 +4,8 @@
 (define-syntax DEBUG
   (syntax-rules ()
     ((_ cmd)
-     (if (eq? *log-level* 'debug)
-         cmd
-         ""))))
+     (if (eq? (*log-level*) 'debug)
+         cmd))))
 
 (define (DEBUG?)
   (eq? (*log-level*) 'debug))
@@ -22,7 +21,7 @@
          (cond ((command-exists? "wget")
                 (if (DEBUG?)
                     (system (format "wget --progress=bar:force:noscroll -O ~a ~a" outfile url))
-                    (system (format "wget --progress=bar:force:noscroll -O ~a ~a > /dev/null" outfile url))))
+                    (system (format "wget --quiet -O ~a ~a > /dev/null" outfile url))))
                ((command-exists? "curl")
                 (if (DEBUG?)
                     (system (format "curl -L ~a --output ~a" url outfile))
