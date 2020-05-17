@@ -49,6 +49,7 @@ $ cyclone-winds [-v] COMMAND [PACKAGES]
       build-local [DIR] - build local package using package.scm from DIR or \".\"
       test-local [DIR] - test local package using package.scm in DIR or \".\"
       package [DIR] - scaffold DIR layout and a package.scm stub
+      package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
    
     PACKAGES:
          Name of the package. Note this can be a symbol or a quoted list of 

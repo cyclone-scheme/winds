@@ -567,27 +567,27 @@
 
            "## Examples\n"
            "```scheme\n"
-           "(import (scheme base)
-                    (cyclone " (->string (or (get-name pkg) "____")) "))"
-                    "\n```\n\n"
+           "(import (scheme base)\n"
+           "        (cyclone " (->string (or (get-name pkg) "____")) "))"
+           "\n```\n\n"
 
-                    "## Author(s)\n"
-                    (->string (or (get-authors pkg) "")) "\n\n"
+           "## Author(s)\n"
+           (->string (or (get-authors pkg) "")) "\n\n"
 
-                    "## Maintainer(s) \n"
-                    (->string (or (get-maintainers pkg) "")) "\n\n" 
+           "## Maintainer(s) \n"
+           (->string (or (get-maintainers pkg) "")) "\n\n" 
 
-                    "## Version \n"
-                    (->string (or (get-version pkg) "")) "\n\n"
+           "## Version \n"
+           (->string (or (get-version pkg) "")) "\n\n"
 
-                    "## License \n"
-                    (->string (or (get-license pkg) "")) "\n\n"
+           "## License \n"
+           (->string (or (get-license pkg) "")) "\n\n"
 
-                    "## Tags \n"
-                    (let ((tags (or (get-tags pkg) "")))
-                      (if (string? tags)
-                          tags
-                          (string-join tags " "))))))
+           "## Tags \n"
+           (let ((tags (or (get-tags pkg) "")))
+             (if (string? tags)
+                 tags
+                 (string-join tags " "))))))
 
     (if (file-exists? doc-path)
         (begin 
@@ -808,6 +808,7 @@
     build-local [DIR] - build local package using package.scm from DIR or \".\"
     test-local [DIR] - test local package using package.scm in DIR or \".\"
     package [DIR] - scaffold DIR layout and a package.scm stub
+    package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
  
   PACKAGES:
        Name of the package. Note this can be a symbol or a quoted list of 
