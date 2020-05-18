@@ -11,6 +11,10 @@
   (0.2 "https://github.com/cyclone-scheme/char-set/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/char-set/archive/v0.2.tar.gz" 
        "534f0d0418eb63ec01f2bc788f970180f0ae4687a22c4c5f925805692b38bb8b"))
+ (clojurian
+  (0.1 "https://github.com/cyclone-scheme/clojurian/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/clojurian/archive/v0.1.tar.gz" 
+       "c2038cb9d3c59c9364ce1c27904591dbd472e19dee3e46ea93452c8d1aa7b583"))
  (csv
   (0.1 "https://github.com/cyclone-scheme/csv/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/csv/archive/v0.1.tar.gz" 
