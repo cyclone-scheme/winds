@@ -580,7 +580,7 @@
                             (string-append
                              "#### "
                              (or
-                              (and def
+                              (and def (list? def)
                                    (string-append "[" (->string (car def)) "]"
                                                   "  " (->string (cadr def)))
                                    )
