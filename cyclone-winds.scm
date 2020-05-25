@@ -205,7 +205,7 @@
   (_programs get-programs set-programs!)
   (_libraries-names get-libraries-names set-libraries-names!)
   (_programs-names get-programs-names set-programs-names!)
-  (_exports get-exports set-exports!))
+  (_exported-defines get-exported-defines set-exported-defines!))
 
 (define (metadata->pkg metadata)
   (let* ((md (if (null? metadata) metadata (cdr metadata)))
@@ -520,10 +520,28 @@
               (string-contains file c))
             *doc-candidates*)))
 
+
+(define (lib:defines->type-and-signature defines)
+  (map
+   (lambda (d)
+     (match d
+       (('define var . body)
+        (cond
+         ((list? var) ;; e.g. (define (a x) x)
+          (list 'procedure var))
+         ((pair? var) ;; e.g. (define (a x . y) x)
+          (list 'procedure var))
+         ((lambda? (car body)) ;; e.g.: (define proc (lambda (x) x))
+          (list 'procedure (cons var (cadar body))))
+         (else (list 'variable var)))) ;; variable
+       (('define-syntax var body) ;; macro - can't infer params automatically
+        (list 'syntax (list var 'PARAMS)))))
+   defines))
+
 (define (write-doc-file! pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path work-dir *default-doc-file*))
-         (libraries+exports (zip (get-libraries-names pkg) (get-exports pkg)))
+         (libraries+defines (zip (get-libraries-names pkg) (get-exported-defines pkg)))
          (markdown
           (string-append
            "# " (->string (or (get-name pkg) "")) "\n"
@@ -554,16 +572,22 @@
 
            "## API \n\n"
            (string-join
-            (map (lambda (lib+exp)
+            (map (lambda (lib+def)
                    (string-append
-                    "### (" (string-join (or (car lib+exp) "") " ") ")\n\n"
+                    "### (" (string-join (or (car lib+def) "") " ") ")\n\n"
                     (string-join
-                     (map (lambda (exp)
+                     (map (lambda (def)
                             (string-append
-                             "#### " (->string (or exp "")) "\n"
-                             "`(" (->string (or exp "")) "   )` \n\n"))
-                          (cadr lib+exp)))))
-                 libraries+exports))
+                             "#### "
+                             (or
+                              (and def
+                                   (string-append "[" (->string (car def)) "]"
+                                                  "  " (->string (cadr def)))
+                                   )
+                              "")
+                             "\n\n\n"))
+                          (cadr lib+def)))))
+                 libraries+defines))
 
            "## Examples\n"
            "```scheme\n"
@@ -656,25 +680,51 @@
     (let ((sld+scm (traverse work-dir)))
       (values (sld-files sld+scm) (scm-files sld+scm)))))
 
-(define (libraries+exports+programs . dir)
+(define (get-all-defines ast)
+  (append (get-parameter-all-occurrences 'define ast)
+          (get-parameter-all-occurrences 'define-syntax ast)))
+
+(define (get-exported-defines exports defines)
+  (filter (lambda (d)
+            (let ((var (cadr d)))
+              (if (list? var) ;; procedure
+                  (member (car var) exports)
+                  (member var exports))))
+          defines))
+
+(define (lib:defines ast work-dir)
+  (let ((body-defines (get-all-defines (lib:body ast)))
+        (include-defines
+         (map (lambda (i)
+                (get-all-defines
+                 (read-all
+                  (open-input-file
+                   (string-append work-dir i)))))
+              (lib:includes ast))))
+    (append body-defines
+            (or (and (pair? include-defines)
+                     (car include-defines))
+                '()))))
+
+(define (libraries+defines+programs . dir)
   (let ((work-dir (if (null? dir)
                       (*default-code-directory*)
                       (->path (car dir) (*default-code-directory*)))))
     (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
-      (let* ((libs+exps+incls
+      (let* ((libs+defs+incls
               (map (lambda (sld)
                      (let ((content
                             (read (open-input-file sld))))
-                       (list (lib:name content) (lib:exports content) (lib:includes content))))
+                       (list (lib:name content) (lib:defines content work-dir) (lib:includes content))))
                    sld-files))
-             (libs (remove null? (fold-right cons '() (map car libs+exps+incls))))
-             (exps (remove null? (map cadr libs+exps+incls)))   
+             (libs (remove null? (fold-right cons '() (map car libs+defs+incls))))
+             (defs (remove null? (map cadr libs+defs+incls)))   
              ;; We can consider 'programs' those .scm files that are not included by .sld ones.
-             (includes (flatten (map caddr libs+exps+incls)))	 
+             (includes (flatten (map caddr libs+defs+incls)))	 
              (progs
               (lset-difference (lambda (f1 f2)
                                  (string=? (path-strip-directory f1) f2)) scm-files includes)))
-        (values libs exps progs)))))
+        (values libs defs progs)))))
 ;; End of package-related procedures
 
 
@@ -691,10 +741,10 @@
                   (metadata->pkg '()))))
 
     (structure-directory-tree! pkg work-dir)
-    (let-values (((libs exps progs) (libraries+exports+programs work-dir)))
+    (let-values (((libs defs progs) (libraries+defines+programs work-dir)))
       (set-libraries-names! pkg libs)
       (set-programs-names! pkg progs)
-      (set-exports! pkg exps) 
+      (set-exported-defines! pkg defs) 
 
       ;; Try to guess package name if not already present in an old 'package.scm' file.
       (if (and (not (get-name pkg)) (not (or (null? libs) (null? (car libs)))))
