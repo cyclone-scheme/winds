@@ -187,7 +187,7 @@
 (define-record-type pkg
   (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
             _dependencies _test-dependencies _foreign-dependencies
-            _libraries _programs _libraries-names _program-names _exports)
+            _libraries _programs _libraries-names _program-names _exported-defines)
   pkg?
   (_name get-name set-name!)
   (_version get-version set-version!)
@@ -230,7 +230,7 @@
      programs
      libraries-names
      programs-names
-     (get-parameter-value 'exports metadata))))
+     #f)))
 
 (define *default-doc-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
 
@@ -520,8 +520,7 @@
               (string-contains file c))
             *doc-candidates*)))
 
-
-(define (lib:defines->type-and-signature defines)
+(define (defines->type-and-signature defines)
   (map
    (lambda (d)
      (match d
@@ -531,8 +530,14 @@
           (list 'procedure var))
          ((pair? var) ;; e.g. (define (a x . y) x)
           (list 'procedure var))
-         ((lambda? (car body)) ;; e.g.: (define proc (lambda (x) x))
+         ((and (list? (car body)) ;; e.g. (define a (lambda (x) x))
+               (lambda? (caar body))               )
           (list 'procedure (cons var (cadar body))))
+         ;; TODO - retrieve all options of parameters for case-lambda
+         ;; and think of all other procedure definition forms (cut?)
+         ((and (list? (car body)) ;; e.g. (define a (case-lambda ((x) ...)))
+               (equal? 'case-lambda (caar body)))
+          (list 'procedure (cons var (caadar body))))
          (else (list 'variable var)))) ;; variable
        (('define-syntax var body) ;; macro - can't infer params automatically
         (list 'syntax (list var 'PARAMS)))))
@@ -541,7 +546,9 @@
 (define (write-doc-file! pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path work-dir *default-doc-file*))
-         (libraries+defines (zip (get-libraries-names pkg) (get-exported-defines pkg)))
+         (libraries+defines (zip (get-libraries-names pkg)
+                                 (get-exported-defines pkg)))
+         ;; We urgently need a Mardown parser...
          (markdown
           (string-append
            "# " (->string (or (get-name pkg) "")) "\n"
@@ -572,21 +579,15 @@
 
            "## API \n\n"
            (string-join
-            (map (lambda (lib+def)
+            (map (lambda (lib+defs)
                    (string-append
-                    "### (" (string-join (or (car lib+def) "") " ") ")\n\n"
+                    "### (" (string-join (or (car lib+defs) "") " ") ")\n\n"
                     (string-join
                      (map (lambda (def)
                             (string-append
-                             "#### "
-                             (or
-                              (and def (list? def)
-                                   (string-append "[" (->string (car def)) "]"
-                                                  "  " (->string (cadr def)))
-                                   )
-                              "")
-                             "\n\n\n"))
-                          (cadr lib+def)))))
+                             "#### *[" (->string (car def)) "]*  "
+                             "`" (->string (cdr def)) "`\n\n\n"))
+                          (defines->type-and-signature (cadr lib+defs))))))
                  libraries+defines))
 
            "## Examples\n"
@@ -618,7 +619,7 @@
           (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
           (delete doc-path)))
     (touch doc-path)
-    (pretty-print markdown (open-output-file doc-path))))
+    (pretty-print (apply string-append markdown) (open-output-file doc-path))))
 
 (define (code-files files . pkg)
   (let ((pkg (if (null? pkg) '() (car pkg))))
@@ -684,27 +685,27 @@
   (append (get-parameter-all-occurrences 'define ast)
           (get-parameter-all-occurrences 'define-syntax ast)))
 
-(define (get-exported-defines exports defines)
+(define (get-defines ast work-dir)
+  (let ((body-defines (get-all-defines (lib:body ast)))
+        (include-defines
+         (map (lambda (i)
+                (get-all-defines
+                 (read
+                  (open-input-file
+                   (->path work-dir i)))))
+              (lib:includes ast))))
+    (append body-defines
+            (or (and (pair? include-defines)
+                     (car include-defines))
+                '()))))
+
+(define (filter-exported-defines exports defines)
   (filter (lambda (d)
             (let ((var (cadr d)))
               (if (list? var) ;; procedure
                   (member (car var) exports)
                   (member var exports))))
           defines))
-
-(define (lib:defines ast work-dir)
-  (let ((body-defines (get-all-defines (lib:body ast)))
-        (include-defines
-         (map (lambda (i)
-                (get-all-defines
-                 (read-all
-                  (open-input-file
-                   (string-append work-dir i)))))
-              (lib:includes ast))))
-    (append body-defines
-            (or (and (pair? include-defines)
-                     (car include-defines))
-                '()))))
 
 (define (libraries+defines+programs . dir)
   (let ((work-dir (if (null? dir)
@@ -715,7 +716,10 @@
               (map (lambda (sld)
                      (let ((content
                             (read (open-input-file sld))))
-                       (list (lib:name content) (lib:defines content work-dir) (lib:includes content))))
+                       (list (lib:name content)
+                             (filter-exported-defines (lib:exports content)
+                                                      (get-defines content work-dir))
+                             (lib:includes content))))
                    sld-files))
              (libs (remove null? (fold-right cons '() (map car libs+defs+incls))))
              (defs (remove null? (map cadr libs+defs+incls)))   
@@ -723,7 +727,9 @@
              (includes (flatten (map caddr libs+defs+incls)))	 
              (progs
               (lset-difference (lambda (f1 f2)
-                                 (string=? (path-strip-directory f1) f2)) scm-files includes)))
+                                 (string=? (path-strip-directory f1) f2))
+                               scm-files
+                               includes)))
         (values libs defs progs)))))
 ;; End of package-related procedures
 
@@ -739,7 +745,7 @@
                     (delete metadata-path)
                     (metadata->pkg md))
                   (metadata->pkg '()))))
-
+    
     (structure-directory-tree! pkg work-dir)
     (let-values (((libs defs progs) (libraries+defines+programs work-dir)))
       (set-libraries-names! pkg libs)

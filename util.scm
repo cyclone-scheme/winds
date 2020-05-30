@@ -31,8 +31,8 @@
   (cond ((string? x) x)
         ((symbol? x) (symbol->string x))
         ((number? x) (number->string x))
-        ((list? x)
-         (string-append "(" (string-join (map ->string x) " ") ")"))
+        ((null? x) "")
+        ((list? x) (string-join (map ->string x) " "))
         (else (error "Could not convert to string" x))))
 
 (define (string-join orig-ls . o)
