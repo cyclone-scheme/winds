@@ -20,6 +20,9 @@
 
 (define *cyclone-winds-version* "0.1")
 
+;; The only global variable that is a parameter
+(define *default-code-directory* (make-parameter "cyclone"))
+
 ;; Index-related procedures
 ;;
 ;; Global index.scm has the format bellow. Note that package
@@ -70,7 +73,7 @@
 ;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
 ;;  ...)
 (define *default-local-index*
-  (->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
+  (->path (get-library-installation-dir) (*default-code-directory*) "cyclone-winds-index.scm"))
 
 ;; Does the local index contain a record for given package/version/compiler?
 (define (local-index-contains? index name pkg-ver cyc-ver)
@@ -368,9 +371,10 @@
           (progs (get-programs-names pkg))
           (libs (get-libraries-names pkg))
           (version (get-version pkg)))
+      (display (format "Building and installing ~a...~%" (->string name)))
       (and libs
-           (build-libraries libs work-dir)
-           (install-libraries libs work-dir))          
+           (begin (build-libraries libs work-dir)
+                  (install-libraries libs work-dir)))          
       (and progs
            (build-programs progs work-dir)
            (install-programs progs work-dir))
@@ -492,14 +496,11 @@
       (and libs (build-libraries libs work-dir))          
       (and progs (build-programs progs work-dir)))))
 
-;; The only global variable that is a parameter
-(define *default-code-directory* (make-parameter "cyclone"))
-
 (define *internal-cyclone-libs*
   ;; No need to list (scheme ...) libs because they are obviously internal.
   `(,@(map (lambda (s) `(srfi ,s))
            '(1 2 8 18 27 28 60 69 106 111 113 117 121 128 132 133 143))
-    (cyclone concurrent) (cyclone match) (cyclone test)))
+    (cyclone concurrent) (cyclone foreign) (cyclone match) (cyclone test)))
 
 (define (test-file? file pkg)
   (or (string-contains file "test")
@@ -551,7 +552,7 @@
          ;; We urgently need a Mardown parser...
          (markdown
           (string-append
-           "# " (->string (or (get-name pkg) "")) "\n"
+           "# " (->string (or (get-name pkg) "")) "\n\n"
            "## Index \n"
            "- [Intro](#Intro)\n"
            "- [Dependencies](#Dependencies)\n"
@@ -569,13 +570,31 @@
            (->string (or (get-description pkg) "")) "\n\n" 
 
            "## Dependencies \n"
-           (->string (or (get-dependencies pkg) "None")) "\n\n" 
+           (let* ((deps (or (get-dependencies pkg) '()))
+                  (md-deps (map (lambda (d)
+                                  (let ((str-d (->string d)))
+                                    (string-append
+                                     "- [" str-d "]"
+                                     "(" *default-doc-url* str-d ")\n")))
+                                deps)))
+             (if (null? md-deps)
+                 "None"
+                 (apply string-append md-deps)))
+           "\n\n" 
 
            "## Test-dependencies \n"
-           (->string (or (get-test-dependencies pkg) "None")) "\n\n" 
+           (let ((test-deps (list->string (or (get-test-dependencies pkg) '()))))
+             (if (string=? "" test-deps)
+                 "None"
+                 test-deps))
+           "\n\n" 
 
            "## Foreign-dependencies \n"
-           (->string (or (get-foreign-dependencies pkg) "None")) "\n\n" 
+           (let ((foreign-deps (list->string (or (get-foreign-dependencies pkg) '()))))
+             (if (string=? "" foreign-deps)
+                 "None"
+                 foreign-deps))
+           "\n\n" 
 
            "## API \n\n"
            (string-join
@@ -583,18 +602,29 @@
                    (string-append
                     "### (" (string-join (or (car lib+defs) "") " ") ")\n\n"
                     (string-join
-                     (map (lambda (def)
+                     (map (lambda (type+signature)
                             (string-append
-                             "#### *[" (->string (car def)) "]*  "
-                             "`" (->string (cdr def)) "`\n\n\n"))
+                             "#### [" (->string (car type+signature)) "]   "
+                             "`"
+                             (let ((signature (cadr type+signature)))
+                               (if (pair? signature)
+                                   ;; Procedure or syntax
+                                   (string-append 
+                                    "(" (string-join (map ->string signature) " ") ")")
+                                   ;; Variable
+                                   (->string signature)))
+                             "`\n\n\n"))
                           (defines->type-and-signature (cadr lib+defs))))))
                  libraries+defines))
 
            "## Examples\n"
            "```scheme\n"
            "(import (scheme base)\n"
-           "        (cyclone " (->string (or (get-name pkg) "____")) "))"
-           "\n```\n\n"
+           "        (" (let ((name (->string (or (get-name pkg) "____"))))
+                         (if (string-contains name "srfi")
+                             (string-join (string-split name #\-) " ")
+                             (string-append (*default-code-directory*) name)))
+           "))\n```\n\n"
 
            "## Author(s)\n"
            (->string (or (get-authors pkg) "")) "\n\n"
@@ -619,7 +649,7 @@
           (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
           (delete doc-path)))
     (touch doc-path)
-    (pretty-print (apply string-append markdown) (open-output-file doc-path))))
+    (display markdown (open-output-file doc-path))))
 
 (define (code-files files . pkg)
   (let ((pkg (if (null? pkg) '() (car pkg))))
@@ -631,6 +661,7 @@
             files)))
 
 (define (sld-files files)
+  (newline) (display files) (newline) (newline)
   (filter (lambda (f)
             (string=? (path-extension f) "sld"))
           files))
@@ -674,10 +705,10 @@
             (append (code-files (map (lambda (f)
                                        (->path dir f))
                                      (car dir-content)))
-                    (reduce-right cons '() (map traverse
-                                                (map (lambda (d)
-                                                       (->path dir d))
-                                                     (cadr dir-content))))))))
+                    (reduce-right append '() (map traverse
+                                                  (map (lambda (d)
+                                                         (->path dir d))
+                                                       (cadr dir-content))))))))
     (let ((sld+scm (traverse work-dir)))
       (values (sld-files sld+scm) (scm-files sld+scm)))))
 
@@ -688,11 +719,11 @@
 (define (get-defines ast work-dir)
   (let ((body-defines (get-all-defines (lib:body ast)))
         (include-defines
-         (map (lambda (i)
+         (map (lambda (inc)
                 (get-all-defines
-                 (read
+                 (read-all
                   (open-input-file
-                   (->path work-dir i)))))
+                   (->path work-dir inc)))))
               (lib:includes ast))))
     (append body-defines
             (or (and (pair? include-defines)
@@ -714,11 +745,13 @@
     (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
       (let* ((libs+defs+incls
               (map (lambda (sld)
-                     (let ((content
-                            (read (open-input-file sld))))
-                       (list (lib:name content)
-                             (filter-exported-defines (lib:exports content)
-                                                      (get-defines content work-dir))
+                     (let* ((content (read (open-input-file sld)))
+                            (lib-name (lib:name content))
+                            (include-dir (cdr (reverse (cdr (reverse lib-name))))))
+                       (list lib-name
+                             (filter-exported-defines
+                              (lib:exports content)
+                              (get-defines content(->path work-dir include-dir)))
                              (lib:includes content))))
                    sld-files))
              (libs (remove null? (fold-right cons '() (map car libs+defs+incls))))
@@ -778,7 +811,7 @@
      (lambda (pkg)
        (with-handler
         (lambda (e)
-          (format "An error occurred ~a" e))
+          (display (format "An error occurred ~a" e)))
         (install-package index pkg)))
      pkgs)))
 
@@ -788,7 +821,7 @@
      (lambda (pkg)
        (with-handler
         (lambda (e)
-          (format "An error occurred ~a" e))
+          (display (format "An error occurred ~a" e)))
         (reinstall-package index pkg)))
      pkgs)))
 
@@ -811,7 +844,7 @@
   (pretty-print
    (filter (lambda (pkg)
              (if (and (not (null? pkg)))
-                 (string-contains (slist->string (car pkg)) (symbol->string term))))
+                 (string-contains (list->string (car pkg)) (symbol->string term))))
            (get-index))))
 
 (define (info name . version)
@@ -834,7 +867,7 @@
 (define *banner*
   (format
    "
-  Cyclone-winds - a package manager for Cyclone Scheme 
+  Cyclone-Winds - a package manager for Cyclone Scheme 
   https://github.com/cyclone-scheme/cyclone-winds 
   (c) 2020 - Cyclone Team 
   Version ~a~%"

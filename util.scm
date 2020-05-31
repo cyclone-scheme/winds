@@ -20,19 +20,20 @@
           metadata))
 
 ;; String procedures imported and adapted from Chibi Scheme
-(define (trim-trailing-slash s)
-  (let* ((len (string-length s))
-         (last (- len 1)))
-    (if (eqv? #\/ (string-ref s last))
-        (substring s 0 last)
-        s)))
+(define (trim-trailing-slash str)
+  (if (string=? str "")
+      ""
+      (let* ((len (string-length str))
+             (last (- len 1)))
+        (if (eqv? #\/ (string-ref str last))
+            (substring str 0 last)
+            str))))
 
 (define (->string x)
   (cond ((string? x) x)
         ((symbol? x) (symbol->string x))
         ((number? x) (number->string x))
         ((null? x) "")
-        ((list? x) (string-join (map ->string x) " "))
         (else (error "Could not convert to string" x))))
 
 (define (string-join orig-ls . o)
@@ -67,8 +68,8 @@
                i
                (lp (+ i 1)))))))
 
-(define (slist->string slst)
-  (string-join (map ->string slst) " "))
+(define (list->string lst)
+  (string-join (map ->string lst) " "))
 
 ;; Convert command-line string list into proper list
 ;; i.e. "(crypto md5)" -> (crypto md5)

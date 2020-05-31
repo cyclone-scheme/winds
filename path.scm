@@ -87,7 +87,10 @@
 (define (->path . args)
   (if (null? args)
       ""
-      (let* ((args0 (->string (car args)))
+      (let* ((arg (car args))
+             (args0 (if (list? arg)
+                        (string-join (map ->string arg) #\/)
+                        (->string arg)))
              (start (trim-trailing-slash args0)))
         (let lp ((ls (cdr args))
                  (res (if (string=? "" start) '() (list start))))
