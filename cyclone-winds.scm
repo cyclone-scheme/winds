@@ -661,7 +661,6 @@
             files)))
 
 (define (sld-files files)
-  (newline) (display files) (newline) (newline)
   (filter (lambda (f)
             (string=? (path-extension f) "sld"))
           files))
