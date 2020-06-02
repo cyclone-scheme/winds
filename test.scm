@@ -7,6 +7,7 @@
   (test-group "Remote work (read-only procedures)"
     (test 0 (system "cyclone-winds -v index"))
     (test 0 (system "cyclone-winds -v local-status"))
+    (test 0 (system "cyclone-winds -v search srfi"))
     (test 0 (system "cyclone-winds -v info iset")))
 
   (test-group "Remote work (read and write procedures)"

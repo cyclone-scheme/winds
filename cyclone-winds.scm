@@ -844,7 +844,7 @@
   (pretty-print
    (filter (lambda (pkg)
              (if (and (not (null? pkg)))
-                 (string-contains (list->string (car pkg)) (symbol->string term))))
+                 (string-contains (->string (car pkg)) (symbol->string term))))
            (get-index))))
 
 (define (info name . version)
