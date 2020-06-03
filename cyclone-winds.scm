@@ -20,6 +20,9 @@
 
 (define *cyclone-winds-version* "0.1")
 
+;; The only global variable that is a parameter
+(define *default-code-directory* (make-parameter "cyclone"))
+
 ;; Index-related procedures
 ;;
 ;; Global index.scm has the format bellow. Note that package
@@ -70,7 +73,7 @@
 ;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
 ;;  ...)
 (define *default-local-index*
-  (->path (get-library-installation-dir) "cyclone" "cyclone-winds-index.scm"))
+  (->path (get-library-installation-dir) (*default-code-directory*) "cyclone-winds-index.scm"))
 
 ;; Does the local index contain a record for given package/version/compiler?
 (define (local-index-contains? index name pkg-ver cyc-ver)
@@ -187,7 +190,7 @@
 (define-record-type pkg
   (make-pkg _name _version _license _authors _maintainers _description _tags _docs _test
             _dependencies _test-dependencies _foreign-dependencies
-            _libraries _programs _libraries-names _program-names _exports)
+            _libraries _programs _libraries-names _program-names _exported-defines)
   pkg?
   (_name get-name set-name!)
   (_version get-version set-version!)
@@ -205,7 +208,7 @@
   (_programs get-programs set-programs!)
   (_libraries-names get-libraries-names set-libraries-names!)
   (_programs-names get-programs-names set-programs-names!)
-  (_exports get-exports set-exports!))
+  (_exported-defines get-exported-defines set-exported-defines!))
 
 (define (metadata->pkg metadata)
   (let* ((md (if (null? metadata) metadata (cdr metadata)))
@@ -230,7 +233,7 @@
      programs
      libraries-names
      programs-names
-     (get-parameter-value 'exports metadata))))
+     #f)))
 
 (define *default-doc-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
 
@@ -368,9 +371,10 @@
           (progs (get-programs-names pkg))
           (libs (get-libraries-names pkg))
           (version (get-version pkg)))
+      (display (format "Building and installing ~a...~%" (->string name)))
       (and libs
-           (build-libraries libs work-dir)
-           (install-libraries libs work-dir))          
+           (begin (build-libraries libs work-dir)
+                  (install-libraries libs work-dir)))          
       (and progs
            (build-programs progs work-dir)
            (install-programs progs work-dir))
@@ -492,14 +496,11 @@
       (and libs (build-libraries libs work-dir))          
       (and progs (build-programs progs work-dir)))))
 
-;; The only global variable that is a parameter
-(define *default-code-directory* (make-parameter "cyclone"))
-
 (define *internal-cyclone-libs*
   ;; No need to list (scheme ...) libs because they are obviously internal.
   `(,@(map (lambda (s) `(srfi ,s))
            '(1 2 8 18 27 28 60 69 106 111 113 117 121 128 132 133 143))
-    (cyclone concurrent) (cyclone match) (cyclone test)))
+    (cyclone concurrent) (cyclone foreign) (cyclone match) (cyclone test)))
 
 (define (test-file? file pkg)
   (or (string-contains file "test")
@@ -520,13 +521,38 @@
               (string-contains file c))
             *doc-candidates*)))
 
+(define (defines->type-and-signature defines)
+  (map
+   (lambda (d)
+     (match d
+       (('define var . body)
+        (cond
+         ((list? var) ;; e.g. (define (a x) x)
+          (list 'procedure var))
+         ((pair? var) ;; e.g. (define (a x . y) x)
+          (list 'procedure var))
+         ((and (list? (car body)) ;; e.g. (define a (lambda (x) x))
+               (lambda? (caar body))               )
+          (list 'procedure (cons var (cadar body))))
+         ;; TODO - retrieve all options of parameters for case-lambda
+         ;; and think of all other procedure definition forms (cut?)
+         ((and (list? (car body)) ;; e.g. (define a (case-lambda ((x) ...)))
+               (equal? 'case-lambda (caar body)))
+          (list 'procedure (cons var (caadar body))))
+         (else (list 'variable var)))) ;; variable
+       (('define-syntax var body) ;; macro - can't infer params automatically
+        (list 'syntax (list var 'PARAMS)))))
+   defines))
+
 (define (write-doc-file! pkg . dir)
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (doc-path (->path work-dir *default-doc-file*))
-         (libraries+exports (zip (get-libraries-names pkg) (get-exports pkg)))
+         (libraries+defines (zip (get-libraries-names pkg)
+                                 (get-exported-defines pkg)))
+         ;; We urgently need a Mardown parser...
          (markdown
           (string-append
-           "# " (->string (or (get-name pkg) "")) "\n"
+           "# " (->string (or (get-name pkg) "")) "\n\n"
            "## Index \n"
            "- [Intro](#Intro)\n"
            "- [Dependencies](#Dependencies)\n"
@@ -544,32 +570,61 @@
            (->string (or (get-description pkg) "")) "\n\n" 
 
            "## Dependencies \n"
-           (->string (or (get-dependencies pkg) "None")) "\n\n" 
+           (let* ((deps (or (get-dependencies pkg) '()))
+                  (md-deps (map (lambda (d)
+                                  (let ((str-d (->string d)))
+                                    (string-append
+                                     "- [" str-d "]"
+                                     "(" *default-doc-url* str-d ")\n")))
+                                deps)))
+             (if (null? md-deps)
+                 "None"
+                 (apply string-append md-deps)))
+           "\n\n" 
 
            "## Test-dependencies \n"
-           (->string (or (get-test-dependencies pkg) "None")) "\n\n" 
+           (let ((test-deps (list->string (or (get-test-dependencies pkg) '()))))
+             (if (string=? "" test-deps)
+                 "None"
+                 test-deps))
+           "\n\n" 
 
            "## Foreign-dependencies \n"
-           (->string (or (get-foreign-dependencies pkg) "None")) "\n\n" 
+           (let ((foreign-deps (list->string (or (get-foreign-dependencies pkg) '()))))
+             (if (string=? "" foreign-deps)
+                 "None"
+                 foreign-deps))
+           "\n\n" 
 
            "## API \n\n"
            (string-join
-            (map (lambda (lib+exp)
+            (map (lambda (lib+defs)
                    (string-append
-                    "### (" (string-join (or (car lib+exp) "") " ") ")\n\n"
+                    "### (" (string-join (or (car lib+defs) "") " ") ")\n\n"
                     (string-join
-                     (map (lambda (exp)
+                     (map (lambda (type+signature)
                             (string-append
-                             "#### " (->string (or exp "")) "\n"
-                             "`(" (->string (or exp "")) "   )` \n\n"))
-                          (cadr lib+exp)))))
-                 libraries+exports))
+                             "#### [" (->string (car type+signature)) "]   "
+                             "`"
+                             (let ((signature (cadr type+signature)))
+                               (if (pair? signature)
+                                   ;; Procedure or syntax
+                                   (string-append 
+                                    "(" (string-join (map ->string signature) " ") ")")
+                                   ;; Variable
+                                   (->string signature)))
+                             "`\n\n\n"))
+                          (defines->type-and-signature (cadr lib+defs))))))
+                 libraries+defines))
 
            "## Examples\n"
            "```scheme\n"
            "(import (scheme base)\n"
-           "        (cyclone " (->string (or (get-name pkg) "____")) "))"
-           "\n```\n\n"
+           "        (" (let ((name (->string (or (get-name pkg) "____"))))
+                         (if (string-contains name "srfi")
+                             (string-join (string-split name #\-) " ")
+                             (string-append (*default-code-directory*) name)))
+           "))\n```\n\n"
 
            "## Author(s)\n"
            (->string (or (get-authors pkg) "")) "\n\n"
@@ -594,7 +649,7 @@
           (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
           (delete doc-path)))
     (touch doc-path)
-    (pretty-print markdown (open-output-file doc-path))))
+    (display markdown (open-output-file doc-path))))
 
 (define (code-files files . pkg)
   (let ((pkg (if (null? pkg) '() (car pkg))))
@@ -649,32 +704,65 @@
             (append (code-files (map (lambda (f)
                                        (->path dir f))
                                      (car dir-content)))
-                    (reduce-right cons '() (map traverse
-                                                (map (lambda (d)
-                                                       (->path dir d))
-                                                     (cadr dir-content))))))))
+                    (reduce-right append '() (map traverse
+                                                  (map (lambda (d)
+                                                         (->path dir d))
+                                                       (cadr dir-content))))))))
     (let ((sld+scm (traverse work-dir)))
       (values (sld-files sld+scm) (scm-files sld+scm)))))
 
-(define (libraries+exports+programs . dir)
+(define (get-all-defines ast)
+  (append (get-parameter-all-occurrences 'define ast)
+          (get-parameter-all-occurrences 'define-syntax ast)))
+
+(define (get-defines ast work-dir)
+  (let ((body-defines (get-all-defines (lib:body ast)))
+        (include-defines
+         (map (lambda (inc)
+                (get-all-defines
+                 (read-all
+                  (open-input-file
+                   (->path work-dir inc)))))
+              (lib:includes ast))))
+    (append body-defines
+            (or (and (pair? include-defines)
+                     (car include-defines))
+                '()))))
+
+(define (filter-exported-defines exports defines)
+  (filter (lambda (d)
+            (let ((var (cadr d)))
+              (if (list? var) ;; procedure
+                  (member (car var) exports)
+                  (member var exports))))
+          defines))
+
+(define (libraries+defines+programs . dir)
   (let ((work-dir (if (null? dir)
                       (*default-code-directory*)
                       (->path (car dir) (*default-code-directory*)))))
     (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
-      (let* ((libs+exps+incls
+      (let* ((libs+defs+incls
               (map (lambda (sld)
-                     (let ((content
-                            (read (open-input-file sld))))
-                       (list (lib:name content) (lib:exports content) (lib:includes content))))
+                     (let* ((content (read (open-input-file sld)))
+                            (lib-name (lib:name content))
+                            (include-dir (cdr (reverse (cdr (reverse lib-name))))))
+                       (list lib-name
+                             (filter-exported-defines
+                              (lib:exports content)
+                              (get-defines content(->path work-dir include-dir)))
+                             (lib:includes content))))
                    sld-files))
-             (libs (remove null? (fold-right cons '() (map car libs+exps+incls))))
-             (exps (remove null? (map cadr libs+exps+incls)))   
+             (libs (remove null? (fold-right cons '() (map car libs+defs+incls))))
+             (defs (remove null? (map cadr libs+defs+incls)))   
              ;; We can consider 'programs' those .scm files that are not included by .sld ones.
-             (includes (flatten (map caddr libs+exps+incls)))	 
+             (includes (flatten (map caddr libs+defs+incls)))	 
              (progs
               (lset-difference (lambda (f1 f2)
-                                 (string=? (path-strip-directory f1) f2)) scm-files includes)))
-        (values libs exps progs)))))
+                                 (string=? (path-strip-directory f1) f2))
+                               scm-files
+                               includes)))
+        (values libs defs progs)))))
 ;; End of package-related procedures
 
 
@@ -689,12 +777,12 @@
                     (delete metadata-path)
                     (metadata->pkg md))
                   (metadata->pkg '()))))
-
+    
     (structure-directory-tree! pkg work-dir)
-    (let-values (((libs exps progs) (libraries+exports+programs work-dir)))
+    (let-values (((libs defs progs) (libraries+defines+programs work-dir)))
       (set-libraries-names! pkg libs)
       (set-programs-names! pkg progs)
-      (set-exports! pkg exps) 
+      (set-exported-defines! pkg defs) 
 
       ;; Try to guess package name if not already present in an old 'package.scm' file.
       (if (and (not (get-name pkg)) (not (or (null? libs) (null? (car libs)))))
@@ -722,7 +810,7 @@
      (lambda (pkg)
        (with-handler
         (lambda (e)
-          (format "An error occurred ~a" e))
+          (display (format "An error occurred ~a" e)))
         (install-package index pkg)))
      pkgs)))
 
@@ -732,7 +820,7 @@
      (lambda (pkg)
        (with-handler
         (lambda (e)
-          (format "An error occurred ~a" e))
+          (display (format "An error occurred ~a" e)))
         (reinstall-package index pkg)))
      pkgs)))
 
@@ -755,7 +843,7 @@
   (pretty-print
    (filter (lambda (pkg)
              (if (and (not (null? pkg)))
-                 (string-contains (slist->string (car pkg)) (symbol->string term))))
+                 (string-contains (->string (car pkg)) (symbol->string term))))
            (get-index))))
 
 (define (info name . version)
@@ -778,7 +866,7 @@
 (define *banner*
   (format
    "
-  Cyclone-winds - a package manager for Cyclone Scheme 
+  Cyclone-Winds - a package manager for Cyclone Scheme 
   https://github.com/cyclone-scheme/cyclone-winds 
   (c) 2020 - Cyclone Team 
   Version ~a~%"
