@@ -5,9 +5,11 @@
         (scheme process-context)
         (scheme repl)
         (scheme cyclone pretty-print)
-        (scheme cyclone util)
+        (except (scheme cyclone util)
+                delete
+                string-join)
         (scheme cyclone libraries)
-        (srfi 1)
+        (except (srfi 1) delete)
         (srfi 28) ; basic format strings
         (cyclone match)
         (libs system-calls)
