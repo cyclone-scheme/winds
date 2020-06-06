@@ -20,21 +20,21 @@ TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
 
 # Binaries 
 WINDS_BN   = $(basename $(WINDS_SRC))
+LIBS_BN    = $(basename $(LIBS_SRC))
 TESTS_BN   = $(basename $(TESTS_SRC))
 
 #Rules
 $(WINDS_BN) : $(WINDS_SRC)
 	$(CYCLONE) $<
 
+$(LIBS_BN) : $(LIBS_SRC)
+	$(CYCLONE) $<
+
 $(TESTS_BN) : $(TESTS_SRC)
 	$(CYCLONE) $<
-	./$@
 
-.PHONY: all libs clean install uninstall test full
-libs : $(LIBS_SRC)
-	$(CYCLONE) $<
-
-all : libs $(WINDS_BN)
+.PHONY: all # libs winds-binary clean install uninstall test full
+	all : $(LIBS_BN) $(WINDS_BN)
 
 clean :
 	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN)
@@ -45,7 +45,10 @@ install : $(WINDS_BN)
 uninstall :
 	$(RM) $(DEST_DIR)/$(WINDS_BN)
 
-test : $(TESTS_BN)
+tests : $(TESTS_BN)
 	./$<
+
+test : $(WINDS_BN) tests
+
 full : 
 	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install && $(MAKE) test

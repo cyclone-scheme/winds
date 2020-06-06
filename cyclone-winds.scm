@@ -6,8 +6,7 @@
         (scheme repl)
         (scheme cyclone pretty-print)
         (except (scheme cyclone util)
-                delete
-                string-join)
+                delete remove string-join)
         (scheme cyclone libraries)
         (except (srfi 1) delete)
         (srfi 28) ; basic format strings
