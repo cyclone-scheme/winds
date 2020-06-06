@@ -1,6 +1,6 @@
 (import (scheme base)
-        (scheme write)
         (scheme read)
+        (scheme write)
         (scheme file)
         (scheme process-context)
         (scheme repl)
@@ -8,15 +8,11 @@
         (scheme cyclone util)
         (scheme cyclone libraries)
         (srfi 1)
-        (srfi 27) ;; random numbers
-        (srfi 28) ;; basic format strings
-        (cyclone match))
-
-(include-c-header "<dirent.h>")
-
-(include "path.scm")
-(include "system-calls.scm")
-(include "util.scm")
+        (srfi 28) ; basic format strings
+        (cyclone match)
+        (libs system-calls)
+        (libs path)
+        (libs util))
 
 (define *cyclone-winds-version* "0.1")
 

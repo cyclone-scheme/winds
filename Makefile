@@ -1,5 +1,5 @@
 # Cyclone-winds - package manager for Cyclone Scheme
-# Copyright (c) 2019, Cyclone Team
+# Copyright (c) 2020, Cyclone Team
 # All rights reserved.
 
 # Commands
@@ -7,36 +7,45 @@ CYCLONE    = cyclone
 INSTALL   ?= install
 RM        ?= rm -f
 
+# Directories
+PREFIX	  ?= /usr/local
+DEST_DIR   = $(PREFIX)/bin
+LIBS_DIR   = libs
+TESTS_DIR  = tests
+
 # Files
-SOURCE = cyclone-winds.scm
-BINARY = cyclone-winds
+WINDS_SRC  = cyclone-winds.scm
+LIBS_SRC   = $(wildcard $(LIBS_DIR)/*.sld)
+TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
 
-# Path
-PREFIX	?= /usr/local
-DESTDIR  = $(PREFIX)/bin
+# Binaries 
+WINDS_BN   = $(basename $(WINDS_SRC))
+TESTS_BN   = $(basename $(TESTS_SRC))
 
-TEST = test.scm
-TEST_BINARY = test
+#Rules
+$(WINDS_BN) : $(WINDS_SRC)
+	$(CYCLONE) $<
 
-$(BINARY) : $(SOURCE)
-	$(CYCLONE) $< 
+$(TESTS_BN) : $(TESTS_SRC)
+	$(CYCLONE) $<
+	./$@
 
-# Primary rules (of interest to an end user)
-.PHONY: all clean install uninstall full test
-all : $(BINARY)
+.PHONY: all libs clean install uninstall test full
+libs : $(LIBS_SRC)
+	$(CYCLONE) $<
 
-test : all
-	$(CYCLONE) $(TEST) && ./$(TEST_BINARY)
+all : libs $(WINDS_BN)
 
 clean :
-	rm -rf $(BINARY) *.so *.o *.a *.out *.c *.meta tags $(TEST_BINARY)
+	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN)
 
-install : $(BINARY)
-	$(INSTALL) -m0755 $(BINARY) $(DESTDIR)
-
+install : $(WINDS_BN)
+	$(INSTALL) -m0755 $(WINDS_BN) $(DEST_DIR)
 
 uninstall :
-	$(RM) $(DESTDIR)/$(BINARY)
+	$(RM) $(DEST_DIR)/$(WINDS_BN)
 
+test : $(TESTS_BN)
+	./$<
 full : 
 	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install && $(MAKE) test
