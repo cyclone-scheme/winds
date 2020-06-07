@@ -14,8 +14,7 @@
           get-local-index
           local-index-contains?
           register-installed-package!
-          unregister-installed-package!
-          )
+          unregister-installed-package!)
   (begin
     ;; Global index.scm has the format bellow. Note that package
     ;; latest version is always at first position and atm there is
@@ -34,11 +33,11 @@
     (define (get-index)
       (let* ((tmp-dir (random-temp-dir))
              (index-path (->path tmp-dir "index.scm")))
-        (make-dir tmp-dir)
+        (make-dir! tmp-dir)
         (display (format "Retrieving index file...~%"))
-        (download *default-index-url* index-path)
+        (download! *default-index-url* index-path)
         (let ((content (cdr (read (open-input-file index-path)))))
-          (delete tmp-dir)
+          (delete! tmp-dir)
           content)))
 
     (define (pkg-info index pkg-name)
@@ -46,19 +45,7 @@
         (#f (error (format "Could not locate package by name: ~s~%" pkg-name)))
         ((pkg-name latest-version old-versions ...) latest-version)))
 
-    (define (version pkg-info)
-      (car pkg-info))
-
-    (define (metadata-url pkg-info)
-      (cadr pkg-info))
-
-    (define (tarball-url pkg-info)
-      (caddr pkg-info))
-
-    (define (sha256sum pkg-info)
-      (cadddr pkg-info))
-
-
+    
     ;; Local index has the following format:
     ;;      PKG-NAME   PKG-VERSION   CYCLONE-VERSION       LIBS                 PROGS
     ;; (((cyclone pkg1)   0.8           "1.11.3"   ((cyclone libX) ...)    ((progamX) ...))

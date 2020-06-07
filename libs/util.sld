@@ -81,9 +81,6 @@
                    i
                    (lp (+ i 1)))))))
 
-    (define (list->string lst)
-      (string-join (map ->string lst) " "))
-
     ;; Convert command-line string list into proper list
     ;; i.e. "(crypto md5)" -> (crypto md5)
     (define (string->proper-symbol s)
@@ -92,5 +89,4 @@
              (last-char (string-ref s (- len 1))))
         (if (and (equal? first-char #\( ) (equal? last-char #\) ))
             (map string->symbol (string-split (substring s 1 (- len 1)) #\space))
-            (string->symbol s))))
-    ))
+            (string->symbol s))))))

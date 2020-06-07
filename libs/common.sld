@@ -8,8 +8,7 @@
           *doc-candidates*
           *library-installable-extensions*
           get-library-installation-dir
-          get-program-installation-dir
-          )
+          get-program-installation-dir)
   (begin
     (define *cyclone-winds-version* "0.1")
 
@@ -23,7 +22,6 @@
       `(,@(map (lambda (s) `(srfi ,s))
                '(1 2 8 18 27 28 60 69 106 111 113 117 121 128 132 133 143))
         (cyclone concurrent) (cyclone foreign) (cyclone match) (cyclone test)))
-
     
     (define *default-doc-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
     (define *default-doc-file* "README.md")

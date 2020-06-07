@@ -7,7 +7,7 @@
           (only (scheme cyclone util) lambda? string-split filter flatten)
           (scheme cyclone libraries)
           (cyclone match)
-          (except (srfi 1) delete)
+          (except (srfi 1) delete!)
           (srfi 28) ; basic format strings
           (libs common)
           (libs util)
@@ -32,7 +32,7 @@
         (for-each
          (lambda (lib)
            (let ((lib-name-path (->path dir lib)))
-             (compile (string-append lib-name-path ".sld") dir)))
+             (compile! (string-append lib-name-path ".sld") dir)))
          lib-list)))
 
     (define (install-libraries lib-list . dir)
@@ -43,9 +43,9 @@
                  (full-lib-name-path (->path dir lib)))
              (for-each
               (lambda (ext)
-                (copy-file-to-dir (string-append full-lib-name-path ext)
-                                  (->path (get-library-installation-dir)
-                                          (path-dir lib-name-path))))
+                (copy-file-to-dir! (string-append full-lib-name-path ext)
+                                   (->path (get-library-installation-dir)
+                                           (path-dir lib-name-path))))
               *library-installable-extensions*)))
          lib-list)))
 
@@ -54,7 +54,7 @@
         (for-each
          (lambda (prog)
            (let ((prog-name-path (->path dir prog)))
-             (compile (string-append prog-name-path ".scm") dir)))
+             (compile! (string-append prog-name-path ".scm") dir)))
          prog-list)))
 
     (define (install-programs prog-list . dir)
@@ -62,7 +62,7 @@
         (for-each
          (lambda (prog)
            (let ((prog-name-path (->path dir prog)))
-             (copy-file-to-dir prog-name-path (get-program-installation-dir))))
+             (copy-file-to-dir! prog-name-path (get-program-installation-dir))))
          prog-list)))
 
     (define (retrieve-package index name . dir)
@@ -77,12 +77,12 @@
                 (string-append (string-join (list pkg-name (->string version)) #\-)
                                ".tar.gz"))
                (outfile (->path work-dir tarball)))
-          (make-dir work-dir)
+          (make-dir! work-dir)
           (display (format "Downloading ~a (version ~a)...~%" name version))
-          (download tarball-url outfile)
+          (download! tarball-url outfile)
           (validate-sha256sum sha256sum outfile)
-          (extract outfile work-dir)
-          (delete outfile)               
+          (extract! outfile work-dir)
+          (delete! outfile)               
           work-dir)))
 
     (define (get-package-remote-metadata index name . dir)
@@ -91,10 +91,10 @@
                            (->path (car dir) (string-append (->string name) "-metadata"))))
              (metadata-url (cadr (pkg-info index name)))
              (metadata-path (->path work-dir *default-metadata-file*)))
-        (make-dir work-dir)
-        (download metadata-url metadata-path)
+        (make-dir! work-dir)
+        (download! metadata-url metadata-path)
         (let ((metadata (read (open-input-file metadata-path))))
-          (delete work-dir)
+          (delete! work-dir)
           metadata)))
 
     (define (build-and-install pkg . dir)
@@ -137,10 +137,10 @@
                       deps))
                 (build-and-install local-pkg work-dir))))
             (begin
-              (delete work-dir)
+              (delete! work-dir)
               (error
                (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
-        (delete work-dir)))
+        (delete! work-dir)))
 
     ;; Similar to install, but do not check package versions. Always build+install
     (define (reinstall-package index name)
@@ -158,10 +158,10 @@
                     deps))
               (build-and-install local-pkg work-dir))
             (begin
-              (delete work-dir)
+              (delete! work-dir)
               (error
                (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
-        (delete work-dir)))
+        (delete! work-dir)))
 
     (define (uninstall-package index name)
       (let ((pkg (assoc name index)))
@@ -173,24 +173,24 @@
                     (lambda (lib)
                       (for-each
                        (lambda (ext)
-                         (delete (->path (get-library-installation-dir)
-                                         (string-append (->path lib) ext)))
+                         (delete! (->path (get-library-installation-dir)
+                                          (string-append (->path lib) ext)))
                          ;; Also delete directories if appropriate
                          (if (>= (length lib) 3)
-                             (delete (->path (get-library-installation-dir)
-                                             (path-dir (->path lib))))))
+                             (delete! (->path (get-library-installation-dir)
+                                              (path-dir (->path lib))))))
                        *library-installable-extensions*))
                     libs))
               (and progs
                    (for-each
                     (lambda (prog)
-                      (delete (->path (get-program-installation-dir) prog)))
+                      (delete! (->path (get-program-installation-dir) prog)))
                     progs))
               (unregister-installed-package! name))
             (display (format "Package ~a not installed. Skipping...~%" name)))))
 
     (define (write-metadata-file! pkg metadata-path)
-      (touch metadata-path)
+      (touch! metadata-path)
       (pretty-print (pkg->metadata pkg) (open-output-file metadata-path)))
 
     (define (defines->type-and-signature defines)
@@ -318,9 +318,9 @@
 
         (if (file-exists? doc-path)
             (begin 
-              (copy-file doc-path (string-append doc-path ".old")) ;; backup old one
-              (delete doc-path)))
-        (touch doc-path)
+              (copy-file! doc-path (string-append doc-path ".old")) ;; backup old one
+              (delete! doc-path)))
+        (touch! doc-path)
         (display markdown (open-output-file doc-path))))
 
     (define (structure-directory-tree! pkg dir)
@@ -329,15 +329,15 @@
         ;; *default-code-directory* itself, hidden directories and files,
         ;; *default-metadata-file* and test files).
         (for-each (lambda (d)
-                    (copy-dir-to-dir d (->path dir (*default-code-directory*)))
-                    (delete d))
+                    (copy-dir-to-dir! d (->path dir (*default-code-directory*)))
+                    (delete! d))
                   (remove (lambda (d)
                             (or (string=? d (*default-code-directory*))
                                 (char=? (string-ref d 0) #\.)))
                           (cadr dir-content)))
         (for-each (lambda (f)
-                    (copy-file-to-dir f (->path dir (*default-code-directory*)))
-                    (delete f))
+                    (copy-file-to-dir! f (->path dir (*default-code-directory*)))
+                    (delete! f))
                   (remove (lambda (f)
                             (char=? (string-ref f 0) #\.))
                           (code-files (car dir-content) pkg)))))

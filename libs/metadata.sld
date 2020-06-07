@@ -186,8 +186,4 @@
                        `(program
                          (name ,p)
                          (description "")))
-                     progs)))))
-    ;; End of metadata-related procedures (i.e. package.scm)
-
-
-    ))
+                     progs)))))))

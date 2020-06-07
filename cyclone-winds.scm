@@ -5,9 +5,9 @@
         (scheme process-context)
         (scheme repl)
         (scheme cyclone pretty-print)
-        (except (scheme cyclone util) delete remove string-join)
+        (except (scheme cyclone util) delete! remove string-join)
         (scheme cyclone libraries)
-        (except (srfi 1) delete)
+        (except (srfi 1) delete!)
         (srfi 28) ; basic format strings
         (cyclone match)
         (libs common)
@@ -36,7 +36,7 @@
             (install test-dep))
           test-dependencies))
     (and test-file
-         (compile (->path work-dir test-file))
+         (compile! (->path work-dir test-file))
          (if (ok? (system (path-strip-extension (->path work-dir test-file))))
              (begin
                (and test-dependencies
@@ -65,8 +65,8 @@
          (pkg (if (file-exists? metadata-path)
                   ;; reads 'package.scm' skipping the initial (package ...) tag
                   (let ((md (cdr (read (open-input-file metadata-path))))) 
-                    (copy-file metadata-path (string-append metadata-path ".old")) ;; backup old one
-                    (delete metadata-path)
+                    (copy-file! metadata-path (string-append metadata-path ".old")) ;; backup old one
+                    (delete! metadata-path)
                     (metadata->pkg md))
                   (metadata->pkg '()))))
     
