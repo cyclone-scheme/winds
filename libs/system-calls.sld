@@ -2,7 +2,7 @@
   (import (scheme base)
           (scheme write)
           (srfi 28) ; basic format strings
-          (only (libs path) path-dir))
+          (only (libs file) path-dir))
   (export  *log-level*
            ok?
            download

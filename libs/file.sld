@@ -1,15 +1,21 @@
-(define-library (libs path)
+(define-library (libs file)
   (import (scheme base)
           (scheme process-context)
+          (only (scheme cyclone util) filter)
           (srfi 27) ; random numbers
-          (libs util))
+          (libs util)
+          (libs metadata))
   (export directory-content
           path-dir
           path-strip-directory
           path-strip-extension
           path-extension
           ->path
-          random-temp-dir)
+          random-temp-dir
+          test-file?
+          code-files
+          sld-files
+          scm-files)
   (include-c-header "<dirent.h>")
   (begin
     (define-c directory-content
@@ -132,4 +138,29 @@
                           ".")))
         (->path temp-dir
                 (string-append (if (null? prefix) "" (car prefix))
-                               (number->string (random-integer 10000000000000000000))))))))
+                               (number->string (random-integer 10000000000000000000))))))
+
+    (define (test-file? file pkg)
+      (or (string-contains file "test")
+          (if (null? pkg)
+              #f
+              (string=? file (or (get-test pkg) "")))))
+
+    (define (code-files files . pkg)
+      (let ((pkg (if (null? pkg) '() (car pkg))))
+        (filter (lambda (f)
+                  (or (string=? (path-extension f) "sld")
+                      (and (string=? (path-extension f) "scm")
+                           (not (test-file? f pkg))
+                           (not (string=? f *default-metadata-file*)))))
+                files)))
+
+    (define (sld-files files)
+      (filter (lambda (f)
+                (string=? (path-extension f) "sld"))
+              files))
+
+    (define (scm-files files)
+      (filter (lambda (f)
+                (string=? (path-extension f) "scm"))
+              files))))

@@ -1,7 +1,6 @@
 (define-library (libs util)
   (import (scheme base)
-          (only (scheme cyclone util)
-                filter string-split))
+          (only (scheme cyclone util) filter string-split))
   (export get-parameter-value
           get-parameter-all-occurrences
           trim-trailing-slash

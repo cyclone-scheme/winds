@@ -12,7 +12,7 @@
         (cyclone match)
         (libs common)
         (libs system-calls)
-        (libs path)
+        (libs file)
         (libs util)
         (libs index)
         (libs metadata))
@@ -219,12 +219,6 @@
       (and libs (build-libraries libs work-dir))          
       (and progs (build-programs progs work-dir)))))
 
-(define (test-file? file pkg)
-  (or (string-contains file "test")
-      (if (null? pkg)
-          #f
-          (string=? file (or (get-test pkg) "")))))
-
 (define (write-metadata-file! pkg metadata-path)
   (touch metadata-path)
   (pretty-print (pkg->metadata pkg) (open-output-file metadata-path)))
@@ -365,25 +359,6 @@
           (delete doc-path)))
     (touch doc-path)
     (display markdown (open-output-file doc-path))))
-
-(define (code-files files . pkg)
-  (let ((pkg (if (null? pkg) '() (car pkg))))
-    (filter (lambda (f)
-              (or (string=? (path-extension f) "sld")
-                  (and (string=? (path-extension f) "scm")
-                       (not (test-file? f pkg))
-                       (not (string=? f *default-metadata-file*)))))
-            files)))
-
-(define (sld-files files)
-  (filter (lambda (f)
-            (string=? (path-extension f) "sld"))
-          files))
-
-(define (scm-files files)
-  (filter (lambda (f)
-            (string=? (path-extension f) "scm"))
-          files))
 
 (define (structure-directory-tree! pkg dir)
   (let ((dir-content (directory-content dir)))
