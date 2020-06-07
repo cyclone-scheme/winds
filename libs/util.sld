@@ -5,6 +5,7 @@
   (export get-parameter-value
           get-parameter-all-occurrences
           trim-trailing-slash
+          remove
           ->string
           string-join
           string-find-right
