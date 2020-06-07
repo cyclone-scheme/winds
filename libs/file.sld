@@ -23,38 +23,37 @@
     (define-c directory-content
       "(void *data, int argc, closure _, object k, object directory)"
       "object file_list = NULL;
-   object dir_list = NULL;
-   
-   Cyc_check_str(data, directory);
- 
-   DIR* d = opendir(string_str(directory));
-   if (d == NULL)
-       Cyc_rt_raise2(data, \"Could not open directory: \", (object *) directory);
-
-   struct dirent *dir; // for the directory entries
-   while((dir = readdir(d)) != NULL)
-   {
-       object ps = alloca(sizeof(string_type));
-       alloca_pair(pl, ps, NULL);
-       make_utf8_string(data, s, dir->d_name);
-       memcpy(ps, &s, sizeof(string_type));
-
-       if(dir->d_type != DT_DIR) {
-           ((list) pl)->pair_cdr = file_list;
-           file_list = pl;
+       object dir_list = NULL;
+       
+       Cyc_check_str(data, directory);
+     
+       DIR* d = opendir(string_str(directory));
+       if (d == NULL)
+           Cyc_rt_raise2(data, \"Could not open directory: \", (object *) directory);
+    
+       struct dirent *dir; // for the directory entries
+       while((dir = readdir(d)) != NULL)
+       {
+           object ps = alloca(sizeof(string_type));
+           alloca_pair(pl, ps, NULL);
+           make_utf8_string(data, s, dir->d_name);
+           memcpy(ps, &s, sizeof(string_type));
+    
+           if(dir->d_type != DT_DIR) {
+               ((list) pl)->pair_cdr = file_list;
+               file_list = pl;
+           }
+           else if(dir->d_type == DT_DIR && strcmp(dir->d_name, \".\") != 0 && strcmp(dir->d_name,\"..\") != 0)  {
+               ((list) pl)->pair_cdr = dir_list;
+               dir_list = pl;
+           }
        }
-       else if(dir->d_type == DT_DIR && strcmp(dir->d_name, \".\") != 0 && strcmp(dir->d_name,\"..\") != 0)  {
-           ((list) pl)->pair_cdr = dir_list;
-           dir_list = pl;
-       }
-   }
-   closedir(d);
-
-   make_pair(l2, (object) dir_list, NULL);
-   make_pair(l, (object) file_list, &l2);
-
-   return_closcall1(data, k, &l);"
-      )
+       closedir(d);
+    
+       make_pair(l2, (object) dir_list, NULL);
+       make_pair(l, (object) file_list, &l2);
+    
+       return_closcall1(data, k, &l);")
 
     ;; Path procedures imported and adapted from Chibi Scheme
     (define (path-dir path)
