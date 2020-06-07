@@ -30,5 +30,3 @@ jobs:
     - name: Run tests
       run: |
         make test
-        cyclone test-install-all.scm
-        #./test-install-all
