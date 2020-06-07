@@ -12,8 +12,8 @@
           (libs common)
           (libs util)
           (libs file)
-          (libs index)
           (libs system-calls)
+          (libs index)
           (libs metadata))
   (export build-libraries
           build-programs

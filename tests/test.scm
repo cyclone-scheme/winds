@@ -28,8 +28,8 @@
     (test 0 (system "./cyclone-winds -v test-local array-list"))
     (test 0 (system "cd array-list && ../cyclone-winds -v package"))
     (test 0 (system "./cyclone-winds -v package array-list && rm -Rf array-list"))
-    (test 0 (system "./cyclone-winds -v retrieve srfi-145"))
-    (test 0 (system "./cyclone-winds -v package-srfi srfi-145 && rm -Rf srfi-145")))
+    (test 0 (system "./cyclone-winds -v retrieve srfi-26"))
+    (test 0 (system "./cyclone-winds -v package-srfi srfi-26 && rm -Rf srfi-26")))
 
   (test-exit))
 

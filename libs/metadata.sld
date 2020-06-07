@@ -4,7 +4,7 @@
           (libs common)
           (libs util))
   (export *default-metadata-file*
-          
+          ;; Package record
           make-pkg
           pkg?
           get-name set-name!

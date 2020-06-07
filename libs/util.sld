@@ -1,10 +1,10 @@
 (define-library (libs util)
   (import (scheme base)
           (only (scheme cyclone util) filter string-split))
-  (export get-parameter-value
+  (export remove
+          get-parameter-value
           get-parameter-all-occurrences
           trim-trailing-slash
-          remove
           ->string
           string-join
           string-find-right
@@ -13,11 +13,6 @@
   (begin
     (define (remove pred lst)
       (filter (lambda (x) (not (pred x))) lst))
-
-    (define (remove-member mem lst)
-      (filter (lambda (e)
-                (not (equal? e mem)))
-              lst))
 
     ;; Returns a list or false
     (define (get-parameter-value param metadata)
