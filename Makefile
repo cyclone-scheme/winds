@@ -32,15 +32,15 @@ $(WINDS_BN) : $(LIBS_BN) $(WINDS_SRC)
 $(LIBS_BN) : %.so : %.sld
 	$(CYCLONE) $<
 
-$(TESTS_BN) : %: %.scm
+$(TESTS_BN) : % : %.scm
 	$(CYCLONE) $<
 
-tests : $(TESTS_BN)
+.PHONY: run-tests test clean install uninstall full
+run-tests : $(TESTS_BN)
 	./$<
 
-test : all tests
+test : all run-tests
 
-.PHONY: clean install uninstall full
 clean :
 	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN)
 
