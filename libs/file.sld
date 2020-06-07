@@ -3,6 +3,7 @@
           (scheme process-context)
           (only (scheme cyclone util) filter)
           (srfi 27) ; random numbers
+          (only (libs common) *doc-candidates*)
           (libs util)
           (libs metadata))
   (export directory-content
@@ -15,7 +16,8 @@
           test-file?
           code-files
           sld-files
-          scm-files)
+          scm-files
+          doc-file?)
   (include-c-header "<dirent.h>")
   (begin
     (define-c directory-content
@@ -163,4 +165,11 @@
     (define (scm-files files)
       (filter (lambda (f)
                 (string=? (path-extension f) "scm"))
-              files))))
+              files))
+
+    (define (doc-file? file)
+      (any (lambda (e)
+             (not (eq? e #f)))
+           (map (lambda (c)
+                  (string-contains file c))
+                *doc-candidates*)))))

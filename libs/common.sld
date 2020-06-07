@@ -5,6 +5,7 @@
           *default-code-directory*
           *default-doc-url*
           *default-doc-file*
+          *doc-candidates*
           *library-installable-extensions*
           get-library-installation-dir
           get-program-installation-dir
@@ -34,9 +35,4 @@
 
     (define (get-program-installation-dir)
       (or (get-environment-variable "CYCLONE_PROGRAM_PATH")
-          (Cyc-installation-dir 'bin)))
-
-
-
-
-    ))
+          (Cyc-installation-dir 'bin)))))

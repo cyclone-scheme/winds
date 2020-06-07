@@ -2,8 +2,7 @@
   (import (scheme base)
           (srfi 28) ; basic format strings
           (libs common)
-          (libs util)
-          )
+          (libs util))
   (export *default-metadata-file*
           
           make-pkg
