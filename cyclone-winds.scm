@@ -145,12 +145,13 @@
   (let ((index (get-local-index)))
     (if (null? index)
         (display (format "None~%"))
-        (for-each
-         (lambda (pkg)
-           (display
-            (format "~%  ~a  Version: ~a  Cyclone: ~a~%  Libraries: ~a~%  Programs:  ~a~%"
-                    (car pkg) (cadr pkg) (caddr pkg) (cadddr pkg) (cadddr (cdr pkg)))))
-         index))))
+        (pretty-print (map (lambda (pkg)
+                             `(,(car pkg)
+                               (version . ,(cadr pkg))
+                               (cyclone . ,(caddr pkg))
+                               (libraries . ,(cadddr pkg))
+                               (programs . ,(cadddr (cdr pkg)))))
+                           index)))))
 
 (define (index)
   (pretty-print (get-index)))
