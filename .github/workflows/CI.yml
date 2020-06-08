@@ -16,8 +16,8 @@ jobs:
       run: sudo apt-get install libck-dev    
     - name: Install Cyclone
       run: |
-        wget https://github.com/cyclone-scheme/binary-releases/raw/master/ubuntu-18.04-lts/cyclone-scheme_0.15_amd64.deb 
-        sudo apt install ./cyclone-scheme_0.15_amd64.deb
+        wget https://github.com/cyclone-scheme/binary-releases/raw/master/ubuntu-18.04-lts/cyclone-scheme_0.18_amd64.deb 
+        sudo apt install ./cyclone-scheme_0.18_amd64.deb
       
     # Setup winds
     - uses: actions/checkout@v2
