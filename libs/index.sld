@@ -1,7 +1,7 @@
 (define-library (libs index)
   (import (scheme base)
           (scheme read)
-          (scheme write)
+          (only (scheme write) display write)
           (scheme file)
           (srfi 28) ; Basic format strings
           (cyclone match)

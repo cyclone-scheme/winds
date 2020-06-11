@@ -1,6 +1,6 @@
 (import (scheme base)
         (scheme read)
-        (scheme write)
+        (only (scheme write) display)
         (scheme file)
         (scheme process-context)
         (scheme repl)

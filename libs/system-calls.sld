@@ -1,6 +1,6 @@
 (define-library (libs system-calls)
   (import (scheme base)
-          (scheme write)
+          (only (scheme write) display)
           (srfi 28) ; basic format strings
           (only (libs file) path-dir))
   (export  *log-level*

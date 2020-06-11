@@ -1,5 +1,8 @@
 (define-library (libs lock)
   (import (scheme base)
+          (only (scheme write) display)
+          (srfi 28) ; basic format strings
+          (only (srfi 18) thread-sleep!)
           (only (libs common) *default-lock-file*)
           (only (libs system-calls) touch! delete!))
   (export with-file-lock
@@ -8,15 +11,14 @@
   (begin
     (define (try-to-lock-file!)
       (let lp ((t 0))
-        (cond ((and (> t 1000) (file-exists? *default-lock-file*))
-               (error "Another Cyclone-Winds instance is running?"))
+        (cond ((and (> t 10) (file-exists? *default-lock-file*))
+               (error "Is another instance of Cyclone-Winds still running?"))
               ((file-exists? *default-lock-file*)
-               ;; (thread-sleep! 1)
+               (display (format "Is another instance of Cyclone-Winds running? Retrying...(~a)~%" t))
+               (thread-sleep! 1)
                (lp (+ t 1)))
-              ((touch! *default-lock-file*)
-               *default-lock-file*)
               (else
-               (error "Could not create lock!")))))
+               (touch! *default-lock-file*)))))
     
     (define (unlock-file!)
       (delete! *default-lock-file*))
