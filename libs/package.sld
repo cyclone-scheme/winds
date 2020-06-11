@@ -46,7 +46,7 @@
                 (copy-file-to-dir! (string-append full-lib-name-path ext)
                                    (->path (get-library-installation-dir)
                                            (path-dir lib-name-path))))
-              *library-installable-extensions*)))         
+              *library-installable-extensions*)))
          lib-list)))
 
     (define (build-programs prog-list . dir)
