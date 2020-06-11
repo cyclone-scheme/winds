@@ -6,7 +6,7 @@
           (libs util)
           (libs metadata)
           (only (libs common) *doc-candidates* *default-lock-file*)
-          (only (libs system-calls)))
+          (only (libs system-calls) ok? touch! delete!))
   (export directory-content
           path-dir
           path-strip-directory
@@ -18,7 +18,10 @@
           code-files
           sld-files
           scm-files
-          doc-file?)
+          doc-file?
+          with-file-lock
+          try-to-lock-file!
+          unlock-file!)
   (include-c-header "<dirent.h>")
   (begin
     (define-c directory-content
@@ -174,7 +177,7 @@
                   (string-contains file c))
                 *doc-candidates*)))
 
-    (define (try-to-lock!)
+    (define (try-to-lock-file!)
       (let lp ((t 0))
         (cond ((and (> t 1000) (file-exists? *default-lock-file*))
                (error "Another instance running"))
@@ -186,7 +189,7 @@
               (else
                (error "Could not create lock!")))))
     
-    (define (unlock!)
+    (define (unlock-file!)
       (delete! *default-lock-file*))
 
     (define-syntax with-file-lock

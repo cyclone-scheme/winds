@@ -1,7 +1,7 @@
 (define-library (libs metadata)
   (import (scheme base)
           (srfi 28) ; basic format strings
-          (libs common)
+          (only (libs common) *default-doc-url*)
           (libs util))
   (export *default-metadata-file*
           ;; Package record

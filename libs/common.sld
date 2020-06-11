@@ -1,6 +1,8 @@
 (define-library (libs common)
   (import (scheme base)
-          (scheme process-context))
+          (scheme process-context)
+          ;;(only (libs file) ->path)
+          )
   (export *cyclone-winds-version*
           *default-code-directory*
           *default-lock-file*
@@ -17,7 +19,7 @@
     (define *default-code-directory* (make-parameter "cyclone"))
 
     (define *default-lock-file*
-      (->path (get-library-installation-dir) "cyclone-winds.lock"))
+      (string-append (get-library-installation-dir) "/" "cyclone-winds.lock"))
     
     (define *library-installable-extensions* '(".o" ".so" ".sld" ".meta"))
     

@@ -81,7 +81,7 @@
 
     (define (register-installed-package! name version cyc-version libs progs)
       (let ((local-index (get-local-index)))
-        (with-lock
+        (with-file-lock
          (with-output-to-file *default-local-index*
            (lambda ()
              (write (cons (list name version cyc-version libs progs)
@@ -92,7 +92,7 @@
 
     (define (unregister-installed-package! name)
       (let* ((local-index (get-local-index)))
-        (with-lock
+        (with-file-lock
          (with-output-to-file *default-local-index*
            (lambda ()
              (write (remove (lambda (pkg)
