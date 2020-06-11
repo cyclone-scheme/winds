@@ -81,19 +81,21 @@
 
     (define (register-installed-package! name version cyc-version libs progs)
       (let ((local-index (get-local-index)))
-        (with-output-to-file *default-local-index*
-          (lambda ()
-            (write (cons (list name version cyc-version libs progs)
-                         (remove (lambda (pkg)
-                                   (equal? (car pkg) name))
-                                 local-index)))))
+        (with-lock
+         (with-output-to-file *default-local-index*
+           (lambda ()
+             (write (cons (list name version cyc-version libs progs)
+                          (remove (lambda (pkg)
+                                    (equal? (car pkg) name))
+                                  local-index))))))
         (display (format "Package ~a (version ~a) successfuly installed with Cyclone ~a.~%" name version cyc-version))))
 
     (define (unregister-installed-package! name)
       (let* ((local-index (get-local-index)))
-        (with-output-to-file *default-local-index*
-          (lambda ()
-            (write (remove (lambda (pkg)
-                             (equal? (car pkg) name))
-                           local-index))))
+        (with-lock
+         (with-output-to-file *default-local-index*
+           (lambda ()
+             (write (remove (lambda (pkg)
+                              (equal? (car pkg) name))
+                            local-index)))))
         (display (format "Package ~a successfuly uninstalled.~%" name))))))

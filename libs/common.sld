@@ -3,6 +3,7 @@
           (scheme process-context))
   (export *cyclone-winds-version*
           *default-code-directory*
+          *default-lock-file*
           *default-doc-url*
           *default-doc-file*
           *doc-candidates*
@@ -15,6 +16,9 @@
     ;; The only global variable that is a parameter
     (define *default-code-directory* (make-parameter "cyclone"))
 
+    (define *default-lock-file*
+      (->path (get-library-installation-dir) "cyclone-winds.lock"))
+    
     (define *library-installable-extensions* '(".o" ".so" ".sld" ".meta"))
     
     (define *internal-cyclone-libs*

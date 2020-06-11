@@ -3,9 +3,10 @@
           (scheme process-context)
           (only (scheme cyclone util) filter)
           (srfi 27) ; random numbers
-          (only (libs common) *doc-candidates*)
           (libs util)
-          (libs metadata))
+          (libs metadata)
+          (only (libs common) *doc-candidates* *default-lock-file*)
+          (only (libs system-calls)))
   (export directory-content
           path-dir
           path-strip-directory
@@ -171,4 +172,27 @@
              (not (eq? e #f)))
            (map (lambda (c)
                   (string-contains file c))
-                *doc-candidates*)))))
+                *doc-candidates*)))
+
+    (define (try-to-lock!)
+      (let lp ((t 0))
+        (cond ((and (> t 1000) (file-exists? *default-lock-file*))
+               (error "Another instance running"))
+              ((file-exists? *default-lock-file*)
+               ;; (thread-sleep! 1)
+               (lp (+ t 1)))
+              ((ok? (touch! *default-lock-file*))
+               *default-lock-file*)
+              (else
+               (error "Could not create lock!")))))
+    
+    (define (unlock!)
+      (delete! *default-lock-file*))
+
+    (define-syntax with-file-lock
+      (syntax-rules ()
+        ((_ body)
+         (begin
+           (try-to-lock-file!)
+           body
+           (unlock-file!)))))))
