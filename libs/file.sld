@@ -4,9 +4,8 @@
           (only (scheme cyclone util) filter)
           (srfi 27) ; random numbers
           (libs util)
-          (libs metadata)
-          (only (libs common) *doc-candidates* *default-lock-file*)
-          (only (libs system-calls) ok? touch! delete!))
+          (only (libs metadata) *default-metadata-file* get-test)
+          (only (libs common) *doc-candidates*))
   (export directory-content
           path-dir
           path-strip-directory
@@ -18,10 +17,7 @@
           code-files
           sld-files
           scm-files
-          doc-file?
-          with-file-lock
-          try-to-lock-file!
-          unlock-file!)
+          doc-file?)
   (include-c-header "<dirent.h>")
   (begin
     (define-c directory-content

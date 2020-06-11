@@ -41,13 +41,12 @@
          (lambda (lib)
            (let ((lib-name-path (->path lib))
                  (full-lib-name-path (->path dir lib)))
-             (with-file-lock
-              (for-each
-               (lambda (ext)
-                 (copy-file-to-dir! (string-append full-lib-name-path ext)
-                                    (->path (get-library-installation-dir)
-                                            (path-dir lib-name-path))))
-               *library-installable-extensions*))))         
+             (for-each
+              (lambda (ext)
+                (copy-file-to-dir! (string-append full-lib-name-path ext)
+                                   (->path (get-library-installation-dir)
+                                           (path-dir lib-name-path))))
+              *library-installable-extensions*)))         
          lib-list)))
 
     (define (build-programs prog-list . dir)
@@ -60,12 +59,11 @@
 
     (define (install-programs prog-list . dir)
       (let ((dir (if (null? dir) "." (car dir))))
-        (with-file-lock
-         (for-each
-          (lambda (prog)
-            (let ((prog-name-path (->path dir prog)))
-              (copy-file-to-dir! prog-name-path (get-program-installation-dir))))
-          prog-list))))
+        (for-each
+         (lambda (prog)
+           (let ((prog-name-path (->path dir prog)))
+             (copy-file-to-dir! prog-name-path (get-program-installation-dir))))
+         prog-list)))
 
     (define (retrieve-package index name . dir)
       (match-let (((version _ tarball-url sha256sum) (pkg-info index name)))

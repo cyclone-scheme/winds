@@ -1,8 +1,6 @@
 (define-library (libs common)
   (import (scheme base)
-          (scheme process-context)
-          ;;(only (libs file) ->path)
-          )
+          (scheme process-context))
   (export *cyclone-winds-version*
           *default-code-directory*
           *default-lock-file*
