@@ -171,27 +171,4 @@
              (not (eq? e #f)))
            (map (lambda (c)
                   (string-contains file c))
-                *doc-candidates*)))
-
-    (define (try-to-lock-file!)
-      (let lp ((t 0))
-        (cond ((and (> t 1000) (file-exists? *default-lock-file*))
-               (error "Another instance running"))
-              ((file-exists? *default-lock-file*)
-               ;; (thread-sleep! 1)
-               (lp (+ t 1)))
-              ((ok? (touch! *default-lock-file*))
-               *default-lock-file*)
-              (else
-               (error "Could not create lock!")))))
-    
-    (define (unlock-file!)
-      (delete! *default-lock-file*))
-
-    (define-syntax with-file-lock
-      (syntax-rules ()
-        ((_ body)
-         (begin
-           (try-to-lock-file!)
-           body
-           (unlock-file!)))))))
+                *doc-candidates*)))))
