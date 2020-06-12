@@ -3,9 +3,9 @@
           (scheme process-context)
           (only (scheme cyclone util) filter)
           (srfi 27) ; random numbers
-          (only (libs common) *doc-candidates*)
           (libs util)
-          (libs metadata))
+          (only (libs metadata) *default-metadata-file* get-test)
+          (only (libs common) *doc-candidates*))
   (export directory-content
           path-dir
           path-strip-directory

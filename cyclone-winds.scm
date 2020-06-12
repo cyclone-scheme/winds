@@ -1,6 +1,6 @@
 (import (scheme base)
         (scheme read)
-        (scheme write)
+        (only (scheme write) display)
         (scheme file)
         (scheme process-context)
         (scheme repl)
@@ -12,11 +12,12 @@
         (cyclone match)
         (libs common)
         (libs system-calls)
-        (libs file)
-        (libs util)
+        (only (libs file) ->path path-strip-extension)
+        (only (libs util) ->string string-contains string->proper-symbol)
         (libs index)
         (libs metadata)
-        (libs package))
+        (libs package)
+        (libs lock))
 
 ;;; User interface procedures
 
@@ -97,24 +98,26 @@
      pkgs)))
 
 (define (install pkgs)
-  (let ((index (get-index)))
-    (for-each
-     (lambda (pkg)
-       (with-handler
-        (lambda (e)
-          (display (format "An error occurred ~a" e)))
-        (install-package index pkg)))
-     pkgs)))
+  (with-file-lock
+   (let ((index (get-index)))
+     (for-each
+      (lambda (pkg)
+        (with-handler
+         (lambda (e)
+           (display (format "An error occurred ~a" e)))
+         (install-package index pkg)))
+      pkgs))))
 
 (define (reinstall pkgs)
-  (let ((index (get-index)))
-    (for-each
-     (lambda (pkg)
-       (with-handler
-        (lambda (e)
-          (display (format "An error occurred ~a" e)))
-        (reinstall-package index pkg)))
-     pkgs)))
+  (with-file-lock
+   (let ((index (get-index)))
+     (for-each
+      (lambda (pkg)
+        (with-handler
+         (lambda (e)
+           (display (format "An error occurred ~a" e)))
+         (reinstall-package index pkg)))
+      pkgs))))
 
 (define (upgrade . pkgs)
   (cond
@@ -125,11 +128,12 @@
     (install (map car (get-local-index))))))
 
 (define (uninstall pkgs)
-  (let ((index (get-local-index)))
-    (for-each
-     (lambda (pkg)
-       (uninstall-package index pkg))
-     pkgs)))
+  (with-file-lock
+   (let ((index (get-local-index)))
+     (for-each
+      (lambda (pkg)
+        (uninstall-package index pkg))
+      pkgs))))
 
 (define (search term)
   (pretty-print
