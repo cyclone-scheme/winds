@@ -11,13 +11,12 @@ A "package" for `cyclone-winds` is wrapper around libraries and/or programs. The
 
 ## Installation
 
-
-Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it with `sudo pkg install gmake`).
-
     git clone https://github.com/cyclone-scheme/cyclone-winds.git
     cd cyclone-winds
     make
     sudo make install
+
+*Note that `gmake` should be used instead of `make` on FreeBSD 12 (install it with `sudo pkg install gmake`).*
 
 Optionally it is possible to pass `PREFIX` to set another destination directory.
 
@@ -73,19 +72,21 @@ $ env CYCLONE_LIBRARY_PATH=/home/me/cyclone-libs cyclone-winds install iset
 ```
 $ env CYCLONE_PROGRAM_PATH=/home/me/local/bin cyclone-winds install hypothetical-program
 ```
-## Package authoring
+## Authoring packages
 
 ### Use of `package` command
 
-Note that running `$ cyclone-winds package [DIR]` inside of a direcotry with already an `.sld` file provides `package.scm` and `README.md` satisfactory stubs that can be adjusted manually. It also structures the directory tree (see [below](#package-file-structure)).
+Running `$ cyclone-wfinds package [DIR]` inside of a directory with `.sld` file(s) will generate `package.scm` and `README.md` stubs that can be adjusted manually later if needed. The command also structures the directory tree appropriately for most cases (see [below](#package-file-structure)).
 
-If you are authoring `SRFIs`, use `package-srfi` instead.
+*Note: if you are authoring `SRFIs`, use the `package-srfi` command instead.*
 
-### `package.scm` parameters
+### Parameters for the `package.scm` file
 
 #### Mandatory parameters
 
-- name: a symbol or a quoted list of symbols (e.g. iset or "(cyclone hypothetical-lib)")
+*Note that each parameter has a specific type:*
+
+- name: a symbol or a double-quoted list of symbols (e.g. `iset` or `"(cyclone hypothetical-lib)"`)
 - version: floating point
 - license: string
 - authors: one or more strings
@@ -99,19 +100,19 @@ If you are authoring `SRFIs`, use `package-srfi` instead.
 
 A `package.scm` file needs at least one `library` and/or `program`.
 
-##### 'library' parameters
+##### Parameters for `(library ...)`
 
 *Note: more than one occurrence is allowed and libraries will be installed in the order they appear.*
 
-- name: list of **two or more** symbols, being the first one `cyclone`. So to install `(pkg lib1)` the `name` parameter should be `(cyclone pkg lib1)`. The package file structure should reflect this and lib definition file should be placed in `cyclone/pkg/lib1.sld`.
-- description: string
+- name: list of **two or more** symbols, being the first one `cyclone`. So to install `lib1` from `pkg` the `name` parameter should be `(cyclone pkg lib1)`. The package file structure should reflect this naming convention, and lib definition file should be placed in `cyclone/pkg/lib1.sld`.
+- [optional] description: string
 
-##### 'program' parameters
+##### Parameters for `(program ...)`
 
 *Note: more than one occurrence is allowed and programs will be installed in the order they appear.*
 
 - name: a single symbol. `.scm` will be appended to this symbol in order to find the program source
-- description: string
+- [optional] description: string
 
 #### Optional parameters
 - dependencies: zero or more *list* of symbols
@@ -121,8 +122,8 @@ A `package.scm` file needs at least one `library` and/or `program`.
 ### package.scm example
 
 ```scheme
-;; Mandatory parameters
 (package
+ ;; Mandatory parameters
  (name example-package)
  (version 0.1)          
  (license "BSD")       
@@ -155,24 +156,28 @@ A `package.scm` file needs at least one `library` and/or `program`.
 
 ### Package file structure
 
-All packages should contain their files inside a `cyclone` base directory, except `package.scm` and the test file, which should be places on base directory (see examples bellow). Note that SRFI implementations should be place under a `srfi` directory instead of a `cyclone` one.
+Packages should contain code files (except `package.scm`, `README.md` and the test file) inside a `cyclone` directory (see examples bellow). SRFI implementations should be place under a `srfi` directory instead of a `cyclone` one.
 
 #### Example 1
 
-If in `package.scm` we have a `(library (name (cyclone http-client))` then after installed it will be used as `(import (cyclone http-client))`.The package file structure should be:
+If in `package.scm` we have a `(library (name (cyclone http-client))` then, after installed, it will be used as `(import (cyclone http-client))`.The package file structure should be:
 
 ```
 package.scm
+README.md
+tests.scm
 cyclone/
 |- http-client.sld
 ```
 
 #### Example 2
 
-If in `package.scm` we have a `(library (name (cyclone crypto md5))` then after installed it will be used as (import (cyclone crypto md5)).The package file structure should be:
+If in `package.scm` we have a `(library (name (cyclone crypto md5))` then, after installed, it will be used as (import (cyclone crypto md5)).The package file structure should be:
 
 ```
 package.scm
+README.md
+tests.scm
 cyclone/
 |- crypto/
    |- md5.sld
@@ -180,22 +185,26 @@ cyclone/
 
 #### Example 3
 
-If in `package.scm` we have a `(program (name start-server))` then after installed it will be called by `$ /usr/local/bin/start-server` (base directory here may change according to your OS configuration or `CYCLONE_PROGRAM_PATH` if changed). The package file structure should be:
+If in `package.scm` we have a `(program (name start-server))` then, after installed, it will be called by `$ /usr/local/bin/start-server` (base directory here may change according to your OS configuration or `CYCLONE_PROGRAM_PATH`, if `PREFIX` was changed during `cyclone` installation). The package file structure should be:
 
 ```
 package.scm
+README.md
+tests.scm
 cyclone/
 |- start-server.scm
 ```
 
 #### Example 4 (SRFIs)
 
-If in `package.scm` we have a `(library (name (srfi 18))` then after installed it will be used as `(import (srfi 18))`.The package file structure should be:
+If in `package.scm` we have a `(library (name (srfi 26))` then, after installed, it will be used as `(import (srfi 26))`.The package file structure should be:
 
 ```
 package.scm
+README.md
+tests.scm
 srfi/
-|- 18.sld
+|- 26.sld
 ```
 
 ## Limitations
