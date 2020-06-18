@@ -12,8 +12,9 @@
     (define (try-to-lock-file!)
       (let lp ((t 0))
         (cond ((and (> t 10) (file-exists? *default-lock-file*))
-               (display "Unable to acquire lock, exiting. Is another instance of Cyclone-Winds still running?" (current-error-port))
-               (newline (current-error-port))
+               (display (format "Unable to acquire lock ~a~%Is another instance of Cyclone-Winds still running?~%"
+                                *default-lock-file*)
+                        (current-error-port))
                (exit 1))
               ((file-exists? *default-lock-file*)
                (display (format "Is another instance of Cyclone-Winds running? Retrying...(~a)~%" t))
