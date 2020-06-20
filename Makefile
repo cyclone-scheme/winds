@@ -53,7 +53,10 @@ run-sys : $(SYS_BN)
 sys: all run-sys
 
 clean :
-	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN) $(SYS_DIR)/*.so $(SYS_DIR)/*.o $(SYS_DIR)/*.c $(SYS_DIR)/*.meta $(SYS_BN)
+	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags 
+	$(RM) $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta 
+	$(RM) $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN) 
+	$(RM) $(SYS_DIR)/*.so $(SYS_DIR)/*.o $(SYS_DIR)/*.c $(SYS_DIR)/*.meta $(SYS_BN)
 
 install : $(WINDS_BN)
 	$(INSTALL) -m0755 $(WINDS_BN) $(DEST_DIR)
