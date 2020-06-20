@@ -402,7 +402,7 @@
                            (list lib-name
                                  (filter-exported-defines
                                   (lib:exports content)
-                                  (get-defines content(->path work-dir include-dir)))
+                                  (get-defines content (->path work-dir include-dir)))
                                  (lib:includes content))))
                        sld-files))
                  (libs (remove null? (fold-right cons '() (map car libs+defs+incls))))
