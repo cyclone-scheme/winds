@@ -112,35 +112,34 @@
                (install-programs progs work-dir))
           (register-installed-package! name version (Cyc-version) libs progs))))
 
+    (define (installed? index name)
+      (let ((version (car (pkg-info index name))))
+        (local-index-contains? (get-local-index) 
+                               name 
+                               version
+                               (Cyc-version))))
+    
     (define (install-package index name)
-      (let* ((work-dir (retrieve-package index name))
-             (local-pkg
-              (validate-metadata
-               (read (open-input-file (->path work-dir *default-metadata-file*)))))
-             (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
-        (if (equal? local-pkg remote-pkg)
-            (let ((deps (get-dependencies local-pkg))
-                  (pkg-ver (get-version local-pkg)))
-              (cond
-               ((local-index-contains? 
-                 (get-local-index) 
-                 name 
-                 pkg-ver 
-                 (Cyc-version))
-                (display (format "Package ~a version ~a already installed. Skipping...~%" 
-                                 name pkg-ver)))
-               (else
-                (and deps
-                     (for-each
-                      (lambda (dep)
-                        (install-package index dep))
-                      deps))
-                (build-and-install local-pkg work-dir))))
-            (begin
-              (delete! work-dir)
-              (error
-               (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
-        (delete! work-dir)))
+      (if (installed? index name)
+          (display (format "Package ~a already installed. Skipping...~%" name))
+          (let* ((work-dir (retrieve-package index name))
+                 (local-pkg
+                  (validate-metadata
+                   (read (open-input-file (->path work-dir *default-metadata-file*)))))
+                 (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
+            (if (equal? local-pkg remote-pkg)
+                (let ((deps (get-dependencies local-pkg))
+                      (pkg-ver (get-version local-pkg)))
+                  (and deps (for-each
+                             (lambda (dep)
+                               (install-package index dep))
+                             deps))
+                  (build-and-install local-pkg work-dir))
+                (begin
+                  (delete! work-dir)
+                  (error
+                   (format "Attention: metadata mismatch between remote package and downloaded one!~%"))))
+            (delete! work-dir))))
 
     ;; Similar to install, but do not check package versions. Always build+install
     (define (reinstall-package index name)
