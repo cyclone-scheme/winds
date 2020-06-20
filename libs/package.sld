@@ -17,6 +17,7 @@
           (libs metadata))
   (export build-libraries
           build-programs
+          find-code-files-recursively
           libraries+defines+programs
           structure-directory-tree!
           write-doc-file!

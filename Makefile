@@ -12,16 +12,19 @@ PREFIX	  ?= /usr/local
 DEST_DIR   = $(PREFIX)/bin
 LIBS_DIR   = libs
 TESTS_DIR  = tests
+SYS_DIR    = sys
 
 # Files
 WINDS_SRC  = cyclone-winds.scm
 LIBS_SRC   = $(wildcard $(LIBS_DIR)/*.sld)
 TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
+SYS_SRC  = $(wildcard $(SYS_DIR)/*.scm)
 
 # Output 
 WINDS_BN   = $(basename $(WINDS_SRC))
 LIBS_BN    = $(LIBS_SRC:.sld=.so)
 TESTS_BN   = $(basename $(TESTS_SRC))
+SYS_BN   = $(basename $(SYS_SRC))
 
 #Rules
 all : $(WINDS_BN)
@@ -35,14 +38,22 @@ $(LIBS_BN) : %.so : %.sld
 $(TESTS_BN) : % : %.scm
 	$(CYCLONE) $<
 
+$(SYS_BN) : % : %.scm
+	$(CYCLONE) $<
+
 .PHONY: run-tests test clean install uninstall full
 run-tests : $(TESTS_BN)
 	./$<
 
 test : all run-tests
 
+run-sys : $(SYS_BN)
+	./$<
+
+sys: all run-sys
+
 clean :
-	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN)
+	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags $(LIBS_DIR)/*.so $(LIBS_DIR)/*.o $(LIBS_DIR)/*.c $(LIBS_DIR)/*.meta $(TESTS_DIR)/*.so $(TESTS_DIR)/*.o $(TESTS_DIR)/*.c $(TESTS_DIR)/*.meta $(TESTS_BN) $(SYS_DIR)/*.so $(SYS_DIR)/*.o $(SYS_DIR)/*.c $(SYS_DIR)/*.meta $(SYS_BN)
 
 install : $(WINDS_BN)
 	$(INSTALL) -m0755 $(WINDS_BN) $(DEST_DIR)

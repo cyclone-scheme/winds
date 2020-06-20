@@ -1,0 +1,42 @@
+(import (scheme base)
+        (scheme read)
+        (scheme cyclone pretty-print)
+        (scheme cyclone libraries)
+        (libs system-calls)
+        (only (libs common) *default-code-directory*)
+        (only (libs file) ->path)
+        (only (libs index) get-index)
+        (only (libs util) ->string string-contains)
+        (only (libs package) find-code-files-recursively retrieve-package))
+
+(define *default-library-index* "indexes/library-index.scm")
+
+(define (libraries+exports . dir)
+  (let ((work-dir (if (null? dir)
+                      (*default-code-directory*)
+                      (->path (car dir) (*default-code-directory*)))))
+    (let-values (((sld-files _) (find-code-files-recursively work-dir)))
+      (map (lambda (sld)
+             (let ((content (read (open-input-file sld))))
+               (list (lib:name content) (lib:exports content))))
+           sld-files))))
+
+(define (srfi? pkg)
+  (string-contains (->string pkg) "srfi"))
+
+(define output
+  (let* ((index (get-index))
+         (all-pkgs (map car index)))
+    (map (lambda (pkg)
+           (begin
+             (retrieve-package index pkg ".")
+             (let* ((pkg-path (->path pkg))
+                    (lib+exps (if (srfi? pkg)
+                                  (parameterize ((*default-code-directory* "srfi"))
+                                    (libraries+exports pkg-path))
+                                  (libraries+exports pkg-path))))
+               (delete! (->path pkg-path))
+               (list pkg lib+exps))))
+         all-pkgs)))
+
+(pretty-print output (open-output-file *default-library-index*))

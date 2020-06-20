@@ -28,7 +28,8 @@
     ;;   (0.9 "url-to-package.scm" "url-to-tarball" "tarball-sha256sum")
     ;;   (0.8 "url-to-package.scm" "url-to-tarball" "tarball-sha256sum"))
     ;;  ...)
-    (define *default-index-url* "https://raw.githubusercontent.com/cyclone-scheme/cyclone-winds/master/index.scm")
+    (define *default-index-url*
+      "https://raw.githubusercontent.com/cyclone-scheme/cyclone-winds/master/indexes/index.scm")
 
     (define (get-index)
       (let* ((tmp-dir (random-temp-dir))
