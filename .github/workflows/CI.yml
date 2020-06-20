@@ -42,7 +42,7 @@ jobs:
         git config --local user.email "arthurmaciel@gmail.com"
         git config --local user.name "arthurmaciel"
         git add ./indexes/library-index.scm
-        git commit -m "Updated library-index.scm on push"
+        [[ -z $(git status -s) ]] || git commit -m "Updated library-index.scm on push"
     
     - name: Push changes
       uses: ad-m/github-push-action@master
