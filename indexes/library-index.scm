@@ -60,29 +60,6 @@
        char-set:symbol
        char-set:hex-digit
        char-set:blank))
-    ((cyclone char-set extras)
-     (char-set
-       ucs-range->char-set
-       char-set-copy
-       char-set-size
-       char-set-fold
-       char-set-for-each
-       list->char-set
-       char-set->list
-       string->char-set
-       char-set->string
-       char-set-adjoin!
-       char-set-adjoin
-       char-set-union
-       char-set-union!
-       char-set-intersection
-       char-set-intersection!
-       char-set-difference
-       char-set-difference!
-       char-set-complement
-       char-set:empty
-       char-set:ascii
-       char-set:full))
     ((cyclone char-set boundary)
      (char-set:regional-indicator
        char-set:extend-or-spacing-mark
@@ -110,7 +87,30 @@
      (Char-Set
        char-set?
        immutable-char-set
-       char-set-contains?))))
+       char-set-contains?))
+    ((cyclone char-set extras)
+     (char-set
+       ucs-range->char-set
+       char-set-copy
+       char-set-size
+       char-set-fold
+       char-set-for-each
+       list->char-set
+       char-set->list
+       string->char-set
+       char-set->string
+       char-set-adjoin!
+       char-set-adjoin
+       char-set-union
+       char-set-union!
+       char-set-intersection
+       char-set-intersection!
+       char-set-difference
+       char-set-difference!
+       char-set-complement
+       char-set:empty
+       char-set:ascii
+       char-set:full))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -426,6 +426,28 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
+        ((cyclone iset iterators)
+         (iset-empty?
+           iset-fold
+           iset-fold-node
+           iset-for-each
+           iset-for-each-node
+           iset->list
+           iset-size
+           iset=
+           iset<=
+           iset>=
+           iset-cursor
+           iset-cursor?
+           iset-cursor-next
+           iset-ref
+           end-of-iset?))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -445,22 +467,6 @@
                iset-squash-bits!
                iset-insert-left!
                iset-insert-right!))
-        ((cyclone iset iterators)
-         (iset-empty?
-           iset-fold
-           iset-fold-node
-           iset-for-each
-           iset-for-each-node
-           iset->list
-           iset-size
-           iset=
-           iset<=
-           iset>=
-           iset-cursor
-           iset-cursor?
-           iset-cursor-next
-           iset-ref
-           end-of-iset?))
         ((cyclone iset base)
          (%make-iset
            make-iset
@@ -476,13 +482,7 @@
            iset-end-set!
            iset-bits-set!
            iset-left-set!
-           iset-right-set!))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))))
+           iset-right-set!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (mime (((cyclone mime)
