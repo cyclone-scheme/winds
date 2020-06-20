@@ -87,7 +87,7 @@
                          (remove (lambda (pkg)
                                    (equal? (car pkg) name))
                                  local-index)))))
-        (display (format "Package ~a (version ~a) successfuly installed with Cyclone ~a.~%" name version cyc-version))))
+        (display (format "Package ~a ~a successfuly installed with Cyclone ~a.~%" name version cyc-version))))
 
     (define (unregister-installed-package! name)
       (let* ((local-index (get-local-index)))

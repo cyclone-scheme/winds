@@ -78,7 +78,7 @@
                                ".tar.gz"))
                (outfile (->path work-dir tarball)))
           (make-dir! work-dir)
-          (display (format "Downloading ~a (version ~a)...~%" name version))
+          (display (format "Downloading ~a ~a...~%" name version))
           (download! tarball-url outfile)
           (validate-sha256sum sha256sum outfile)
           (extract! outfile work-dir)
