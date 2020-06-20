@@ -18,7 +18,7 @@ SYS_DIR    = sys
 WINDS_SRC  = cyclone-winds.scm
 LIBS_SRC   = $(wildcard $(LIBS_DIR)/*.sld)
 TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
-SYS_SRC  = $(wildcard $(SYS_DIR)/*.scm)
+SYS_SRC  = $(SYS_DIR)/tasks.scm
 
 # Output 
 WINDS_BN   = $(basename $(WINDS_SRC))
@@ -38,8 +38,8 @@ $(LIBS_BN) : %.so : %.sld
 $(TESTS_BN) : % : %.scm
 	$(CYCLONE) $<
 
-$(SYS_BN) : % : %.scm
-	$(CYCLONE) $<
+$(SYS_BN) : 
+	$(CYCLONE) $(SYS_SRC)
 
 .PHONY: run-tests test clean install uninstall full
 run-tests : $(TESTS_BN)
@@ -47,10 +47,10 @@ run-tests : $(TESTS_BN)
 
 test : all run-tests
 
-run-sys : $(SYS_BN)
+run-sys-tasks : $(SYS_BN)
 	./$<
 
-sys: all run-sys
+sys-tasks: all run-sys-tasks
 
 clean :
 	$(RM) $(WINDS_BN) *.a *.out *.so *.o *.c *.meta tags 

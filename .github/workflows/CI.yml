@@ -32,12 +32,18 @@ jobs:
         make test
         
     # Run system tasks
-    - name: Update library index
+    - name: Clone wiki directory
       run: |
-        make sys
+        git clone https://github.com/cyclone-scheme/cyclone-winds.wiki.git wiki
+
+    ## This updates library index, create wiki index and update packages wikis
+    - name: Sys tasks
+      run: |
+        make sys-tasks
         make clean
-        
-    - name: Commit files
+
+    ## Library index
+    - name: Commit library index
       run: |
         git config --local user.email "arthurmaciel@gmail.com"
         git config --local user.name "arthurmaciel"
@@ -49,3 +55,6 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         force: true
+
+    ## Wiki index (already updated by 'make sys-tasks')
+    
