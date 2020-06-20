@@ -30,3 +30,22 @@ jobs:
     - name: Run tests
       run: |
         make test
+        
+    # Run system tasks
+    - name: Update library index
+      run: |
+        make sys
+        make clean
+        
+    - name: Commit files
+      run: |
+        git config --local user.email "arthurmaciel@gmail.com"
+        git config --local user.name "arthurmaciel"
+        git add ./indexes/library-index.scm
+        git commit -m "Updated library-index.scm on push"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: true
