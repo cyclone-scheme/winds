@@ -12,7 +12,7 @@
 
 (define wiki-separator
   (string-append
-   "---------------"
+   "\n\n---------------\n"
    "# Contributions from the community:\n\n"))
 
 (define (update-package-wiki! pkg-name)

@@ -57,16 +57,6 @@ jobs:
           commit_username: ${{ github.repository_owner }}
           commit_email: ${{ secrets.AUTOMATION_EMAIL }}
           commit_message: 'Updated wiki'
-    # - name: Push wiki changes
-    #   # Taken from https://github.com/marketplace/actions/github-wiki-action
-    #   uses: Andrew-Chen-Wang/github-wiki-action@v2
-    #   env:
-    #     # Make sure you have that / at the end. We use rsync 
-    #     # WIKI_DIR's default is wiki/
-    #     WIKI_DIR: wiki/
-    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     GH_MAIL: ${{ secrets.AUTOMATION_EMAIL }}
-    #     GH_NAME: ${{ github.repository_owner }}
 
     - name: Clean wiki directory
       run: |
