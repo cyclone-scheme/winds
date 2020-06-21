@@ -48,6 +48,15 @@ jobs:
         make clean
 
     # Wiki index (already updated by 'make sys-tasks')
+    - name: Push wiki changes
+      uses: joeizzard/action-wiki-sync@master
+      with:
+          username: ${{ github.repository_owner }}
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+          wiki_folder: wiki
+          commit_username: ${{ github.repository_owner }}
+          commit_email: ${{ secrets.AUTOMATION_EMAIL }}
+          commit_message: 'Updated wiki'
     # - name: Push wiki changes
     #   # Taken from https://github.com/marketplace/actions/github-wiki-action
     #   uses: Andrew-Chen-Wang/github-wiki-action@v2
