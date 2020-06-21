@@ -18,7 +18,10 @@
     (define (get-parameter-value param metadata)
       (let ((param (assoc param metadata)))
         (if (and param (not (null? param)))
-            (cadr param)
+            (if (and (> (length param) 2)
+                     (string? (cadr param)))
+                (string-join (cdr param) " ")
+                (cadr param))
             #f)))
 
     ;; Returns a list

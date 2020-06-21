@@ -295,7 +295,7 @@
                "        (" (let ((name (->string (or (get-name pkg) "____"))))
                              (if (string-contains name "srfi")
                                  (string-join (string-split name #\-) " ")
-                                 (string-append (*default-code-directory*) name)))
+                                 (string-append (*default-code-directory*) " " name)))
                "))\n```\n\n"
 
                "## Author(s)\n"
