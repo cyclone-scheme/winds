@@ -7,7 +7,7 @@
 If you want to **contribute**, please take a look at the [Roadmap](roadmap).\n
 Packages available:\n
 |Package|Description|License|Author(s)|Maintainer(s)|Version|
-|-------|-----------|-------|---------|-------------|:-----:|\n")
+|-------|-----------|:-----:|---------|-------------|:-----:|\n")
 
 (define home-footer
   "\n\n*The above content was automatically generated on last Cyclone Winds update.*")
