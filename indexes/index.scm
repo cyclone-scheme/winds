@@ -30,7 +30,7 @@
  (iset
   (0.1 "https://github.com/cyclone-scheme/iset/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/iset/archive/v0.1.tar.gz" 
-       "6D87365E4A454219095DCC2D3736E1449ADDA746A6E1571582E49FFA47F8A4E5"))
+       "46a1bae1bfe36956ce2e5d549f46767e8666586f8ac5b8a0fa1e625b1bb36871"))
  (json
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
