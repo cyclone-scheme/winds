@@ -44,7 +44,8 @@
                        (string-append wiki-header
                                       "No documentation provided.\n\n"
                                       "Please consider contacting the package author.\n\n"
-                                      "Back to [index](" *default-wiki-url* ").\n\n"))
+                                      "Back to [index](" *default-wiki-url* ").\n\n"
+                                      wiki-separator))
                       (else
                        (string-append wiki-header doc wiki-separator)))))
           (display wiki-new-content (open-output-file wiki-file-path))
