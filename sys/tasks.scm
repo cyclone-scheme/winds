@@ -2,35 +2,48 @@
         (scheme read)
         (scheme cyclone pretty-print)
         (scheme cyclone libraries)
-        (libs system-calls)
-        (only (libs common) *default-code-directory*)
+        (srfi 132)
+        (libs metadata)
+        (only (libs system-calls) delete!)
+        (only (libs common) *default-code-directory* *default-doc-file*)
         (only (libs file) ->path)
         (only (libs index) get-index)
         (only (libs util) ->string string-contains)
         (only (libs package) find-code-files-recursively retrieve-package))
 
-(include "sys/update-library-index.scm")
 (include "sys/update-wiki-index.scm")
-(include "sys/update-packages-wikis.scm")
+(include "sys/update-packages-wiki.scm")
+(include "sys/update-library-index.scm")
+
+(define (file->string file)
+  (define file-port (open-input-file file))
+  (let lp ((content ""))
+    (let ((r (read-line file-port)))
+      (if (eof-object? r)
+          (string-copy content 1) ; hack to remove first "\n"
+          (lp (string-append content "\n" r))))))
+
+(define (srfi? pkg)
+  (string-contains (->string pkg) "srfi"))
 
 (define *index* (get-index))
 
-;; (define finish-hook '())
-
-;; (define (hook-add! hook proc)
-;;   (set! hook (append hook proc)))
-
-;; (define (hook-run hook . args)
-;;   (for-each (lambda (proc) (apply proc args))
-;;             hook))
+(define *pkg-list*
+  (list-sort (lambda (a b)
+               (string<? (symbol->string a)
+                         (symbol->string b)))
+             (map car *index*)))
 
 (define (main)
-  (let ((all-pkgs (map car *index*)))
+  (begin
     (for-each (lambda (pkg)
-                (update-library-index! pkg)
+                (retrieve-package *index* pkg ".")
                 (update-wiki-index! pkg)
-                (update-packages-wikis! pkg))
-              all-pkgs)
+                (update-package-wiki! pkg)
+                (update-library-index! pkg)
+                (delete! (->path pkg-path)))
+              *pkg-list*)
+    (write-wiki-index!)
     (write-library-index!)))
 
 (main)

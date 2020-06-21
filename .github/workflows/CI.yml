@@ -31,22 +31,41 @@ jobs:
       run: |
         make test
         
-    # Run system tasks
+    # Run system tasks (the order is important!)
+    ## Pre-requisite
     - name: Clone wiki directory
       run: |
         git clone https://github.com/cyclone-scheme/cyclone-winds.wiki.git wiki
 
-    ## This updates library index, create wiki index and update packages wikis
-    - name: Sys tasks
+    ## Update wiki index, packages wikis and library index.
+    ## One command does all to avoid multiple iterations over all packages,
+    ## which could become too slow as the packages list grows.
+    - name: Update wiki and library index
       run: |
         make sys-tasks
         make clean
 
+    ## Wiki index (already updated by 'make sys-tasks')
+   - name: Push wiki changes
+      # Taken from https://github.com/marketplace/actions/github-wiki-action
+      uses: Andrew-Chen-Wang/github-wiki-action@v2
+      env:
+        # Make sure you have that / at the end. We use rsync 
+        # WIKI_DIR's default is wiki/
+        WIKI_DIR: wiki/
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_MAIL: ${{ secrets.AUTOMATION_EMAIL }}
+        GH_NAME: ${{ github.repository_owner }}
+
+    - name: Clean wiki directory
+      run: |
+        rm -Rf wiki
+
     ## Library index
     - name: Commit library index
       run: |
-        git config --local user.email "arthurmaciel@gmail.com"
-        git config --local user.name "arthurmaciel"
+        git config --local user.email ${{ secrets.AUTOMATION_EMAIL }}
+        git config --local user.name ${{ github.repository_owner }}
         git add ./indexes/library-index.scm
         [[ -z $(git status -s) ]] || git commit -m "Updated library-index.scm on push"
     
@@ -56,5 +75,5 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         force: true
 
-    ## Wiki index (already updated by 'make sys-tasks')
+
     
