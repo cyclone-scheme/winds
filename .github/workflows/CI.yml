@@ -48,7 +48,7 @@ jobs:
         make clean
 
     # Wiki index (already updated by 'make sys-tasks')
-   - name: Push wiki changes
+    - name: Push wiki changes
       # Taken from https://github.com/marketplace/actions/github-wiki-action
       uses: Andrew-Chen-Wang/github-wiki-action@v2
       env:
