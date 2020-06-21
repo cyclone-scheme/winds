@@ -48,6 +48,7 @@ jobs:
         make clean
 
     # Wiki index (already updated by 'make sys-tasks')
+    # Got from https://github.com/marketplace/actions/wiki-sync        
     - name: Push wiki changes
       uses: joeizzard/action-wiki-sync@master
       with:
