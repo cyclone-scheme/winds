@@ -3,7 +3,7 @@
 (define *default-wiki-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
 
 (define home-header
-  "# Welcome to the cyclone-winds wiki!\n
+  "# Welcome to the Cyclone Winds wiki!\n
 If you want to **contribute**, please take a look at the [Roadmap](roadmap).\n
 Packages available:\n
 |Package|Description|License|Author(s)|Maintainer(s)|Version|
