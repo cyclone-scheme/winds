@@ -31,21 +31,23 @@ jobs:
       run: |
         make test
         
+    # -----------------------------------------------------------------
     # Run system tasks (the order is important!)
-    ## Pre-requisite
+
+    # Pre-requisite
     - name: Clone wiki directory
       run: |
         git clone https://github.com/cyclone-scheme/cyclone-winds.wiki.git wiki
 
-    ## Update wiki index, packages wikis and library index.
-    ## One command does all to avoid multiple iterations over all packages,
-    ## which could become too slow as the packages list grows.
+    # Update wiki index, packages wikis and library index.
+    # One command does all to avoid multiple iterations over all packages,
+    # which could become too slow as the packages list grows.
     - name: Update wiki and library index
       run: |
         make sys-tasks
         make clean
 
-    ## Wiki index (already updated by 'make sys-tasks')
+    # Wiki index (already updated by 'make sys-tasks')
    - name: Push wiki changes
       # Taken from https://github.com/marketplace/actions/github-wiki-action
       uses: Andrew-Chen-Wang/github-wiki-action@v2
@@ -61,7 +63,7 @@ jobs:
       run: |
         rm -Rf wiki
 
-    ## Library index
+    # Library index
     - name: Commit library index
       run: |
         git config --local user.email ${{ secrets.AUTOMATION_EMAIL }}
