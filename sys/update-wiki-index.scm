@@ -1,11 +1,13 @@
 (define *default-wiki-directory* "wiki")
 (define *default-wiki-home-file* (->path *default-wiki-directory* "Home.md"))
+(define *default-wiki-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
 
 (define home-header
   "# Welcome to the cyclone-winds wiki!\n
 If you want to **contribute**, please take a look at the [Roadmap](roadmap).\n
 Packages available:\n
-|Package|Description|License|Author|Maintainer|Version|\n")
+|Package|Description|License|Author(s)|Maintainer(s)|Version|
+|-------|-----------|-------|---------|-------------|:-----:|\n")
 
 (define home-footer
   "\n\n*The above content was automatically generated on last Cyclone Winds update.*")
@@ -13,16 +15,17 @@ Packages available:\n
 (define (get-info-row pkg-name)
   (let* ((work-dir (->path "." pkg-name))
          (md-path (->path work-dir *default-metadata-file*))
-         (pkg (metadata->pkg (read (open-input-file md-path)))))
+         (pkg (metadata->pkg (cdr (read (open-input-file md-path))))))
     (string-append "|"
-                   (string-join (list (->string (get-name pkg))
+                   (string-join (list (let ((name (->string (get-name pkg))))
+                                        (string-append "[" name "](" *default-wiki-url* name ")"))
                                       (get-description pkg)
                                       (get-license pkg)
                                       (get-authors pkg)
                                       (get-maintainers pkg)
                                       (->string (get-version pkg)))
                                 "|")
-                   "|")))
+                   "|\n")))
 
 (define wiki-index "")
 
@@ -34,5 +37,5 @@ Packages available:\n
     (set! wiki-index (string-append wiki-index info-row))))
 
 (define (write-wiki-index!) 
-  (pretty-print (string-append home-header wiki-index home-footer)
-                (open-output-file *default-wiki-home-file*)))
+  (display (string-append home-header wiki-index home-footer)
+           (open-output-file *default-wiki-home-file*)))

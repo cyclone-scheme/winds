@@ -15,7 +15,7 @@
                       (parameterize ((*default-code-directory* "srfi"))
                         (libraries+exports pkg-name))
                       (libraries+exports pkg-name))))
-    (set! library-index (append library-index (list pkg-name lib+exps)))))
+    (set! library-index (append library-index (list (list pkg-name lib+exps))))))
 
 (define (write-library-index!) 
   (pretty-print library-index

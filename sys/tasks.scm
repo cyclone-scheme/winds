@@ -1,14 +1,16 @@
 (import (scheme base)
         (scheme read)
+        (only (scheme write) display)
         (scheme cyclone pretty-print)
         (scheme cyclone libraries)
-        (srfi 132)
+        (srfi 28) ; basic format string
+        (srfi 132) ; sort algorithms
         (libs metadata)
         (only (libs system-calls) delete!)
         (only (libs common) *default-code-directory* *default-doc-file*)
         (only (libs file) ->path)
         (only (libs index) get-index)
-        (only (libs util) ->string string-contains)
+        (only (libs util) ->string string-contains string-join)
         (only (libs package) find-code-files-recursively retrieve-package))
 
 (include "sys/update-wiki-index.scm")
@@ -20,7 +22,7 @@
   (let lp ((content ""))
     (let ((r (read-line file-port)))
       (if (eof-object? r)
-          (string-copy content 1) ; hack to remove first "\n"
+          (string-copy content (min (string-length content) 1)) ; hack to remove first "\n"
           (lp (string-append content "\n" r))))))
 
 (define (srfi? pkg)
@@ -41,9 +43,11 @@
                 (update-wiki-index! pkg)
                 (update-package-wiki! pkg)
                 (update-library-index! pkg)
-                (delete! (->path pkg-path)))
+                (delete! (->path pkg)))
               *pkg-list*)
     (write-wiki-index!)
-    (write-library-index!)))
+    (display (format "Wiki index updated.~%"))
+    (write-library-index!)
+    (display (format "Library index updated.~%"))))
 
 (main)
