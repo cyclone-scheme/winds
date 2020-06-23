@@ -20,9 +20,9 @@
        "https://github.com/cyclone-scheme/csv/archive/v0.1.tar.gz" 
        "74ceaff8c1e459c22e8e8a5cfa346959fe931aacccec5e9d352513cefd35bbb1"))
  (curl 
-  (0.1 "https://github.com/cyclone-scheme/curl/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/curl/archive/v0.1.tar.gz" 
-       "CB0FB34CB5E27A45AD452A2C06CD7FFFB3EDC12C6E30F96823033DF081975219"))
+  (0.2 "https://github.com/cyclone-scheme/curl/raw/v0.2/package.scm" 
+       "https://github.com/cyclone-scheme/curl/archive/v0.2.tar.gz" 
+       "eec2593db6a2d1243bc22df4e2dde537ba8f24d03ecd4f339ef41b4450e72634"))
  (irregex
   (0.1 "https://github.com/cyclone-scheme/irregex/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/irregex/archive/v0.1.tar.gz" 
@@ -52,9 +52,9 @@
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.1.tar.gz" 
        "d02ff1fa701a2993460a65a5634e8a1a921567b136524072abf99b98187ead10"))
  (sha2
-  (0.2 "https://github.com/cyclone-scheme/sha2/raw/v0.2/package.scm" 
-       "https://github.com/cyclone-scheme/sha2/archive/v0.2.tar.gz" 
-       "a1007b68d1167e044c7dc7c16871847b179f138765910881164a57c30c2fc48b"))
+  (0.3 "https://github.com/cyclone-scheme/sha2/raw/v0.3/package.scm" 
+       "https://github.com/cyclone-scheme/sha2/archive/v0.3.tar.gz" 
+       "b85872ff5b1f58525240914f717f0c0f969a48fc8b0d62a07941042061f0732d"))
  (srfi-26
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
