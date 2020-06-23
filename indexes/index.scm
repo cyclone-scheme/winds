@@ -10,7 +10,7 @@
  (char-set
   (0.2 "https://github.com/cyclone-scheme/char-set/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/char-set/archive/v0.2.tar.gz" 
-       "534f0d0418eb63ec01f2bc788f970180f0ae4687a22c4c5f925805692b38bb8b"))
+       "ac6d6f77748e7d33a2181e63dd3c70ee3c060b8a7debba02c0b9aba41689dcf2"))
  (clojurian
   (0.1 "https://github.com/cyclone-scheme/clojurian/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/clojurian/archive/v0.1.tar.gz" 
