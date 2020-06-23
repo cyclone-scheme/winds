@@ -52,9 +52,9 @@
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.1.tar.gz" 
        "d02ff1fa701a2993460a65a5634e8a1a921567b136524072abf99b98187ead10"))
  (sha2
-  (0.1 "https://github.com/cyclone-scheme/sha2/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/sha2/archive/v0.1.tar.gz" 
-       "fced9a7bfbe17ac8ebc896ea74445c2ace8d0203793c5836dcafc858485285ce"))
+  (0.2 "https://github.com/cyclone-scheme/sha2/raw/v0.2/package.scm" 
+       "https://github.com/cyclone-scheme/sha2/archive/v0.2.tar.gz" 
+       "a1007b68d1167e044c7dc7c16871847b179f138765910881164a57c30c2fc48b"))
  (srfi-26
   (0.1 "https://github.com/cyclone-scheme/srfi-26/raw/master/package.scm" 
        "https://github.com/cyclone-scheme/srfi-26/archive/v0.1.tar.gz" 
