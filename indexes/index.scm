@@ -19,7 +19,7 @@
   (0.1 "https://github.com/cyclone-scheme/csv/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/csv/archive/v0.1.tar.gz" 
        "74ceaff8c1e459c22e8e8a5cfa346959fe931aacccec5e9d352513cefd35bbb1"))
- (curl
+ (curl 
   (0.1 "https://github.com/cyclone-scheme/curl/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/curl/archive/v0.1.tar.gz" 
        "CB0FB34CB5E27A45AD452A2C06CD7FFFB3EDC12C6E30F96823033DF081975219"))
