@@ -7,6 +7,10 @@
   (0.3 "https://github.com/cyclone-scheme/base64/raw/v0.3/package.scm"
        "https://github.com/cyclone-scheme/base64/archive/v0.3.tar.gz" 
        "1480aa75e46f5e1858c1bbed34ea69079286dba47c5763e14ce4a416ab787f63"))
+ (bytevector
+  (0.1 "https://github.com/cyclone-scheme/bytevector/raw/v0.1/package.scm"
+       "955da1e33da440e6506af827eebaa0c6ebb839b6ff373b92178e160d2729cf5d" 
+       "1480aa75e46f5e1858c1bbed34ea69079286dba47c5763e14ce4a416ab787f63"))
  (char-set
   (0.2 "https://github.com/cyclone-scheme/char-set/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/char-set/archive/v0.2.tar.gz" 
