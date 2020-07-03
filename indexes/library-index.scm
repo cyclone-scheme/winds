@@ -507,6 +507,7 @@
            iset-right-set!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
+ (md5 (((cyclone crypto md5) (md5))))
  (mime (((cyclone mime)
          (assq-ref
            mime-header-fold
