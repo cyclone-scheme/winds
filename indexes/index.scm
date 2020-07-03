@@ -39,6 +39,10 @@
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
        "08deeba553c023a1af641e78887630ab3ff20c40f5f9c021fcb8a68c89d0e859"))
+ (md5
+  (0.1 "https://github.com/cyclone-scheme/md5/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/md5/archive/v0.1.tar.gz" 
+       "d7699ba9c540d5cf41c9e4bfeba137da1809d568d8e91e01b7d561c885e60691"))
  (mime
   (0.2 "https://github.com/cyclone-scheme/mime/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/mime/archive/v0.2.tar.gz" 
