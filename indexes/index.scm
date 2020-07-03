@@ -42,7 +42,7 @@
  (md5
   (0.1 "https://github.com/cyclone-scheme/md5/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/md5/archive/v0.1.tar.gz" 
-       "d7699ba9c540d5cf41c9e4bfeba137da1809d568d8e91e01b7d561c885e60691"))
+       "ca6c84382ed273c1248bda34528e3667be49c8397a4fa3cdd0a6891be65fc138"))
  (mime
   (0.2 "https://github.com/cyclone-scheme/mime/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/mime/archive/v0.2.tar.gz" 
