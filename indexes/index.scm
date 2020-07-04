@@ -10,7 +10,7 @@
  (bytevector
   (0.1 "https://github.com/cyclone-scheme/bytevector/raw/v0.1/package.scm"
        "https://github.com/cyclone-scheme/bytevector/archive/v0.1.tar.gz"
-       "955da1e33da440e6506af827eebaa0c6ebb839b6ff373b92178e160d2729cf5d"))
+       "3f57363559907001323268515a27ef2437e0c9948a503181cfd022bcd57179d6"))
  (char-set
   (0.2 "https://github.com/cyclone-scheme/char-set/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/char-set/archive/v0.2.tar.gz" 
