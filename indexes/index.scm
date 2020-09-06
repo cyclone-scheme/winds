@@ -55,6 +55,10 @@
   (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
        "63aed8cef0f73f508f809fa99942d064ee619d71d8914e4b83b3a44c94e41b4e"))
+ (postgresql
+  (0.1 "https://github.com/cyclone-scheme/postgresql/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/postgresql/archive/v0.1.tar.gz" 
+       "2b216a463c859db0ee74e720627b0aaeec394767083203424d1232f7b18dd5fa"))
  (quoted-printable
   (0.2 "https://github.com/cyclone-scheme/quoted-printable/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.2.tar.gz" 
