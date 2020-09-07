@@ -67,6 +67,11 @@
        char-set:empty
        char-set:ascii
        char-set:full))
+    ((cyclone char-set base)
+     (Char-Set
+       char-set?
+       immutable-char-set
+       char-set-contains?))
     ((cyclone char-set extras)
      (char-set
        ucs-range->char-set
@@ -90,11 +95,6 @@
        char-set:empty
        char-set:ascii
        char-set:full))
-    ((cyclone char-set base)
-     (Char-Set
-       char-set?
-       immutable-char-set
-       char-set-contains?))
     ((cyclone char-set full)
      (char-set:lower-case
        char-set:upper-case
@@ -464,6 +464,28 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))
+        ((cyclone iset base)
+         (%make-iset
+           make-iset
+           iset?
+           iset-contains?
+           Integer-Set
+           iset-start
+           iset-end
+           iset-bits
+           iset-left
+           iset-right
+           iset-start-set!
+           iset-end-set!
+           iset-bits-set!
+           iset-left-set!
+           iset-right-set!))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -482,29 +504,7 @@
                iset-copy-node
                iset-squash-bits!
                iset-insert-left!
-               iset-insert-right!))
-        ((cyclone iset base)
-         (%make-iset
-           make-iset
-           iset?
-           iset-contains?
-           Integer-Set
-           iset-start
-           iset-end
-           iset-bits
-           iset-left
-           iset-right
-           iset-start-set!
-           iset-end-set!
-           iset-bits-set!
-           iset-left-set!
-           iset-right-set!))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))))
+               iset-insert-right!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -574,6 +574,142 @@
        path-resolve
        path-normalize
        make-path))))
+ (postgresql
+   (((cyclone postgresql)
+     (make-postgresql-connection
+       postgresql-connection?
+       postgresql-open-connection!
+       postgresql-secure-connection!
+       postgresql-login!
+       postgresql-terminate!
+       postgresql-query?
+       postgresql-query-descriptions
+       postgresql-execute-sql!
+       postgresql-prepared-statement?
+       postgresql-prepared-statement
+       postgresql-prepared-statement-sql
+       postgresql-bind-parameters!
+       postgresql-execute!
+       postgresql-close-prepared-statement!
+       postgresql-fetch-query!
+       postgresql-start-transaction!
+       postgresql-commit!
+       postgresql-rollback!
+       *postgresql-maximum-results*
+       *postgresql-date-format*
+       *postgresql-time-format*
+       *postgresql-timestamp-format*
+       *postgresql-copy-data-handler*
+       *postgresql-write-data-handler*
+       *postgresql-notice-handler*
+       *postgresql-unknown-type-handler*
+       postgresql-transaction-mode
+       postgresql-isolation-level-serializable
+       postgresql-isolation-level-repeatable-read
+       postgresql-isolation-level-read-committed
+       postgresql-isolation-level-read-uncommitted
+       postgresql-access-mode-read-write
+       postgresql-access-mode-read-only
+       postgresql-deferrable-on
+       postgresql-deferrable-off
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
+    ((cyclone postgresql buffer)
+     (postgresql-send-ssl-request
+       postgresql-send-startup-message
+       postgresql-send-password-message
+       postgresql-send-terminate-message
+       postgresql-send-sync-message
+       postgresql-send-flush-message
+       postgresql-send-query-message
+       postgresql-send-parse-message
+       postgresql-send-bind-message
+       postgresql-send-describe-message
+       postgresql-send-execute-message
+       postgresql-send-close-message
+       postgresql-send-copy-data-message
+       postgresql-send-copy-fail-message
+       postgresql-send-copy-done-message
+       postgresql-read-response
+       make-postgresql-out-buffer))
+    ((cyclone postgresql apis)
+     (make-postgresql-connection
+       postgresql-connection?
+       postgresql-open-connection!
+       postgresql-secure-connection!
+       postgresql-login!
+       postgresql-terminate!
+       postgresql-query?
+       postgresql-query-descriptions
+       postgresql-execute-sql!
+       postgresql-prepared-statement?
+       postgresql-prepared-statement
+       postgresql-prepared-statement-sql
+       postgresql-bind-parameters!
+       postgresql-execute!
+       postgresql-close-prepared-statement!
+       *postgresql-maximum-results*
+       *postgresql-date-format*
+       *postgresql-time-format*
+       *postgresql-timestamp-format*
+       *postgresql-copy-data-handler*
+       *postgresql-write-data-handler*
+       *postgresql-notice-handler*
+       *postgresql-unknown-type-handler*
+       postgresql-fetch-query!
+       postgresql-start-transaction!
+       postgresql-commit!
+       postgresql-rollback!
+       postgresql-transaction-mode
+       postgresql-isolation-level-serializable
+       postgresql-isolation-level-repeatable-read
+       postgresql-isolation-level-read-committed
+       postgresql-isolation-level-read-uncommitted
+       postgresql-access-mode-read-write
+       postgresql-access-mode-read-only
+       postgresql-deferrable-on
+       postgresql-deferrable-off))
+    ((cyclone postgresql conditions)
+     (raise-postgresql-error
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
+    ((cyclone postgresql messages)
+     (postgresql-send-ssl-request
+       postgresql-send-startup-message
+       postgresql-send-password-message
+       postgresql-send-terminate-message
+       postgresql-send-sync-message
+       postgresql-send-flush-message
+       postgresql-send-query-message
+       postgresql-send-parse-message
+       postgresql-send-bind-message
+       postgresql-send-describe-message
+       postgresql-send-execute-message
+       postgresql-send-close-message
+       postgresql-send-copy-data-message
+       postgresql-send-copy-fail-message
+       postgresql-send-copy-done-message
+       postgresql-read-response))
+    ((cyclone postgresql misc ssl)
+     (socket->ssl-socket
+       ssl-socket-input-port
+       ssl-socket-output-port
+       ssl-socket?
+       ssl-socket-close))
+    ((cyclone postgresql misc io)
+     (write-u16-be write-u32-be))))
  (quoted-printable
    (((cyclone quoted-printable)
      (quoted-printable-encode
