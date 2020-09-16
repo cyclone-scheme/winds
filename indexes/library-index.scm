@@ -67,11 +67,14 @@
        char-set:empty
        char-set:ascii
        char-set:full))
-    ((cyclone char-set base)
-     (Char-Set
-       char-set?
-       immutable-char-set
-       char-set-contains?))
+    ((cyclone char-set boundary)
+     (char-set:regional-indicator
+       char-set:extend-or-spacing-mark
+       char-set:hangul-l
+       char-set:hangul-v
+       char-set:hangul-t
+       char-set:hangul-lv
+       char-set:hangul-lvt))
     ((cyclone char-set extras)
      (char-set
        ucs-range->char-set
@@ -95,6 +98,11 @@
        char-set:empty
        char-set:ascii
        char-set:full))
+    ((cyclone char-set base)
+     (Char-Set
+       char-set?
+       immutable-char-set
+       char-set-contains?))
     ((cyclone char-set full)
      (char-set:lower-case
        char-set:upper-case
@@ -110,14 +118,6 @@
        char-set:symbol
        char-set:hex-digit
        char-set:blank))
-    ((cyclone char-set boundary)
-     (char-set:regional-indicator
-       char-set:extend-or-spacing-mark
-       char-set:hangul-l
-       char-set:hangul-v
-       char-set:hangul-t
-       char-set:hangul-lv
-       char-set:hangul-lvt))
     ((cyclone char-set ascii)
      (char-set:lower-case
        char-set:upper-case
@@ -448,44 +448,6 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
-        ((cyclone iset iterators)
-         (iset-empty?
-           iset-fold
-           iset-fold-node
-           iset-for-each
-           iset-for-each-node
-           iset->list
-           iset-size
-           iset=
-           iset<=
-           iset>=
-           iset-cursor
-           iset-cursor?
-           iset-cursor-next
-           iset-ref
-           end-of-iset?))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))
-        ((cyclone iset base)
-         (%make-iset
-           make-iset
-           iset?
-           iset-contains?
-           Integer-Set
-           iset-start
-           iset-end
-           iset-bits
-           iset-left
-           iset-right
-           iset-start-set!
-           iset-end-set!
-           iset-bits-set!
-           iset-left-set!
-           iset-right-set!))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -504,7 +466,45 @@
                iset-copy-node
                iset-squash-bits!
                iset-insert-left!
-               iset-insert-right!))))
+               iset-insert-right!))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))
+        ((cyclone iset iterators)
+         (iset-empty?
+           iset-fold
+           iset-fold-node
+           iset-for-each
+           iset-for-each-node
+           iset->list
+           iset-size
+           iset=
+           iset<=
+           iset>=
+           iset-cursor
+           iset-cursor?
+           iset-cursor-next
+           iset-ref
+           end-of-iset?))
+        ((cyclone iset base)
+         (%make-iset
+           make-iset
+           iset?
+           iset-contains?
+           Integer-Set
+           iset-start
+           iset-end
+           iset-bits
+           iset-left
+           iset-right
+           iset-start-set!
+           iset-end-set!
+           iset-bits-set!
+           iset-left-set!
+           iset-right-set!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -620,6 +620,33 @@
        postgresql-error-column
        postgresql-error-data-type
        postgresql-error-constraint))
+    ((cyclone postgresql messages)
+     (postgresql-send-ssl-request
+       postgresql-send-startup-message
+       postgresql-send-password-message
+       postgresql-send-terminate-message
+       postgresql-send-sync-message
+       postgresql-send-flush-message
+       postgresql-send-query-message
+       postgresql-send-parse-message
+       postgresql-send-bind-message
+       postgresql-send-describe-message
+       postgresql-send-execute-message
+       postgresql-send-close-message
+       postgresql-send-copy-data-message
+       postgresql-send-copy-fail-message
+       postgresql-send-copy-done-message
+       postgresql-read-response))
+    ((cyclone postgresql conditions)
+     (raise-postgresql-error
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
     ((cyclone postgresql buffer)
      (postgresql-send-ssl-request
        postgresql-send-startup-message
@@ -675,33 +702,6 @@
        postgresql-access-mode-read-only
        postgresql-deferrable-on
        postgresql-deferrable-off))
-    ((cyclone postgresql conditions)
-     (raise-postgresql-error
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
-    ((cyclone postgresql messages)
-     (postgresql-send-ssl-request
-       postgresql-send-startup-message
-       postgresql-send-password-message
-       postgresql-send-terminate-message
-       postgresql-send-sync-message
-       postgresql-send-flush-message
-       postgresql-send-query-message
-       postgresql-send-parse-message
-       postgresql-send-bind-message
-       postgresql-send-describe-message
-       postgresql-send-execute-message
-       postgresql-send-close-message
-       postgresql-send-copy-data-message
-       postgresql-send-copy-fail-message
-       postgresql-send-copy-done-message
-       postgresql-read-response))
     ((cyclone postgresql misc ssl)
      (socket->ssl-socket
        ssl-socket-input-port
@@ -789,6 +789,49 @@
        hook->list
        hook-run))))
  (srfi-26 (((srfi 26) (cut cute))))
+ (srfi-41
+   (((srfi 41)
+     (make-stream
+       make-stream-pair
+       make-stream-null
+       stream-promise
+       stream-null
+       stream-cons
+       stream?
+       stream-null?
+       stream-pair?
+       stream-car
+       stream-cdr
+       stream-lambda
+       define-stream
+       list->stream
+       port->stream
+       stream
+       stream->list
+       stream-append
+       stream-concat
+       stream-constant
+       stream-drop
+       stream-drop-while
+       stream-filter
+       stream-fold
+       stream-for-each
+       stream-from
+       stream-iterate
+       stream-length
+       stream-let
+       stream-map
+       stream-match
+       stream-of
+       stream-range
+       stream-ref
+       stream-reverse
+       stream-scan
+       stream-take
+       stream-take-while
+       stream-unfold
+       stream-unfolds
+       stream-zip))))
  (string
    (((cyclone string)
      (string-cursor?
