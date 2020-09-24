@@ -788,6 +788,13 @@
        hook-reset!
        hook->list
        hook-run))))
+ (srfi-197
+   (((srfi 197)
+     (chain chain-and
+            chain-when
+            chain-lambda
+            nest
+            nest-reverse))))
  (srfi-26 (((srfi 26) (cut cute))))
  (srfi-41
    (((srfi 41)
