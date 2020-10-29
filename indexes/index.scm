@@ -99,6 +99,10 @@
   (0.1 "https://github.com/cyclone-scheme/sxml/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
        "dabd1188875aa223c1613ce5c61da9dd2164caea9f2ded34f5ab9c864f725c79"))
+ (temple
+  (0.1 "https://github.com/cyclone-scheme/temple/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/temple/archive/v0.1.tar.gz" 
+       "8e63679f822b8c3393f2dbdb3d7679d27d89e3e87bc9dab73f78e0cd71495e97"))
  (uri
   (0.1 "https://github.com/cyclone-scheme/uri/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/uri/archive/v0.1.tar.gz" 
