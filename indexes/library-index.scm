@@ -892,6 +892,24 @@
            sxml-strip
            html-escape
            html-tag->string))))
+ (syslog
+   (((cyclone syslog)
+     (open-log
+       send-log
+       openlog
+       closelog
+       syslog
+       setlogmask
+       LOG_PID
+       LOG_USER
+       EMERG
+       ALERT
+       CRIT
+       ERR
+       WARNING
+       NOTICE
+       INFO
+       DEBUG))))
  (temple
    (((cyclone web temple)
      (render get-parse-tree build-parse-tree))
