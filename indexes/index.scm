@@ -48,9 +48,9 @@
        "https://github.com/cyclone-scheme/mime/archive/v0.2.tar.gz" 
        "142f96e76a2991bb093648018b6c3c42c678242eed0e241620a29f62e67a8387"))
  (packrat
-  (0.1 "https://github.com/cyclone-scheme/packrat/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/packrat/archive/v0.1.tar.gz" 
-       "363c7703076c8d52e90fec4f5de6a9d904b2c8bdc962a81d52dcf776540a4cea"))
+  (0.2 "https://github.com/cyclone-scheme/packrat/raw/v0.2/package.scm" 
+       "https://github.com/cyclone-scheme/packrat/archive/v0.2.tar.gz" 
+       "0b8e314c39bc9deb57e7f671e6989cec3881fcc7e426d676f6aa2055bae4b1f0"))
  (pathname
   (0.1 "https://github.com/cyclone-scheme/pathname/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
