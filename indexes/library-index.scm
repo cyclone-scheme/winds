@@ -67,6 +67,29 @@
        char-set:empty
        char-set:ascii
        char-set:full))
+    ((cyclone char-set extras)
+     (char-set
+       ucs-range->char-set
+       char-set-copy
+       char-set-size
+       char-set-fold
+       char-set-for-each
+       list->char-set
+       char-set->list
+       string->char-set
+       char-set->string
+       char-set-adjoin!
+       char-set-adjoin
+       char-set-union
+       char-set-union!
+       char-set-intersection
+       char-set-intersection!
+       char-set-difference
+       char-set-difference!
+       char-set-complement
+       char-set:empty
+       char-set:ascii
+       char-set:full))
     ((cyclone char-set boundary)
      (char-set:regional-indicator
        char-set:extend-or-spacing-mark
@@ -75,6 +98,11 @@
        char-set:hangul-t
        char-set:hangul-lv
        char-set:hangul-lvt))
+    ((cyclone char-set base)
+     (Char-Set
+       char-set?
+       immutable-char-set
+       char-set-contains?))
     ((cyclone char-set ascii)
      (char-set:lower-case
        char-set:upper-case
@@ -104,35 +132,7 @@
        char-set:punctuation
        char-set:symbol
        char-set:hex-digit
-       char-set:blank))
-    ((cyclone char-set base)
-     (Char-Set
-       char-set?
-       immutable-char-set
-       char-set-contains?))
-    ((cyclone char-set extras)
-     (char-set
-       ucs-range->char-set
-       char-set-copy
-       char-set-size
-       char-set-fold
-       char-set-for-each
-       list->char-set
-       char-set->list
-       string->char-set
-       char-set->string
-       char-set-adjoin!
-       char-set-adjoin
-       char-set-union
-       char-set-union!
-       char-set-intersection
-       char-set-intersection!
-       char-set-difference
-       char-set-difference!
-       char-set-complement
-       char-set:empty
-       char-set:ascii
-       char-set:full))))
+       char-set:blank))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -448,12 +448,22 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))
+        ((cyclone iset iterators)
+         (iset-empty?
+           iset-fold
+           iset-fold-node
+           iset-for-each
+           iset-for-each-node
+           iset->list
+           iset-size
+           iset=
+           iset<=
+           iset>=
+           iset-cursor
+           iset-cursor?
+           iset-cursor-next
+           iset-ref
+           end-of-iset?))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -489,22 +499,12 @@
            iset-bits-set!
            iset-left-set!
            iset-right-set!))
-        ((cyclone iset iterators)
-         (iset-empty?
-           iset-fold
-           iset-fold-node
-           iset-for-each
-           iset-for-each-node
-           iset->list
-           iset-size
-           iset=
-           iset<=
-           iset>=
-           iset-cursor
-           iset-cursor?
-           iset-cursor-next
-           iset-ref
-           end-of-iset?))))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -620,16 +620,6 @@
        postgresql-error-column
        postgresql-error-data-type
        postgresql-error-constraint))
-    ((cyclone postgresql conditions)
-     (raise-postgresql-error
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
     ((cyclone postgresql messages)
      (postgresql-send-ssl-request
        postgresql-send-startup-message
@@ -647,6 +637,34 @@
        postgresql-send-copy-fail-message
        postgresql-send-copy-done-message
        postgresql-read-response))
+    ((cyclone postgresql conditions)
+     (raise-postgresql-error
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
+    ((cyclone postgresql buffer)
+     (postgresql-send-ssl-request
+       postgresql-send-startup-message
+       postgresql-send-password-message
+       postgresql-send-terminate-message
+       postgresql-send-sync-message
+       postgresql-send-flush-message
+       postgresql-send-query-message
+       postgresql-send-parse-message
+       postgresql-send-bind-message
+       postgresql-send-describe-message
+       postgresql-send-execute-message
+       postgresql-send-close-message
+       postgresql-send-copy-data-message
+       postgresql-send-copy-fail-message
+       postgresql-send-copy-done-message
+       postgresql-read-response
+       make-postgresql-out-buffer))
     ((cyclone postgresql apis)
      (make-postgresql-connection
        postgresql-connection?
@@ -684,24 +702,6 @@
        postgresql-access-mode-read-only
        postgresql-deferrable-on
        postgresql-deferrable-off))
-    ((cyclone postgresql buffer)
-     (postgresql-send-ssl-request
-       postgresql-send-startup-message
-       postgresql-send-password-message
-       postgresql-send-terminate-message
-       postgresql-send-sync-message
-       postgresql-send-flush-message
-       postgresql-send-query-message
-       postgresql-send-parse-message
-       postgresql-send-bind-message
-       postgresql-send-describe-message
-       postgresql-send-execute-message
-       postgresql-send-close-message
-       postgresql-send-copy-data-message
-       postgresql-send-copy-fail-message
-       postgresql-send-copy-done-message
-       postgresql-read-response
-       make-postgresql-out-buffer))
     ((cyclone postgresql misc io)
      (write-u16-be write-u32-be))
     ((cyclone postgresql misc ssl)
@@ -913,10 +913,10 @@
  (temple
    (((cyclone web temple)
      (render get-parse-tree build-parse-tree))
-    ((cyclone web temple trace)
-     (trace set-trace-level!))
     ((cyclone web temple parser)
-     (parse *read-size* string-pos))))
+     (parse *read-size* string-pos))
+    ((cyclone web temple trace)
+     (trace set-trace-level!))))
  (uri (((cyclone uri)
         (uri? uri->string
               make-uri
