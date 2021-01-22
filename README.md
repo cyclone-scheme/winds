@@ -1,19 +1,19 @@
-[<img src="cyclone-winds.png" alt="cyclone-winds">](http://github.com/cyclone-scheme/cyclone-winds)
+[<img src="winds.png" alt="winds">](http://github.com/cyclone-scheme/winds)
 
-# cyclone-winds
+# winds
 Package manager for [Cyclone Scheme](https://cyclone-scheme.org).
 
-The official list of packages is on the [wiki](https://github.com/cyclone-scheme/cyclone-winds/wiki).
+The official list of packages is on the [wiki](https://github.com/cyclone-scheme/winds/wiki).
 
 ## Introduction
 
-A "package" for `cyclone-winds` is wrapper around libraries and/or programs. They are extensions to the core implemenation of Cyclone Scheme. 
+A "package" for `winds` is wrapper around libraries and/or programs. They are extensions to the core implemenation of Cyclone Scheme. 
 
 ## Installation
 
 ```shell
-$ git clone https://github.com/cyclone-scheme/cyclone-winds.git
-$ cd cyclone-winds
+$ git clone https://github.com/cyclone-scheme/winds.git
+$ cd winds
 $ make
 $ sudo make install
 ```
@@ -24,14 +24,14 @@ Optionally it is possible to pass `PREFIX` to set another destination directory.
 
 ```shell
 $ make 
-$ sudo make PREFIX=/home/joe/cyclone-winds install
-$ /home/joe/cyclone-winds/bin/cyclone-winds --help
+$ sudo make PREFIX=/home/joe/winds install
+$ /home/joe/winds/bin/winds --help
 ```
    
 ## Usage
 
 ```
-$ cyclone-winds [-v] COMMAND [PACKAGES]
+$ winds [-v] COMMAND [PACKAGES]
 ```
     
     COMMANDS:
@@ -46,7 +46,7 @@ $ cyclone-winds [-v] COMMAND [PACKAGES]
       search TERM - search for packages whose name (partially) match the specified TERM
       info PACKAGE - list all metadata about specified PACKAGE
       local-status - list all installed packages
-      index - pretty-prints cyclone-winds packages index
+      index - pretty-prints winds packages index
   
       PACKAGE AUTHORING:
       build-local [DIR] - build local package using package.scm from DIR or \".\"
@@ -60,7 +60,7 @@ $ cyclone-winds [-v] COMMAND [PACKAGES]
 
 
 ```
-$ cyclone-winds install iset       
+$ winds install iset       
 ```
 
 ## Alternative install directories
@@ -70,17 +70,17 @@ Libraries and programs can be installed into an alternative location using respe
 Example on zsh:
 
 ```
-$ env CYCLONE_LIBRARY_PATH=/home/me/cyclone-libs cyclone-winds install iset
+$ env CYCLONE_LIBRARY_PATH=/home/me/cyclone-libs winds install iset
 ```
 
 ```
-$ env CYCLONE_PROGRAM_PATH=/home/me/local/bin cyclone-winds install hypothetical-program
+$ env CYCLONE_PROGRAM_PATH=/home/me/local/bin winds install hypothetical-program
 ```
 ## Authoring packages
 
 ### Use of `package` command
 
-Running `$ cyclone-wfinds package [DIR]` inside of a directory with `.sld` file(s) will generate `package.scm` and `README.md` stubs that can be adjusted manually later if needed. The command also structures the directory tree appropriately for most cases (see [below](#package-file-structure)).
+Running `$ winds package [DIR]` inside of a directory with `.sld` file(s) will generate `package.scm` and `README.md` stubs that can be adjusted manually later if needed. The command also structures the directory tree appropriately for most cases (see [below](#package-file-structure)).
 
 *Note: if you are authoring `SRFIs`, use the `package-srfi` command instead.*
 
@@ -97,7 +97,7 @@ Running `$ cyclone-wfinds package [DIR]` inside of a directory with `.sld` file(
 - maintainers: one or more strings
 - description: string
 - tags: one or more strings
-- docs: string pointing to documentation (at the moment should point to `https://github.com/cyclone-scheme/cyclone-winds/wiki/PACKAGE-NAME.md`)
+- docs: string pointing to documentation (at the moment should point to `https://github.com/cyclone-scheme/winds/wiki/PACKAGE-NAME.md`)
 - test: string pointing to a test file
 
 #### Code parameters
@@ -135,7 +135,7 @@ A `package.scm` file needs at least one `library` and/or `program`.
  (maintainers "Arthur Maciel <email@email.com>")
  (description "This is an example package only for demonstration purposes.")
  (tags "Misc" "Devel")
- (docs "https://github.com/cyclone-scheme/cyclone-winds/wiki/example-package.md")
+ (docs "https://github.com/cyclone-scheme/winds/wiki/example-package.md")
  (test "tests.scm")
  
  (library
@@ -221,6 +221,6 @@ srfi/
 On FreeBSD `/tmp` is not writeable by default for non-root users. So set the environment variable `TMP` to a writeable directory. Example:
 
 ```
-$ env TMP=/home/me/tmp cyclone-winds retrieve iset
+$ env TMP=/home/me/tmp winds retrieve iset
 ```
 

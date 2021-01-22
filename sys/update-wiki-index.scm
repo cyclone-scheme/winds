@@ -1,6 +1,6 @@
 (define *default-wiki-directory* "wiki")
 (define *default-wiki-home-file* (->path *default-wiki-directory* "Home.md"))
-(define *default-wiki-url* "https://github.com/cyclone-scheme/cyclone-winds/wiki/")
+(define *default-wiki-url* "https://github.com/cyclone-scheme/winds/wiki/")
 
 (define home-header
   "# Welcome to the Cyclone Winds wiki!\n

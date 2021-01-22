@@ -163,17 +163,17 @@
 (define *banner*
   (format
    "
-  Cyclone-Winds - a package manager for Cyclone Scheme 
-  https://github.com/cyclone-scheme/cyclone-winds 
+  Winds - a package manager for Cyclone Scheme 
+  https://github.com/cyclone-scheme/winds 
   (c) 2020 - Cyclone Team 
   Version ~a~%"
-   *cyclone-winds-version*))
+   *winds-version*))
 
 (define (usage)
   (display
    (format
     "~a
-  Usage: cyclone-winds [-v] COMMAND [PACKAGES]
+  Usage: winds [-v] COMMAND [PACKAGES]
   
   COMMANDS:
 
@@ -187,7 +187,7 @@
     search TERM - search for packages whose name (partially) match the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
     local-status - list all installed packages
-    index - pretty-prints cyclone-winds packages index
+    index - pretty-prints winds packages index
 
     PACKAGE AUTHORING:
     build-local [DIR] - build local package using package.scm from DIR or \".\"
