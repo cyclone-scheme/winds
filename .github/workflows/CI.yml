@@ -21,9 +21,9 @@ jobs:
       
     # Setup winds
     - uses: actions/checkout@v2
-    - name: Build cyclone-winds
+    - name: Build Winds
       run: make
-    - name: Install cyclone-winds
+    - name: Install Winds
       run: sudo make install
       
     # Run our tests
@@ -37,7 +37,7 @@ jobs:
     # Pre-requisite
     - name: Clone wiki directory
       run: |
-        git clone https://github.com/cyclone-scheme/cyclone-winds.wiki.git wiki
+        git clone https://github.com/cyclone-scheme/winds.wiki.git wiki
 
     # Update wiki index, packages wikis and library index.
     # One command does all to avoid multiple iterations over all packages,
