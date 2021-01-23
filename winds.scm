@@ -165,7 +165,7 @@
    "
   Winds - a package manager for Cyclone Scheme 
   https://github.com/cyclone-scheme/winds 
-  (c) 2020 - Cyclone Team 
+  (c) 2021 - Cyclone Team 
   Version ~a~%"
    *winds-version*))
 
