@@ -1,4 +1,4 @@
-# Cyclone-winds - package manager for Cyclone Scheme
+# Winds - package manager for Cyclone Scheme
 # Copyright (c) 2020, Cyclone Team
 # All rights reserved.
 
@@ -15,7 +15,7 @@ TESTS_DIR  = tests
 SYS_DIR    = sys
 
 # Files
-WINDS_SRC  = cyclone-winds.scm
+WINDS_SRC  = winds.scm
 LIBS_SRC   = $(wildcard $(LIBS_DIR)/*.sld)
 TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
 SYS_SRC  = $(SYS_DIR)/tasks.scm

@@ -29,7 +29,7 @@
     ;;   (0.8 "url-to-package.scm" "url-to-tarball" "tarball-sha256sum"))
     ;;  ...)
     (define *default-index-url*
-      "https://raw.githubusercontent.com/cyclone-scheme/cyclone-winds/master/indexes/index.scm")
+      "https://raw.githubusercontent.com/cyclone-scheme/winds/master/indexes/index.scm")
 
     (define (get-index)
       (let* ((tmp-dir (random-temp-dir))
@@ -53,7 +53,7 @@
     ;;  ((cyclone pkg2)   0.2           "1.11.0"   ((cyclone libY) ...)    ((progamY) ...))
     ;;  ...)
     (define *default-local-index*
-      (->path (get-library-installation-dir) (*default-code-directory*) "cyclone-winds-index.scm"))
+      (->path (get-library-installation-dir) (*default-code-directory*) "winds-index.scm"))
 
     ;; Does the local index contain a record for given package/version/compiler?
     (define (local-index-contains? index name pkg-ver cyc-ver)
