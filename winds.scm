@@ -196,8 +196,7 @@
     package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
  
   PACKAGES:
-       Name of the package. Note this can be a symbol or a quoted list of 
-       two or more symbols, e.g. \"(cyclone iset)\"~%"
+       Name of the package passed as symbols (e.g. iset sxml srfi-197)"
     *banner*)))
 
 (define (main)
