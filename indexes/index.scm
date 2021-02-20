@@ -59,6 +59,10 @@
   (0.1 "https://github.com/cyclone-scheme/postgresql/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/postgresql/archive/v0.1.tar.gz" 
        "2b216a463c859db0ee74e720627b0aaeec394767083203424d1232f7b18dd5fa"))
+ (python
+  (0.1 "https://github.com/cyclone-scheme/python/raw/v0.1/package.scm" 
+       "https://github.com/cyclone-scheme/python/archive/v0.1.tar.gz" 
+       "7b320ac8924a0f7f583ee89d8127af9ed1e1d65e9e1fafac13c3304b5a366058"))
  (quoted-printable
   (0.2 "https://github.com/cyclone-scheme/quoted-printable/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.2.tar.gz" 
