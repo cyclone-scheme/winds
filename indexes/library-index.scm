@@ -67,6 +67,21 @@
        char-set:empty
        char-set:ascii
        char-set:full))
+    ((cyclone char-set full)
+     (char-set:lower-case
+       char-set:upper-case
+       char-set:title-case
+       char-set:letter
+       char-set:digit
+       char-set:letter+digit
+       char-set:graphic
+       char-set:printing
+       char-set:whitespace
+       char-set:iso-control
+       char-set:punctuation
+       char-set:symbol
+       char-set:hex-digit
+       char-set:blank))
     ((cyclone char-set boundary)
      (char-set:regional-indicator
        char-set:extend-or-spacing-mark
@@ -75,6 +90,21 @@
        char-set:hangul-t
        char-set:hangul-lv
        char-set:hangul-lvt))
+    ((cyclone char-set ascii)
+     (char-set:lower-case
+       char-set:upper-case
+       char-set:title-case
+       char-set:letter
+       char-set:digit
+       char-set:letter+digit
+       char-set:graphic
+       char-set:printing
+       char-set:whitespace
+       char-set:iso-control
+       char-set:punctuation
+       char-set:symbol
+       char-set:hex-digit
+       char-set:blank))
     ((cyclone char-set base)
      (Char-Set
        char-set?
@@ -102,37 +132,7 @@
        char-set-complement
        char-set:empty
        char-set:ascii
-       char-set:full))
-    ((cyclone char-set ascii)
-     (char-set:lower-case
-       char-set:upper-case
-       char-set:title-case
-       char-set:letter
-       char-set:digit
-       char-set:letter+digit
-       char-set:graphic
-       char-set:printing
-       char-set:whitespace
-       char-set:iso-control
-       char-set:punctuation
-       char-set:symbol
-       char-set:hex-digit
-       char-set:blank))
-    ((cyclone char-set full)
-     (char-set:lower-case
-       char-set:upper-case
-       char-set:title-case
-       char-set:letter
-       char-set:digit
-       char-set:letter+digit
-       char-set:graphic
-       char-set:printing
-       char-set:whitespace
-       char-set:iso-control
-       char-set:punctuation
-       char-set:symbol
-       char-set:hex-digit
-       char-set:blank))))
+       char-set:full))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -448,6 +448,25 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
+        ((cyclone iset constructors)
+         (iset iset-copy
+               list->iset
+               list->iset!
+               iset-map
+               iset-adjoin
+               iset-adjoin!
+               iset-delete
+               iset-delete!
+               iset-union
+               iset-union!
+               iset-intersection
+               iset-intersection!
+               iset-difference
+               iset-difference!
+               iset-copy-node
+               iset-squash-bits!
+               iset-insert-left!
+               iset-insert-right!))
         ((cyclone iset optimize)
          (iset-balance
            iset-balance!
@@ -485,26 +504,7 @@
            iset-cursor?
            iset-cursor-next
            iset-ref
-           end-of-iset?))
-        ((cyclone iset constructors)
-         (iset iset-copy
-               list->iset
-               list->iset!
-               iset-map
-               iset-adjoin
-               iset-adjoin!
-               iset-delete
-               iset-delete!
-               iset-union
-               iset-union!
-               iset-intersection
-               iset-intersection!
-               iset-difference
-               iset-difference!
-               iset-copy-node
-               iset-squash-bits!
-               iset-insert-left!
-               iset-insert-right!))))
+           end-of-iset?))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -620,6 +620,33 @@
        postgresql-error-column
        postgresql-error-data-type
        postgresql-error-constraint))
+    ((cyclone postgresql conditions)
+     (raise-postgresql-error
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
+    ((cyclone postgresql messages)
+     (postgresql-send-ssl-request
+       postgresql-send-startup-message
+       postgresql-send-password-message
+       postgresql-send-terminate-message
+       postgresql-send-sync-message
+       postgresql-send-flush-message
+       postgresql-send-query-message
+       postgresql-send-parse-message
+       postgresql-send-bind-message
+       postgresql-send-describe-message
+       postgresql-send-execute-message
+       postgresql-send-close-message
+       postgresql-send-copy-data-message
+       postgresql-send-copy-fail-message
+       postgresql-send-copy-done-message
+       postgresql-read-response))
     ((cyclone postgresql apis)
      (make-postgresql-connection
        postgresql-connection?
@@ -657,16 +684,6 @@
        postgresql-access-mode-read-only
        postgresql-deferrable-on
        postgresql-deferrable-off))
-    ((cyclone postgresql conditions)
-     (raise-postgresql-error
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
     ((cyclone postgresql buffer)
      (postgresql-send-ssl-request
        postgresql-send-startup-message
@@ -685,31 +702,89 @@
        postgresql-send-copy-done-message
        postgresql-read-response
        make-postgresql-out-buffer))
-    ((cyclone postgresql messages)
-     (postgresql-send-ssl-request
-       postgresql-send-startup-message
-       postgresql-send-password-message
-       postgresql-send-terminate-message
-       postgresql-send-sync-message
-       postgresql-send-flush-message
-       postgresql-send-query-message
-       postgresql-send-parse-message
-       postgresql-send-bind-message
-       postgresql-send-describe-message
-       postgresql-send-execute-message
-       postgresql-send-close-message
-       postgresql-send-copy-data-message
-       postgresql-send-copy-fail-message
-       postgresql-send-copy-done-message
-       postgresql-read-response))
+    ((cyclone postgresql misc io)
+     (write-u16-be write-u32-be))
     ((cyclone postgresql misc ssl)
      (socket->ssl-socket
        ssl-socket-input-port
        ssl-socket-output-port
        ssl-socket?
-       ssl-socket-close))
-    ((cyclone postgresql misc io)
-     (write-u16-be write-u32-be))))
+       ssl-socket-close))))
+ (python
+   (((cyclone python)
+     (py-start
+       py-stop
+       py-import
+       py-run-simple-string
+       py-run-file
+       py-value
+       py-def
+       py-def-attribute
+       py-def-method
+       py
+       ->string
+       %py-initialize
+       %py-finalize
+       %py-incref
+       %py-decref
+       %py-callable-check
+       %py-err-occurred
+       %py-err-clear
+       %py-err-as-string
+       %raise-python-exception
+       %python-exception-string
+       %py-error
+       %py-object-call-object
+       %py-object-call
+       %py-object-get-attr-string
+       %py-object-set-attr-string
+       %py-object-str
+       %py-object-type
+       %long->py-bool
+       %py-bool->bool
+       %long->py-long
+       %py-long->long
+       %py-float->double
+       %py-float-from-double
+       %string->py-str
+       %py-str->string
+       %py-str->string-and-size
+       %py-dict-new
+       %py-dict-keys
+       %py-dict-size
+       %py-dict-get-item
+       %py-dict-get-item-string
+       %py-dict-items
+       %py-dict-set-item
+       %py-list-new
+       %py-list-size
+       %py-list-get-item
+       %py-list-set-item
+       %py-tuple-new
+       %py-tuple-size
+       %py-tuple-get-item
+       %py-tuple-set-item
+       %py-object-get-buffer
+       %py-buffer->contiguous
+       %contiguous->py-buffer
+       %py-buffer-release
+       %py-buffer-size
+       %py-import
+       %py-import-module
+       %py-import-module-ex
+       %py-import-get-module-dict
+       %py-import-add-module
+       %py-module-get-dict
+       %py-module-get-dict-as-ptr
+       %py-module-add-object
+       %py-run-simple-string
+       %py-run-string
+       %py-run-file
+       %py-eval
+       %py-apply
+       *py-functions*
+       %scm->python
+       %python->scm))))
  (quoted-printable
    (((cyclone quoted-printable)
      (quoted-printable-encode
