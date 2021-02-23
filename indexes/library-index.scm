@@ -574,6 +574,7 @@
        path-resolve
        path-normalize
        make-path))))
+ (popen (((cyclone io popen) (popen pclose))))
  (postgresql
    (((cyclone postgresql)
      (make-postgresql-connection
