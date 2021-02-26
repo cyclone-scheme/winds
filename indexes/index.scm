@@ -66,7 +66,7 @@
  (python
   (0.1 "https://github.com/cyclone-scheme/python/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/python/archive/v0.1.tar.gz" 
-       "c02f7aac8d6877fb43124e4a3592a0753acb4d636b75f555c3f0c49e4f9f5802"))
+       "4c2197cb1ccc2b866212e5860fe0da6dd8ccbd3fda90305aceff8f9275f76bc3"))
  (quoted-printable
   (0.2 "https://github.com/cyclone-scheme/quoted-printable/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.2.tar.gz" 
