@@ -56,9 +56,9 @@
        "https://github.com/cyclone-scheme/pathname/archive/v0.1.tar.gz" 
        "63aed8cef0f73f508f809fa99942d064ee619d71d8914e4b83b3a44c94e41b4e"))
  (popen
-  (0.2 "https://github.com/cyclone-scheme/popen/raw/v0.2/package.scm" 
-       "https://github.com/cyclone-scheme/popen/archive/v0.2.tar.gz" 
-       "c5129d93aee386a0acfdc9a01c1541dc5196729c3d748785df536cbffbf20dff"))
+  (0.3 "https://github.com/cyclone-scheme/popen/raw/v0.3/package.scm" 
+       "https://github.com/cyclone-scheme/popen/archive/v0.3.tar.gz" 
+       "76d2eb89bf1246d06460648a83a27263c1c38642b00c8d5bf57df6368e30e367"))
  (postgresql
   (0.1 "https://github.com/cyclone-scheme/postgresql/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/postgresql/archive/v0.1.tar.gz" 
