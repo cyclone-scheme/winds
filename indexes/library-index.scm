@@ -574,7 +574,12 @@
        path-resolve
        path-normalize
        make-path))))
- (popen (((cyclone io popen) (popen pclose))))
+ (popen (((cyclone io popen)
+          (popen pclose
+                 open-input-pipe
+                 close-pipe-port
+                 with-input-from-pipe
+                 read-all-from-pipe))))
  (postgresql
    (((cyclone postgresql)
      (make-postgresql-connection
