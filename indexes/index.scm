@@ -64,9 +64,9 @@
        "https://github.com/cyclone-scheme/postgresql/archive/v0.1.tar.gz" 
        "2b216a463c859db0ee74e720627b0aaeec394767083203424d1232f7b18dd5fa"))
  (python
-  (0.1 "https://github.com/cyclone-scheme/python/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/python/archive/v0.1.tar.gz" 
-       "64216db2a2219e35a4dbaa13adb1a1a478c4a461b0f0437fef7531fd1f568dd4"))
+  (0.2 "https://github.com/cyclone-scheme/python/raw/v0.2/package.scm" 
+       "https://github.com/cyclone-scheme/python/archive/v0.2.tar.gz" 
+       "3108b1183a496559752f6590bae4ac78b90d066f81dffc71ebe5c900d07173a6"))
  (quoted-printable
   (0.2 "https://github.com/cyclone-scheme/quoted-printable/raw/v0.2/package.scm" 
        "https://github.com/cyclone-scheme/quoted-printable/archive/v0.2.tar.gz" 
