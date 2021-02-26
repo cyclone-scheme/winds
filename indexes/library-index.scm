@@ -579,7 +579,8 @@
                  open-input-pipe
                  close-pipe-port
                  with-input-from-pipe
-                 read-all-from-pipe))))
+                 read-all-from-pipe
+                 read-lines-from-pipe))))
  (postgresql
    (((cyclone postgresql)
      (make-postgresql-connection
