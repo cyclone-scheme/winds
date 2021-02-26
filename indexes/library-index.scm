@@ -713,7 +713,8 @@
        ssl-socket-close))))
  (python
    (((cyclone python)
-     (py-start
+     (with-python
+       py-start
        py-stop
        py-import
        py-run-simple-string
@@ -722,10 +723,13 @@
        py-def
        py-def-attribute
        py-def-method
-       py
+       py-call
        ->string
+       %py-is-initialized
+       %initialized?
        %py-initialize
        %py-finalize
+       %with-initialization-check
        %py-incref
        %py-decref
        %py-callable-check
