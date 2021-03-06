@@ -17,6 +17,8 @@
        base64-decode-string
        base64-decode-bytevector
        base64-encode-header))))
+ (benchmark
+   (((cyclone benchmark) (elapsed perf-counter))))
  (bytevector
    (((cyclone bytevector)
      (bytevector-u16-ref-le
