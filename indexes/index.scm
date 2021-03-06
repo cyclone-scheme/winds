@@ -7,6 +7,10 @@
   (0.3 "https://github.com/cyclone-scheme/base64/raw/v0.3/package.scm"
        "https://github.com/cyclone-scheme/base64/archive/v0.3.tar.gz" 
        "1480aa75e46f5e1858c1bbed34ea69079286dba47c5763e14ce4a416ab787f63"))
+ (benchmark
+  (0.1 "https://github.com/cyclone-scheme/benchmark/raw/v0.1/package.scm"
+       "https://github.com/cyclone-scheme/benchmark/archive/v0.1.tar.gz" 
+       "0cf90af1f4aab08921cbaa55590751e4303ef52ee8d9c1be0332b6c4f2bc6ecc"))
  (bytevector
   (0.1 "https://github.com/cyclone-scheme/bytevector/raw/v0.1/package.scm"
        "https://github.com/cyclone-scheme/bytevector/archive/v0.1.tar.gz"
