@@ -197,7 +197,8 @@
  
   PACKAGES:
        Name of the package passed as symbols (e.g. iset sxml srfi-197)"
-    *banner*)))
+    *banner*))
+  (newline))
 
 (define (main)
   (match (map string->proper-symbol (command-line))
