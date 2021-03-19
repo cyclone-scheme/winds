@@ -69,21 +69,29 @@
        char-set:empty
        char-set:ascii
        char-set:full))
-    ((cyclone char-set full)
-     (char-set:lower-case
-       char-set:upper-case
-       char-set:title-case
-       char-set:letter
-       char-set:digit
-       char-set:letter+digit
-       char-set:graphic
-       char-set:printing
-       char-set:whitespace
-       char-set:iso-control
-       char-set:punctuation
-       char-set:symbol
-       char-set:hex-digit
-       char-set:blank))
+    ((cyclone char-set extras)
+     (char-set
+       ucs-range->char-set
+       char-set-copy
+       char-set-size
+       char-set-fold
+       char-set-for-each
+       list->char-set
+       char-set->list
+       string->char-set
+       char-set->string
+       char-set-adjoin!
+       char-set-adjoin
+       char-set-union
+       char-set-union!
+       char-set-intersection
+       char-set-intersection!
+       char-set-difference
+       char-set-difference!
+       char-set-complement
+       char-set:empty
+       char-set:ascii
+       char-set:full))
     ((cyclone char-set boundary)
      (char-set:regional-indicator
        char-set:extend-or-spacing-mark
@@ -112,29 +120,21 @@
        char-set?
        immutable-char-set
        char-set-contains?))
-    ((cyclone char-set extras)
-     (char-set
-       ucs-range->char-set
-       char-set-copy
-       char-set-size
-       char-set-fold
-       char-set-for-each
-       list->char-set
-       char-set->list
-       string->char-set
-       char-set->string
-       char-set-adjoin!
-       char-set-adjoin
-       char-set-union
-       char-set-union!
-       char-set-intersection
-       char-set-intersection!
-       char-set-difference
-       char-set-difference!
-       char-set-complement
-       char-set:empty
-       char-set:ascii
-       char-set:full))))
+    ((cyclone char-set full)
+     (char-set:lower-case
+       char-set:upper-case
+       char-set:title-case
+       char-set:letter
+       char-set:digit
+       char-set:letter+digit
+       char-set:graphic
+       char-set:printing
+       char-set:whitespace
+       char-set:iso-control
+       char-set:punctuation
+       char-set:symbol
+       char-set:hex-digit
+       char-set:blank))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -629,16 +629,6 @@
        postgresql-error-column
        postgresql-error-data-type
        postgresql-error-constraint))
-    ((cyclone postgresql conditions)
-     (raise-postgresql-error
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
     ((cyclone postgresql messages)
      (postgresql-send-ssl-request
        postgresql-send-startup-message
@@ -711,6 +701,16 @@
        postgresql-send-copy-done-message
        postgresql-read-response
        make-postgresql-out-buffer))
+    ((cyclone postgresql conditions)
+     (raise-postgresql-error
+       postgresql-error?
+       postgresql-error-severity
+       postgresql-error-code
+       postgresql-error-schema
+       postgresql-error-table
+       postgresql-error-column
+       postgresql-error-data-type
+       postgresql-error-constraint))
     ((cyclone postgresql misc io)
      (write-u16-be write-u32-be))
     ((cyclone postgresql misc ssl)
@@ -1001,10 +1001,10 @@
  (temple
    (((cyclone web temple)
      (render get-parse-tree build-parse-tree))
-    ((cyclone web temple parser)
-     (parse *read-size* string-pos))
     ((cyclone web temple trace)
-     (trace set-trace-level!))))
+     (trace set-trace-level!))
+    ((cyclone web temple parser)
+     (parse *read-size* string-pos))))
  (uri (((cyclone uri)
         (uri? uri->string
               make-uri
