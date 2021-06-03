@@ -1,17 +1,17 @@
 (define-library (libs util)
   (import (scheme base)
           (only (scheme cyclone util) filter string-split))
-  (export remove
+  (export chain
           get-parameter-value
           get-parameter-all-occurrences
-          trim-trailing-slash
+          remove
           ->string
           string-contains
           string-find-right
           string-join
           string-split
           string->proper-symbol
-          chain)
+          trim-trailing-slash)
   (begin
     (define (remove pred lst)
       (filter (lambda (x) (not (pred x))) lst))
