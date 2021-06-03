@@ -1,10 +1,8 @@
 (define-library (libs semantic)
   (import (scheme base)
-          (only (libs util) string-contains string-split)
-          (only (cyclone match) match)
-          )
-  (export )
-
+          (only (libs util) chain string-contains string-split)
+          (only (cyclone match) match))
+  (export greatest)
   (begin
     (define (greatest v1 v2)
       (match-let (((major1 minor1 patch1) (version->number-list (sanitize-version v1)))

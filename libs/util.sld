@@ -6,10 +6,12 @@
           get-parameter-all-occurrences
           trim-trailing-slash
           ->string
-          string-join
-          string-find-right
           string-contains
-          string->proper-symbol)
+          string-find-right
+          string-join
+          string-split
+          string->proper-symbol
+          chain)
   (begin
     (define (remove pred lst)
       (filter (lambda (x) (not (pred x))) lst))
@@ -87,4 +89,38 @@
              (last-char (string-ref s (- len 1))))
         (if (and (equal? first-char #\( ) (equal? last-char #\) ))
             (map string->symbol (string-split (substring s 1 (- len 1)) #\space))
-            (string->symbol s))))))
+            (string->symbol s))))
+
+    (define-syntax chain
+      (syntax-rules …₁ ()
+                    ((_ initial-value) initial-value)
+                    ((_ initial-value (step …₁) …₁)
+                     (chain initial-value _ ... (step …₁) …₁))
+                    ((_ initial-value placeholder (step …₁) …₁)
+                     (chain initial-value placeholder ... (step …₁) …₁))
+                    ((_ initial-value placeholder ellipsis (first-step …₁) (next-step …₁) …₁)
+                     (let ()
+                       (define-syntax %chain
+                         (syntax-rules …₂ (placeholder ellipsis)
+                                        ; (_ in-step out-step in-vars out-vars in-steps out-steps)
+                                       ((_ () () () ((var) …₂) () (step …₂ last-step))
+                                        (let* ((var step) …₂) last-step))
+                                       ((_ () () () (vars …₂) () (step …₂ last-step))
+                                        (let*-values ((vars step) …₂) last-step))
+                                       ((_ () () () out-vars (step . in-steps) out-steps)
+                                        (%chain step () () out-vars in-steps out-steps))
+                                       ((_ () step () (out-vars …₂) in-steps (out-steps …₂))
+                                        (%chain () () () (out-vars …₂ ignored) in-steps (out-steps …₂ step)))
+                                       ((_ () step vars (out-vars …₂) in-steps (out-steps …₂))
+                                        (%chain () () () (out-vars …₂ vars) in-steps (out-steps …₂ step)))
+                                       ((_ (placeholder ellipsis) (step …₂) () (out-vars …₂) in-steps (out-steps …₂))
+                                        (%chain () () () (out-vars …₂ chain-rest-var) in-steps (out-steps …₂ (apply step …₂ chain-rest-var))))
+                                       ((_ (placeholder ellipsis) (step …₂) (vars …₂) (out-vars …₂) in-steps (out-steps …₂))
+                                        (%chain () () () (out-vars …₂ (vars …₂ . chain-rest-var)) in-steps (out-steps …₂ (apply step …₂ chain-rest-var))))
+                                       ((_ (placeholder ellipsis . rest) . _)
+                                        (syntax-error "_ ... can only be used as a final argument"))
+                                       ((_ (placeholder . in-step) (out-step …₂) (vars …₂) . rest)
+                                        (%chain in-step (out-step …₂ chain-var) (vars …₂ chain-var) . rest))
+                                       ((_ (x . in-step) (out-step …₂) . rest)
+                                        (%chain in-step (out-step …₂ x) . rest))))
+                       (%chain (first-step …₁) () () () ((next-step …₁) …₁) (initial-value))))))))
