@@ -1,9 +1,14 @@
 (define-library (libs semantic)
   (import (scheme base)
           (cyclone format)
+          (only (srfi 1) fold)
           (only (cyclone match) match)
+          (only (scheme cyclone util) filter)
           (only (libs util) chain string-contains string-join string-split))
-  (export find-version latest-version)
+  (export find-version
+          greatest-version
+          latest-version
+          sanitize-version)
   (begin
 
     ;; when converted to numbers by version->number-list, stars ("*") become '#f'.

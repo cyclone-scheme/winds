@@ -40,7 +40,7 @@
     ;; TODO: review this validation strategy - seems too naive.
     (define mandatory-parameters
       `((name ,(list (lambda (x) (or (symbol? x) (list? x)))))
-        (version ,(list number?))
+        (version ,(list string?))
         (license ,(list string?))
         (authors ,(list string?))
         (maintainers ,(list string?))
@@ -146,7 +146,7 @@
     (define (pkg->metadata pkg)
       `(package
         (name                  ,(or (get-name pkg) '____))
-        (version               ,(or (get-version pkg) 0.1))
+        (version               ,(or (get-version pkg) "0.1.0"))
         (license               ,(or (get-license pkg) "BSD"))
         (authors               ,(or (get-authors pkg) ""))
         (maintainers           ,(or (get-maintainers pkg) ""))

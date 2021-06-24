@@ -42,31 +42,32 @@
           content)))
 
     (define (pkg-info index name/maybe-version)
-      (define (pkg-versions)
-        (match (assoc name/maybe-version index)
+      (define (pkg-versions name)
+        (match (assoc name index)
           (#f #f)
           ((pkg-name versions ..1) versions)
           (else
-           (error (format "Could not find versions for package ~s~%" name/maybe-version)))))
+           (error (format "Could not find versions for package ~s~%" name)))))
 
       (define (split-name-version)
-        (or (and-let* ((len (string-length name/maybe-version))
+        (or (and-let* ((name/maybe-version (->string name/maybe-version))
+                       (len (string-length name/maybe-version))
                        ((> len 0))
                        (dash-position (string-find-right name/maybe-version #\-))
                        ((> dash-position 0))
                        (name (substring name/maybe-version 0 dash-position))
                        (version (substring name/maybe-version (+ 1 dash-position) len)))
-              (values name version))
+              (values (string->symbol name) version))
             (values #f #f)))
 
-      (let ((versions (pkg-versions index name/maybe-version)))
+      (let ((versions (pkg-versions name/maybe-version)))
         (if versions
             ;; 'name/maybe-version' contains a valid package name, but no version. Get latest...
-            (assoc (latest-version (map car versions)) versions) 
-            ;; Try to extract name and version from 'name/maybe-version', e.g. 'pkg-name-0.1.2"
+            (cons name/maybe-version (assoc (latest-version (map car versions)) versions)) 
+            ;; Try to extract name and version from 'name/maybe-version', e.g. "pkg-name-0.1.2"
             (let-values (((name version) (split-name-version)))
-              (or (and-let* ((versions (pkg-versions index name)))
-                    (or (assoc (find-version version (map car versions)) versions)
+              (or (and-let* ((versions (pkg-versions name)))
+                    (or (cons name (assoc (find-version version (map car versions)) versions))
                         (error (format "Could not find version ~s of package ~s~%" version name))))
                   (error (format "Could not find package by name: ~s~%" name)))))))
 
