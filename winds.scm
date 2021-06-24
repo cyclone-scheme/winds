@@ -88,6 +88,7 @@
       (display (format "Scaffolded directory tree and generated stubs for ~a and ~a.~%"
                        *default-metadata-file* *default-doc-file*)))))
 
+;; General interface
 (define (retrieve pkgs)
   (let ((index (get-index)))
     (for-each
