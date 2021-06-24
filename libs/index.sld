@@ -67,7 +67,8 @@
             ;; Try to extract name and version from 'name/maybe-version', e.g. "pkg-name-0.1.2"
             (let-values (((name version) (split-name-version)))
               (or (and-let* ((versions (pkg-versions name)))
-                    (or (cons name (assoc (find-version version (map car versions)) versions))
+                    (or (and-let* ((info (assoc (find-version version (map car versions)) versions)))
+                          (cons name info))
                         (error (format "Could not find version ~s of package ~s~%" version name))))
                   (error (format "Could not find package by name: ~s~%" name)))))))
 
