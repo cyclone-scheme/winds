@@ -32,6 +32,9 @@
        "https://github.com/cyclone-scheme/curl/archive/v0.2.tar.gz" 
        "eec2593db6a2d1243bc22df4e2dde537ba8f24d03ecd4f339ef41b4450e72634"))
  (dummy-test-package
+  ("0.1.1" "https://github.com/cyclone-scheme/dummy-test-package/raw/v0.1.1/package.scm" 
+           "https://github.com/cyclone-scheme/dummy-test-package/archive/v0.1.1.tar.gz" 
+           "afbf1993abe0fbd5a7dcf5f288d7fcad0ece0676bcd43196501fbc0e0f8e9f2f")
   ("0.1.0" "https://github.com/cyclone-scheme/dummy-test-package/raw/v0.1.0/package.scm" 
            "https://github.com/cyclone-scheme/dummy-test-package/archive/v0.1.0.tar.gz" 
            "befccadee2c664efd46d3cc58ff3ebec45a8dff0e2b5eec318b5cba27a795731"))
