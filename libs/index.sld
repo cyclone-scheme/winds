@@ -45,29 +45,30 @@
       (define (pkg-versions)
         (match (assoc name/maybe-version index)
           (#f #f)
-          ((pkg-name versions ..1) versions)))
+          ((pkg-name versions ..1) versions)
+          (else
+           (error (format "Could not find versions for package ~s~%" name/maybe-version)))))
 
       (define (split-name-version)
-        (and-let* ((len (string-length name/maybe-version))
-                   ((> len 0))
-                   (dash-position (string-find-right name/maybe-version #\-))
-                   ((> dash-position 0))
-                   (name (substring name/maybe-version 0 dash-position))
-                   (version (substring name/maybe-version (+ 1 dash-position) len)))
-          (values name version)))
+        (or (and-let* ((len (string-length name/maybe-version))
+                       ((> len 0))
+                       (dash-position (string-find-right name/maybe-version #\-))
+                       ((> dash-position 0))
+                       (name (substring name/maybe-version 0 dash-position))
+                       (version (substring name/maybe-version (+ 1 dash-position) len)))
+              (values name version))
+            (values #f #f)))
 
       (let ((versions (pkg-versions index name/maybe-version)))
         (if versions
-            ;; We found a package with name equal to the content of 'name/maybe-version',
-            ;; so no version was specified; return latest version then...
-            (assoc (latest-version (map car versions))
-                   versions) 
-            ;; Otherwise, we assume 'name/maybe-version' contains a version, e.g. 'pkg-name-0.1.2"
+            ;; 'name/maybe-version' contains a valid package name, but no version. Get latest...
+            (assoc (latest-version (map car versions)) versions) 
+            ;; Try to extract name and version from 'name/maybe-version', e.g. 'pkg-name-0.1.2"
             (let-values (((name version) (split-name-version)))
               (or (and-let* ((versions (pkg-versions index name)))
-                    (or (assoc version versions)
-                        (error (format "Could not locate package ~s version ~s~%" name version))))
-                  (error (format "Could not locate package ~s~%" name)))))))
+                    (or (assoc (find-version version (map car versions)) versions)
+                        (error (format "Could not find version ~s of package ~s~%" version name))))
+                  (error (format "Could not find package by name: ~s~%" name)))))))
 
     ;; Local index has the following format:
     ;;     PKG-NAME   PKG-VERSION    CYCLONE-VERSION        LIBRARIES             PROGRAMS

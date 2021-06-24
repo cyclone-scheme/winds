@@ -1,6 +1,6 @@
 (define-library (libs util)
   (import (scheme base)
-          (only (scheme list) split-at)
+          (only (srfi 1) split-at)
           (only (scheme cyclone util) filter string-split))
   (export chain
           get-parameter-value
