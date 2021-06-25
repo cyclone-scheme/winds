@@ -88,6 +88,7 @@
       (display (format "Scaffolded directory tree and generated stubs for ~a and ~a.~%"
                        *default-metadata-file* *default-doc-file*)))))
 
+;; General interface
 (define (retrieve pkgs)
   (let ((index (get-index)))
     (for-each
@@ -196,7 +197,7 @@
     package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
  
   PACKAGES:
-       Name of the package passed as symbols (e.g. iset sxml srfi-197)"
+    Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2~%"
     *banner*))
   (newline))
 

@@ -55,12 +55,33 @@ $ winds [-v] COMMAND [PACKAGES]
       package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
    
     PACKAGES:
-         Name of the package. Note this can be a symbol or a quoted list of 
-         two or more symbols, e.g. \"(cyclone iset)\"~%~%"
-
+         Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2
+                 
 
 ```
-$ winds install iset       
+$ winds install iset 
+```
+
+## Package versions
+
+Versions can be specified at the of the package name:
+
+```
+$ winds install dummy-test-package-0.1.2
+```
+
+The star (`*`) symbol can be used to represent the latest option for each slot (`major`.`minor`.`patch`). So to specify the latest value for `minor` with a `0` for the major slot one can call: 
+
+```
+$ winds install dummy-test-package-0.*
+```
+
+The `major` slot has precedence over the `minor`, which itself has higher precedence over the `patch` slot. So `pkg-name-*.1.2` will be treated as `pkg-name-*.*.*` and `pkg-name-0.*.8` will be handled as `pkg-name-0.*.*`. If the version is ommited or specified as a single `*` (e.g. `pkg-name-*`), the latest version of the package will be installed.
+
+Note: some shells need quotation for the use of `*` so a safe options is to call:
+
+```
+$ winds install "dummy-test-package-0.1.*"
 ```
 
 ## Alternative install directories

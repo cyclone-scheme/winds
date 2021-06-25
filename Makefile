@@ -16,7 +16,8 @@ SYS_DIR    = sys
 
 # Files
 WINDS_SRC  = winds.scm
-LIBS_SRC   = $(wildcard $(LIBS_DIR)/*.sld)
+LIBS	   = util common metadata file system-calls lock semantic index package
+LIBS_SRC   = $(LIBS:%=$(LIBS_DIR)/%.sld)
 TESTS_SRC  = $(wildcard $(TESTS_DIR)/*.scm)
 SYS_SRC  = $(SYS_DIR)/tasks.scm
 

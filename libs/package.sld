@@ -67,7 +67,7 @@
          prog-list)))
 
     (define (retrieve-package index name . dir)
-      (match-let (((version _ tarball-url sha256sum) (pkg-info index name)))
+      (match-let (((name version _ tarball-url sha256sum) (pkg-info index name)))
         (let* ((pkg-name (if (list? name)
                              (string-join (map ->string name) #\-)
                              (->string name)))
@@ -90,7 +90,7 @@
       (let* ((work-dir (if (null? dir)
                            (random-temp-dir (string-append (->string name) "-metadata"))
                            (->path (car dir) (string-append (->string name) "-metadata"))))
-             (metadata-url (cadr (pkg-info index name)))
+             (metadata-url (caddr (pkg-info index name)))
              (metadata-path (->path work-dir *default-metadata-file*)))
         (make-dir! work-dir)
         (download! metadata-url metadata-path)
@@ -114,7 +114,7 @@
           (register-installed-package! name version (Cyc-version) libs progs))))
 
     (define (installed? index name)
-      (let ((version (car (pkg-info index name))))
+      (match-let (((name version _ _ _) (pkg-info index name)))
         (local-index-contains? (get-local-index) 
                                name 
                                version
