@@ -122,9 +122,9 @@
        "https://github.com/cyclone-scheme/sxml/archive/v0.1.tar.gz" 
        "dabd1188875aa223c1613ce5c61da9dd2164caea9f2ded34f5ab9c864f725c79"))
  (syslog
-  ("0.1.1" "https://github.com/cyclone-scheme/syslog/raw/v0.1/package.scm" 
-       "https://github.com/cyclone-scheme/syslog/archive/v0.1.tar.gz" 
-       "1d71fbe63bb5bcca9a46c7bb930c98a62f7ca5bb9cf80193124cb906ab81745e"))
+  ("0.1.1" "https://github.com/cyclone-scheme/syslog/raw/v0.1.1/package.scm" 
+       "https://github.com/cyclone-scheme/syslog/archive/v0.1.1.tar.gz" 
+       "5863fa896357c2811e2655b9f31c940c8031e2a4af5ccd6e70c2802552600686"))
  (temple
   (0.3 "https://github.com/cyclone-scheme/temple/raw/v0.3/package.scm" 
        "https://github.com/cyclone-scheme/temple/archive/v0.3.tar.gz" 
