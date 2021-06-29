@@ -2,7 +2,7 @@
  (array-list
   ("0.1.1" "https://github.com/cyclone-scheme/array-list/raw/v0.1.1/package.scm" 
        "https://github.com/cyclone-scheme/array-list/archive/v0.1.1.tar.gz" 
-       "fd6fb5f09fd095357af17403d5eb5700166bbc83f976abcf30845648a6a8bc88"))
+       "acff04918bddec0dd3820f492f793c36a88909fdbc778d722aaeb2f4fa8776b"))
  (base64
   ("0.4.0" "https://github.com/cyclone-scheme/base64/raw/v0.4.0/package.scm"
        "https://github.com/cyclone-scheme/base64/archive/v0.4.0.tar.gz" 
