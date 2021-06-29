@@ -46,9 +46,9 @@
        "https://github.com/cyclone-scheme/irregex/archive/v0.1.tar.gz" 
        "4f90280f2284c4086bc7ba97e644c581a73621291041a0d90abef8927f9f4c48"))
  (iset
-  ("0.2.0" "https://github.com/cyclone-scheme/iset/raw/v0.2.0/package.scm" 
-       "https://github.com/cyclone-scheme/iset/archive/v0.2.0.tar.gz" 
-       "c25f750817ad980a55fc563306ed773ef5dc8d00fe0ef7ba071f706d31fc776d"))
+  ("0.2.1" "https://github.com/cyclone-scheme/iset/raw/v0.2.1/package.scm" 
+       "https://github.com/cyclone-scheme/iset/archive/v0.2.1.tar.gz" 
+       "d55fd16df97e213b7f0d871c99b2e2966d64d944b4b9390ebc43c085717bfd76"))
  (json
   (0.1 "https://github.com/cyclone-scheme/json/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/json/archive/v0.1.tar.gz" 
