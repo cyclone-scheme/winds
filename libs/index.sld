@@ -70,7 +70,7 @@
                     (or (and-let* ((info (assoc (find-version version (map car versions)) versions)))
                           (cons name info))
                         (error (format "Could not find version ~s of package ~s~%" version name))))
-                  (error (format "Could not find package by name: ~s~%" name)))))))
+                  (error (format "Could not find package by name: ~s~%" name/maybe-version)))))))
 
     ;; Local index has the following format:
     ;;     PKG-NAME   PKG-VERSION    CYCLONE-VERSION        LIBRARIES             PROGRAMS
