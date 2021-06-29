@@ -4,9 +4,9 @@
        "https://github.com/cyclone-scheme/array-list/archive/v0.1.1.tar.gz" 
        "fd6fb5f09fd095357af17403d5eb5700166bbc83f976abcf30845648a6a8bc88"))
  (base64
-  (0.3 "https://github.com/cyclone-scheme/base64/raw/v0.3/package.scm"
-       "https://github.com/cyclone-scheme/base64/archive/v0.3.tar.gz" 
-       "1480aa75e46f5e1858c1bbed34ea69079286dba47c5763e14ce4a416ab787f63"))
+  ("0.4.0" "https://github.com/cyclone-scheme/base64/raw/v0.4.0/package.scm"
+       "https://github.com/cyclone-scheme/base64/archive/v0.4.0.tar.gz" 
+       "13f6fcfc3a08aab1d3edd91bd724489de349e19fd3af1aa6762393510342421f"))
  (benchmark
   (0.1 "https://github.com/cyclone-scheme/benchmark/raw/v0.1/package.scm"
        "https://github.com/cyclone-scheme/benchmark/archive/v0.1.tar.gz" 
