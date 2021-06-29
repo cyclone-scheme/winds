@@ -16,9 +16,9 @@
        "https://github.com/cyclone-scheme/bytevector/archive/v0.1.tar.gz"
        "3f57363559907001323268515a27ef2437e0c9948a503181cfd022bcd57179d6"))
  (char-set
-  (0.2 "https://github.com/cyclone-scheme/char-set/raw/v0.2/package.scm" 
-       "https://github.com/cyclone-scheme/char-set/archive/v0.2.tar.gz" 
-       "f544c16343f263e96d7455b8876b0abe6bff5de949325a3c30a436529bfdfe26"))
+  ("0.3.0" "https://github.com/cyclone-scheme/char-set/raw/v0.3.0/package.scm" 
+       "https://github.com/cyclone-scheme/char-set/archive/v0.3.0.tar.gz" 
+       "ca3d6e2dfe8d72a78ceae38d4cb8064099fa5b9b8e9a83c9c623b73443abb182"))
  (clojurian
   (0.1 "https://github.com/cyclone-scheme/clojurian/raw/v0.1/package.scm" 
        "https://github.com/cyclone-scheme/clojurian/archive/v0.1.tar.gz" 
