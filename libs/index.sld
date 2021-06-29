@@ -88,7 +88,7 @@
           (let ((idx-pkg-ver (cadr metadata))
                 (idx-cyc-ver (caddr metadata)))
             (and (equal? idx-pkg-ver (greatest-version idx-pkg-ver pkg-ver))
-                 (equal? cyc-ver (greatest-version idx-cyc-ver cyc-ver)))))
+                 (equal? idx-cyc-ver (greatest-version idx-cyc-ver cyc-ver)))))
          (else #f))))
 
     (define (get-local-index)
