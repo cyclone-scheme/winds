@@ -70,7 +70,7 @@
                     (or (and-let* ((info (assoc (find-version version (map car versions)) versions)))
                           (cons name info))
                         (error (format "Could not find version ~s of package ~s~%" version name))))
-                  (error (format "Could not find package by name: ~s~%" name)))))))
+                  (error (format "Could not find package by name: ~s~%" name/maybe-version)))))))
 
     ;; Local index has the following format:
     ;;     PKG-NAME   PKG-VERSION    CYCLONE-VERSION        LIBRARIES             PROGRAMS
@@ -82,22 +82,13 @@
 
     ;; Does the local index contain a record for given package/version/compiler?
     (define (local-index-contains? index name pkg-ver cyc-ver)
-      (define (->num obj)
-        (cond
-         ((string? obj)
-          (string->number obj))
-         ((number? obj)
-          obj)
-         (else
-          (error "Unable to convert to number" obj))))
-
       (let ((metadata (assoc name index)))
         (cond
          ((pair? metadata)
           (let ((idx-pkg-ver (cadr metadata))
                 (idx-cyc-ver (caddr metadata)))
-            (and (>= (->num idx-pkg-ver) (->num pkg-ver))
-                 (>= (->num idx-cyc-ver) (->num cyc-ver)))))
+            (and (equal? idx-pkg-ver (greatest-version idx-pkg-ver pkg-ver))
+                 (equal? idx-cyc-ver (greatest-version idx-cyc-ver cyc-ver)))))
          (else #f))))
 
     (define (get-local-index)
