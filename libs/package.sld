@@ -1,6 +1,7 @@
 (define-library (libs package)
   (import (scheme base)
           (scheme read)
+          (scheme file)
           (scheme write)
           (scheme process-context)
           (scheme cyclone pretty-print)
@@ -94,8 +95,10 @@
              (metadata-path (->path work-dir *default-metadata-file*)))
         (make-dir! work-dir)
         (download! metadata-url metadata-path)
-        (let ((metadata (read (open-input-file metadata-path))))
+        (let* ((metadata-port (open-input-file metadata-path))
+               (metadata (read metadata-port)))
           (delete! work-dir)
+          (close-port metadata-port)
           metadata)))
 
     (define (build-and-install pkg . dir)
@@ -126,7 +129,8 @@
           (let* ((work-dir (retrieve-package index name))
                  (local-pkg
                   (validate-metadata
-                   (read (open-input-file (->path work-dir *default-metadata-file*)))))
+                   (with-input-from-file (->path work-dir *default-metadata-file*)
+                     (lambda () (read)))))
                  (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
             (if (equal? local-pkg remote-pkg)
                 (let ((deps (get-dependencies local-pkg))
@@ -147,7 +151,8 @@
       (let* ((work-dir (retrieve-package index name))
              (local-pkg
               (validate-metadata
-               (read (open-input-file (->path work-dir *default-metadata-file*)))))
+               (with-input-from-file (->path work-dir *default-metadata-file*)
+                 (lambda () (read)))))
              (remote-pkg (validate-metadata (get-package-remote-metadata index name))))
         (if (equal? local-pkg remote-pkg)
             (let ((deps (get-dependencies local-pkg)))
@@ -191,7 +196,8 @@
 
     (define (write-metadata-file! pkg metadata-path)
       (touch! metadata-path)
-      (pretty-print (pkg->metadata pkg) (open-output-file metadata-path)))
+      (with-output-to-file metadata-path
+        (lambda () (pretty-print (pkg->metadata pkg)))))
 
     (define (defines->type-and-signature defines)
       (map
@@ -321,7 +327,8 @@
               (copy-file! doc-path (string-append doc-path ".old")) ;; backup old one
               (delete! doc-path)))
         (touch! doc-path)
-        (display markdown (open-output-file doc-path))))
+        (with-output-to-file doc-path
+          (lambda () (display markdown)))))
 
     (define (structure-directory-tree! pkg dir)
       (let ((dir-content (directory-content dir)))
@@ -373,9 +380,8 @@
             (include-defines
              (map (lambda (inc)
                     (get-all-defines
-                     (read-all
-                      (open-input-file
-                       (->path work-dir inc)))))
+                     (with-input-from-file (->path work-dir inc)
+                       (lambda () (read-all)))))
                   (lib:includes ast))))
         (append body-defines
                 (or (and (pair? include-defines)
@@ -397,9 +403,11 @@
         (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
           (let* ((libs+defs+incls
                   (map (lambda (sld)
-                         (let* ((content (read (open-input-file sld)))
+                         (let* ((sld-port (open-input-file sld))
+                                (content (read sld-port))
                                 (lib-name (lib:name content))
                                 (include-dir (cdr (reverse (cdr (reverse lib-name))))))
+                           (close-port sld-port)
                            (list lib-name
                                  (filter-exported-defines
                                   (lib:exports content)
