@@ -70,9 +70,9 @@
            "https://github.com/cyclone-scheme/pathname/archive/v0.1.0.tar.gz"
            "521a38ca02d73df248753b4e7964c801462e56bdc3dd649c1258e7e6ffeb0e86"))
  (popen
-  ("0.3.0" "https://github.com/cyclone-scheme/popen/raw/v0.3.0/package.scm"
-           "https://github.com/cyclone-scheme/popen/archive/v0.3.0.tar.gz"
-           "d929b771269147d3102b5a0fe8044da2c2d5e16568490d5d6c2dcc07b6ad684f"))
+  ("0.4.0" "https://github.com/cyclone-scheme/popen/raw/v0.4.0/package.scm"
+           "https://github.com/cyclone-scheme/popen/archive/v0.4.0.tar.gz"
+           "0150878619b5fcb90946fa2876f67b00e22328f6746afa6c041074cad1803bb6"))
  (pathname
   ("0.1.0" "https://github.com/cyclone-scheme/pathname/raw/v0.1.0/package.scm"
            "https://github.com/cyclone-scheme/pathname/archive/v0.1.0.tar.gz"
