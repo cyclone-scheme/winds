@@ -69,11 +69,6 @@
        char-set:empty
        char-set:ascii
        char-set:full))
-    ((cyclone char-set base)
-     (Char-Set
-       char-set?
-       immutable-char-set
-       char-set-contains?))
     ((cyclone char-set ascii)
      (char-set:lower-case
        char-set:upper-case
@@ -89,21 +84,19 @@
        char-set:symbol
        char-set:hex-digit
        char-set:blank))
-    ((cyclone char-set full)
-     (char-set:lower-case
-       char-set:upper-case
-       char-set:title-case
-       char-set:letter
-       char-set:digit
-       char-set:letter+digit
-       char-set:graphic
-       char-set:printing
-       char-set:whitespace
-       char-set:iso-control
-       char-set:punctuation
-       char-set:symbol
-       char-set:hex-digit
-       char-set:blank))
+    ((cyclone char-set boundary)
+     (char-set:regional-indicator
+       char-set:extend-or-spacing-mark
+       char-set:hangul-l
+       char-set:hangul-v
+       char-set:hangul-t
+       char-set:hangul-lv
+       char-set:hangul-lvt))
+    ((cyclone char-set base)
+     (Char-Set
+       char-set?
+       immutable-char-set
+       char-set-contains?))
     ((cyclone char-set extras)
      (char-set
        ucs-range->char-set
@@ -127,14 +120,21 @@
        char-set:empty
        char-set:ascii
        char-set:full))
-    ((cyclone char-set boundary)
-     (char-set:regional-indicator
-       char-set:extend-or-spacing-mark
-       char-set:hangul-l
-       char-set:hangul-v
-       char-set:hangul-t
-       char-set:hangul-lv
-       char-set:hangul-lvt))))
+    ((cyclone char-set full)
+     (char-set:lower-case
+       char-set:upper-case
+       char-set:title-case
+       char-set:letter
+       char-set:digit
+       char-set:letter+digit
+       char-set:graphic
+       char-set:printing
+       char-set:whitespace
+       char-set:iso-control
+       char-set:punctuation
+       char-set:symbol
+       char-set:hex-digit
+       char-set:blank))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -452,6 +452,12 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))
         ((cyclone iset base)
          (%make-iset
            make-iset
@@ -468,12 +474,22 @@
            iset-bits-set!
            iset-left-set!
            iset-right-set!))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))
+        ((cyclone iset iterators)
+         (iset-empty?
+           iset-fold
+           iset-fold-node
+           iset-for-each
+           iset-for-each-node
+           iset->list
+           iset-size
+           iset=
+           iset<=
+           iset>=
+           iset-cursor
+           iset-cursor?
+           iset-cursor-next
+           iset-ref
+           end-of-iset?))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -492,23 +508,7 @@
                iset-copy-node
                iset-squash-bits!
                iset-insert-left!
-               iset-insert-right!))
-        ((cyclone iset iterators)
-         (iset-empty?
-           iset-fold
-           iset-fold-node
-           iset-for-each
-           iset-for-each-node
-           iset->list
-           iset-size
-           iset=
-           iset<=
-           iset>=
-           iset-cursor
-           iset-cursor?
-           iset-cursor-next
-           iset-ref
-           end-of-iset?))))
+               iset-insert-right!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -578,6 +578,20 @@
        path-resolve
        path-normalize
        make-path))))
+ (pathname
+   (((cyclone pathname)
+     (path-strip-directory
+       path-directory
+       path-extension
+       path-strip-extension
+       path-replace-extension
+       path-absolute?
+       path-relative?
+       path-strip-leading-parents
+       path-relative-to
+       path-resolve
+       path-normalize
+       make-path))))
  (popen (((cyclone io popen)
           (popen pclose
                  open-input-pipe
@@ -585,142 +599,6 @@
                  with-input-from-pipe
                  read-all-from-pipe
                  read-lines-from-pipe))))
- (postgresql
-   (((cyclone postgresql)
-     (make-postgresql-connection
-       postgresql-connection?
-       postgresql-open-connection!
-       postgresql-secure-connection!
-       postgresql-login!
-       postgresql-terminate!
-       postgresql-query?
-       postgresql-query-descriptions
-       postgresql-execute-sql!
-       postgresql-prepared-statement?
-       postgresql-prepared-statement
-       postgresql-prepared-statement-sql
-       postgresql-bind-parameters!
-       postgresql-execute!
-       postgresql-close-prepared-statement!
-       postgresql-fetch-query!
-       postgresql-start-transaction!
-       postgresql-commit!
-       postgresql-rollback!
-       *postgresql-maximum-results*
-       *postgresql-date-format*
-       *postgresql-time-format*
-       *postgresql-timestamp-format*
-       *postgresql-copy-data-handler*
-       *postgresql-write-data-handler*
-       *postgresql-notice-handler*
-       *postgresql-unknown-type-handler*
-       postgresql-transaction-mode
-       postgresql-isolation-level-serializable
-       postgresql-isolation-level-repeatable-read
-       postgresql-isolation-level-read-committed
-       postgresql-isolation-level-read-uncommitted
-       postgresql-access-mode-read-write
-       postgresql-access-mode-read-only
-       postgresql-deferrable-on
-       postgresql-deferrable-off
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
-    ((cyclone postgresql messages)
-     (postgresql-send-ssl-request
-       postgresql-send-startup-message
-       postgresql-send-password-message
-       postgresql-send-terminate-message
-       postgresql-send-sync-message
-       postgresql-send-flush-message
-       postgresql-send-query-message
-       postgresql-send-parse-message
-       postgresql-send-bind-message
-       postgresql-send-describe-message
-       postgresql-send-execute-message
-       postgresql-send-close-message
-       postgresql-send-copy-data-message
-       postgresql-send-copy-fail-message
-       postgresql-send-copy-done-message
-       postgresql-read-response))
-    ((cyclone postgresql apis)
-     (make-postgresql-connection
-       postgresql-connection?
-       postgresql-open-connection!
-       postgresql-secure-connection!
-       postgresql-login!
-       postgresql-terminate!
-       postgresql-query?
-       postgresql-query-descriptions
-       postgresql-execute-sql!
-       postgresql-prepared-statement?
-       postgresql-prepared-statement
-       postgresql-prepared-statement-sql
-       postgresql-bind-parameters!
-       postgresql-execute!
-       postgresql-close-prepared-statement!
-       *postgresql-maximum-results*
-       *postgresql-date-format*
-       *postgresql-time-format*
-       *postgresql-timestamp-format*
-       *postgresql-copy-data-handler*
-       *postgresql-write-data-handler*
-       *postgresql-notice-handler*
-       *postgresql-unknown-type-handler*
-       postgresql-fetch-query!
-       postgresql-start-transaction!
-       postgresql-commit!
-       postgresql-rollback!
-       postgresql-transaction-mode
-       postgresql-isolation-level-serializable
-       postgresql-isolation-level-repeatable-read
-       postgresql-isolation-level-read-committed
-       postgresql-isolation-level-read-uncommitted
-       postgresql-access-mode-read-write
-       postgresql-access-mode-read-only
-       postgresql-deferrable-on
-       postgresql-deferrable-off))
-    ((cyclone postgresql conditions)
-     (raise-postgresql-error
-       postgresql-error?
-       postgresql-error-severity
-       postgresql-error-code
-       postgresql-error-schema
-       postgresql-error-table
-       postgresql-error-column
-       postgresql-error-data-type
-       postgresql-error-constraint))
-    ((cyclone postgresql buffer)
-     (postgresql-send-ssl-request
-       postgresql-send-startup-message
-       postgresql-send-password-message
-       postgresql-send-terminate-message
-       postgresql-send-sync-message
-       postgresql-send-flush-message
-       postgresql-send-query-message
-       postgresql-send-parse-message
-       postgresql-send-bind-message
-       postgresql-send-describe-message
-       postgresql-send-execute-message
-       postgresql-send-close-message
-       postgresql-send-copy-data-message
-       postgresql-send-copy-fail-message
-       postgresql-send-copy-done-message
-       postgresql-read-response
-       make-postgresql-out-buffer))
-    ((cyclone postgresql misc ssl)
-     (socket->ssl-socket
-       ssl-socket-input-port
-       ssl-socket-output-port
-       ssl-socket?
-       ssl-socket-close))
-    ((cyclone postgresql misc io)
-     (write-u16-be write-u32-be))))
  (python
    (((cyclone python)
      (with-python
@@ -810,7 +688,6 @@
        quoted-printable-decode-string
        quoted-printable-decode-bytevector))))
  (sha2 (((cyclone crypto sha2) (sha-224 sha-256))))
- (srfi-145 (((srfi 145) (assume))))
  (srfi-152
    (((srfi 152)
      (string=?
@@ -867,17 +744,6 @@
        string-replicate
        string-segment
        string-split))))
- (srfi-173
-   (((srfi 173)
-     (make-hook
-       hook?
-       list->hook
-       list->hook!
-       hook-add!
-       hook-delete!
-       hook-reset!
-       hook->list
-       hook-run))))
  (srfi-197
    (((srfi 197)
      (chain chain-and
@@ -886,49 +752,6 @@
             nest
             nest-reverse))))
  (srfi-26 (((srfi 26) (cut cute))))
- (srfi-41
-   (((srfi 41)
-     (make-stream
-       make-stream-pair
-       make-stream-null
-       stream-promise
-       stream-null
-       stream-cons
-       stream?
-       stream-null?
-       stream-pair?
-       stream-car
-       stream-cdr
-       stream-lambda
-       define-stream
-       list->stream
-       port->stream
-       stream
-       stream->list
-       stream-append
-       stream-concat
-       stream-constant
-       stream-drop
-       stream-drop-while
-       stream-filter
-       stream-fold
-       stream-for-each
-       stream-from
-       stream-iterate
-       stream-length
-       stream-let
-       stream-map
-       stream-match
-       stream-of
-       stream-range
-       stream-ref
-       stream-reverse
-       stream-scan
-       stream-take
-       stream-take-while
-       stream-unfold
-       stream-unfolds
-       stream-zip))))
  (string
    (((cyclone string)
      (string-cursor?
@@ -1003,10 +826,10 @@
  (temple
    (((cyclone web temple)
      (render get-parse-tree build-parse-tree))
-    ((cyclone web temple trace)
-     (trace set-trace-level!))
     ((cyclone web temple parser)
-     (parse *read-size* string-pos))))
+     (parse *read-size* string-pos))
+    ((cyclone web temple trace)
+     (trace set-trace-level!))))
  (uri (((cyclone uri)
         (uri? uri->string
               make-uri
