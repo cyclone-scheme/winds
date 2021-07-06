@@ -37,8 +37,10 @@
         (make-dir! tmp-dir)
         (display (format "Retrieving index file...~%"))
         (download! *default-index-url* index-path)
-        (let ((content (cdr (read (open-input-file index-path)))))
+        (let* ((index-port (open-input-file index-path))
+               (content (cdr (read index-port))))
           (delete! tmp-dir)
+          (close-port index-port)
           content)))
 
     (define (pkg-info index name/maybe-version)
@@ -93,7 +95,8 @@
 
     (define (get-local-index)
       (if (file-exists? *default-local-index*)
-          (read (open-input-file *default-local-index*))
+          (with-input-from-file *default-local-index*
+            (lambda () (read)))
           '()))
 
     (define (register-installed-package! name version cyc-version libs progs)
