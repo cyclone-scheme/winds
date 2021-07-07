@@ -4,7 +4,7 @@
   (let ((work-dir (->path pkg-name (*default-code-directory*))))
     (let-values (((sld-files _) (find-code-files-recursively work-dir)))
       (map (lambda (sld)
-             (let ((content (read (open-input-file sld))))
+             (let ((content (with-input-from-file sld (lambda () (read)))))
                (list (lib:name content) (lib:exports content))))
            sld-files))))
 
@@ -18,6 +18,7 @@
     (set! library-index (append library-index (list (list pkg-name lib+exps))))))
 
 (define (write-library-index!) 
-  (pretty-print library-index
-                (open-output-file *default-library-index*)))
+  (with-output-to-file *default-library-index*
+    (lambda ()
+      (pretty-print library-index))))
 

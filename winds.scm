@@ -26,9 +26,8 @@
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (pkg
           (validate-metadata
-           (read
-            (open-input-file (->path work-dir
-                                     *default-metadata-file*)))))
+           (with-input-from-file (->path work-dir *default-metadata-file*)
+             (lambda () (read)))))
          (test-dependencies (get-test-dependencies pkg))
          (test-file (get-test pkg)))
     (and test-dependencies
@@ -52,9 +51,8 @@
   (let* ((work-dir (if (null? dir) "." (->path (car dir))))
          (pkg
           (validate-metadata
-           (read
-            (open-input-file (->path work-dir
-                                     *default-metadata-file*))))))
+           (with-input-from-file (->path work-dir *default-metadata-file*)
+             (lambda () (read))))))
     (let ((progs (get-programs-names pkg))
           (libs (get-libraries-names pkg)))
       (and libs (build-libraries libs work-dir))          
@@ -65,7 +63,7 @@
          (metadata-path (->path work-dir *default-metadata-file*))
          (pkg (if (file-exists? metadata-path)
                   ;; reads 'package.scm' skipping the initial (package ...) tag
-                  (let ((md (cdr (read (open-input-file metadata-path))))) 
+                  (let ((md (cdr (with-input-from-file metadata-path (lambda () (read)))))) 
                     (copy-file! metadata-path (string-append metadata-path ".old")) ;; backup old one
                     (delete! metadata-path)
                     (metadata->pkg md))

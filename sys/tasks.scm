@@ -18,12 +18,13 @@
 (include "sys/update-library-index.scm")
 
 (define (file->string file)
-  (define file-port (open-input-file file))
-  (let lp ((content ""))
-    (let ((r (read-line file-port)))
-      (if (eof-object? r)
-          (string-copy content (min (string-length content) 1)) ; hack to remove first "\n"
-          (lp (string-append content "\n" r))))))
+  (with-input-from-file file
+    (lambda ()
+      (let lp ((content ""))
+        (let ((r (read-line)))
+          (if (eof-object? r)
+              (string-copy content (min (string-length content) 1)) ; hack to remove first "\n"
+              (lp (string-append content "\n" r))))))))
 
 (define (srfi? pkg)
   (string-contains (->string pkg) "srfi"))

@@ -95,10 +95,8 @@
              (metadata-path (->path work-dir *default-metadata-file*)))
         (make-dir! work-dir)
         (download! metadata-url metadata-path)
-        (let* ((metadata-port (open-input-file metadata-path))
-               (metadata (read metadata-port)))
+        (let ((metadata (with-input-from-file metadata-path (lambda () (read)))))
           (delete! work-dir)
-          (close-port metadata-port)
           metadata)))
 
     (define (build-and-install pkg . dir)
@@ -403,11 +401,9 @@
         (let-values (((sld-files scm-files) (find-code-files-recursively work-dir)))
           (let* ((libs+defs+incls
                   (map (lambda (sld)
-                         (let* ((sld-port (open-input-file sld))
-                                (content (read sld-port))
+                         (let* ((content (with-input-from-file sld (lambda () (read))))
                                 (lib-name (lib:name content))
                                 (include-dir (cdr (reverse (cdr (reverse lib-name))))))
-                           (close-port sld-port)
                            (list lib-name
                                  (filter-exported-defines
                                   (lib:exports content)
