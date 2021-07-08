@@ -1,5 +1,6 @@
 (import (scheme base)
         (scheme read)
+        (scheme file)
         (only (scheme write) display)
         (scheme cyclone pretty-print)
         (scheme cyclone libraries)
