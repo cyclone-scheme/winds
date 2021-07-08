@@ -48,5 +48,6 @@
                                       wiki-separator))
                       (else
                        (string-append wiki-header doc wiki-separator)))))
-          (display wiki-new-content (open-output-file wiki-file-path))
+          (with-output-to-file wiki-file-path
+            (lambda () (display wiki-new-content)))
           (display (format "Wiki of package ~a updated.~%" pkg-name))))))

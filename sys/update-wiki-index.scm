@@ -15,7 +15,7 @@ Packages available:\n
 (define (get-info-row pkg-name)
   (let* ((work-dir (->path "." pkg-name))
          (md-path (->path work-dir *default-metadata-file*))
-         (pkg (metadata->pkg (cdr (read (open-input-file md-path))))))
+         (pkg (metadata->pkg (cdr (with-input-from-file md-path (lambda () (read)))))))
     (string-append "|"
                    (string-join (list (let ((name (->string (get-name pkg))))
                                         (string-append "[" name "](" *default-wiki-url* name ")"))
@@ -37,5 +37,6 @@ Packages available:\n
     (set! wiki-index (string-append wiki-index info-row))))
 
 (define (write-wiki-index!) 
-  (display (string-append home-header wiki-index home-footer)
-           (open-output-file *default-wiki-home-file*)))
+  (with-output-to-file *default-wiki-home-file*
+    (lambda ()
+      (display (string-append home-header wiki-index home-footer)))))

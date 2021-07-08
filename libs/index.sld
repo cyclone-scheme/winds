@@ -37,10 +37,8 @@
         (make-dir! tmp-dir)
         (display (format "Retrieving index file...~%"))
         (download! *default-index-url* index-path)
-        (let* ((index-port (open-input-file index-path))
-               (content (cdr (read index-port))))
+        (let* ((content (cdr (with-input-from-file index-path (lambda () (read))))))
           (delete! tmp-dir)
-          (close-port index-port)
           content)))
 
     (define (pkg-info index name/maybe-version)
