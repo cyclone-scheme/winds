@@ -1,7 +1,7 @@
 [<img src="winds.png" alt="winds">](http://github.com/cyclone-scheme/winds)
 
 # winds
-Package manager for [Cyclone Scheme](https://cyclone-scheme.org).
+Package manager for [Cyclone Scheme](https://justinethier.github.io/cyclone/).
 
 The official list of packages is on the [wiki](https://github.com/cyclone-scheme/winds/wiki).
 
