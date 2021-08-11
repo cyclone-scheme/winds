@@ -11,7 +11,7 @@
           get-library-installation-dir
           get-program-installation-dir)
   (begin
-    (define *winds-version* "0.31.0")
+    (define *winds-version* "0.32.0")
 
     ;; The only global variable that is a parameter
     (define *default-code-directory* (make-parameter "cyclone"))
