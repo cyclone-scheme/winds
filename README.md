@@ -35,7 +35,7 @@ $ winds [-v] COMMAND [PACKAGES]
 ```
     
     COMMANDS:
-  
+ 
       COMMON USE:
       help  -  print usage
       retrieve PACKAGE [...]  - downloads and extracts specified PACKAGE(s)
@@ -56,11 +56,16 @@ $ winds [-v] COMMAND [PACKAGES]
    
     PACKAGES:
          Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2
-                 
+    
+    FLAGS:
+         The "-v" flag turns on the verbose mode.
 
+Example:
 ```
-$ winds install iset 
+$ winds install iset
 ```
+
+For installation into other directories please see the [Alternative install directories](#alternative-install-directories) section.
 
 ## Package versions
 
