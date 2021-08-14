@@ -195,7 +195,10 @@
     package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
  
   PACKAGES:
-    Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2~%"
+    Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2
+    
+  FLAGS:
+    The \"-v\" flag turns on the verbose mode.~%"
     *banner*))
   (newline))
 
