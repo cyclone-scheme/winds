@@ -9,6 +9,7 @@
         (scheme cyclone libraries)
         (except (srfi 1) delete!)
         (srfi 28) ; basic format strings
+        (only (srfi 132) list-sort)
         (cyclone match)
         (libs common)
         (libs system-calls)
@@ -154,7 +155,10 @@
                                (cyclone . ,(caddr pkg))
                                (libraries . ,(cadddr pkg))
                                (programs . ,(cadddr (cdr pkg)))))
-                           index)))))
+                           (list-sort (lambda (pkg1 pkg2)
+                                        (string<? (symbol->string (car pkg1))
+                                                  (symbol->string (car pkg2))))
+                                      index))))))
 
 (define (index)
   (pretty-print (get-index)))
