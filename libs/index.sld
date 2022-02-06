@@ -36,7 +36,6 @@
       (let* ((tmp-dir (random-temp-dir))
              (index-path (->path tmp-dir "index.scm")))
         (make-dir! tmp-dir)
-        (display (format "Retrieving index file...~%"))
         (download! *default-index-url* index-path)
         (let* ((content (cdr (with-input-from-file index-path (lambda () (read))))))
           (delete! tmp-dir)

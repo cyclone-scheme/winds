@@ -135,12 +135,30 @@
         (uninstall-package index pkg))
       pkgs))))
 
+;; Info procedures
 (define (search term)
-  (pretty-print
-   (filter (lambda (pkg)
-             (if (and (not (null? pkg)))
-                 (string-contains (->string (car pkg)) (symbol->string term))))
-           (get-index))))
+  (filter (lambda (pkg)
+            (if (and (not (null? pkg)))
+                (string-contains (->string (car pkg)) (symbol->string term))))
+          (get-index)))
+
+(define (info name . version)
+  (get-package-remote-metadata (get-index) name))
+
+(define (local-status)
+  (map (lambda (pkg)
+         `(,(car pkg)
+           (version . ,(cadr pkg))
+           (cyclone . ,(caddr pkg))
+           (libraries . ,(cadddr pkg))
+           (programs . ,(cadddr (cdr pkg)))))
+       (list-sort (lambda (pkg1 pkg2)
+                    (string<? (symbol->string (car pkg1))
+                              (symbol->string (car pkg2))))
+                  (get-local-index))))
+
+(define (index)
+  (get-index))
 
 (define (suggest identifier)
   (let ((get-pkg-name car)
@@ -158,27 +176,7 @@
               (cons (get-pkg-name pkg) libs))))
      (get-library-index))))
 
-(define (info name . version)
-  (pretty-print (get-package-remote-metadata (get-index) name)))
-
-(define (local-status)
-  (let ((index (get-local-index)))
-    (if (null? index)
-        (display (format "None~%"))
-        (pretty-print (map (lambda (pkg)
-                             `(,(car pkg)
-                               (version . ,(cadr pkg))
-                               (cyclone . ,(caddr pkg))
-                               (libraries . ,(cadddr pkg))
-                               (programs . ,(cadddr (cdr pkg)))))
-                           (list-sort (lambda (pkg1 pkg2)
-                                        (string<? (symbol->string (car pkg1))
-                                                  (symbol->string (car pkg2))))
-                                      index))))))
-
-(define (index)
-  (pretty-print (get-index)))
-
+;; CLI
 (define *banner*
   (format
    "
@@ -203,7 +201,7 @@
     reinstall PACKAGE [...] - retrieve and reinstall specified PACKAGE(s)
     upgrade [PACKAGE ...] - upgrade all installed packages or specified PACKAGE(s)
     uninstall PACKAGE [...] - remove specified PACKAGE(s)
-    search TERM - search for packages whose name (partially) match the specified TERM
+    search TERM - search for packages whose name (partially) matches the specified TERM
     info PACKAGE - list all metadata about specified PACKAGE
     local-status - list all installed packages
     index - pretty-prints winds packages index
@@ -233,17 +231,20 @@
 
 (define (dispatch cmds)
   (match cmds
+    ;; General interface
     (('retrieve pkgs ..1) (retrieve pkgs))
     (('install pkgs ..1) (install pkgs))
     (('reinstall pkgs ..1) (reinstall pkgs))
     (('upgrade) (upgrade))
     (('upgrade pkgs ..1) (upgrade pkgs))
     (('uninstall pkgs ..1) (uninstall pkgs))
-    (('search term) (search term))
-    (('info name) (info name))
-    (('local-status) (local-status))
-    (('index) (index))
+    ;; Info procedures
+    (('search term) (pretty-print (search term)))
+    (('info name) (pretty-print (info name)))
+    (('local-status) (pretty-print (local-status)))
+    (('index) (pretty-print (index)))
     (('suggest identifier) (pretty-print (suggest identifier)))
+    ;; Package authoring
     (('build-local) (build-local))
     (('build-local dir) (build-local dir))    
     (('test-local) (test-local))
