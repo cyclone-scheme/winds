@@ -43,7 +43,7 @@ $ winds [-v] COMMAND [PACKAGES]
       reinstall PACKAGE [...] - retrieve and reinstall specified PACKAGE(s)
       upgrade [PACKAGE ...] - upgrade all installed packages or specified PACKAGE(s)
       uninstall PACKAGE [...] - remove specified PACKAGE(s)
-      search TERM - search for packages whose name (partially) match the specified TERM
+      search TERM - search for packages whose name (partially) matches the specified TERM
       info PACKAGE - list all metadata about specified PACKAGE
       local-status - list all installed packages
       index - pretty-prints winds packages index
@@ -56,10 +56,10 @@ $ winds [-v] COMMAND [PACKAGES]
       package-srfi [DIR] - scaffold DIR layout and a package.scm stub for SRFIs
    
     PACKAGES:
-         Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2
+      Name of the package. Versions can be appended, e.g. dummy-test-package-0.1.2
     
     FLAGS:
-         The "-v" flag turns on the verbose mode.
+      The "-v" flag turns on the verbose mode.
 
 Example:
 ```
@@ -240,7 +240,6 @@ srfi/
 
 ## Limitations
 
-- Packages will always have their latest version installed (there is no way to select older versions)
 - No way to digitally sign packages - only tarball sha256sums are verified
 
 ## Tips and tricks
