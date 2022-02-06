@@ -142,6 +142,22 @@
                  (string-contains (->string (car pkg)) (symbol->string term))))
            (get-index))))
 
+(define (suggest identifier)
+  (let ((get-pkg-name car)
+        (get-libraries cadr)
+        (get-library-name car)
+        (get-exports-list cadr))
+    (filter-map
+     (lambda (pkg)
+       (let ((libs (filter-map
+                    (lambda (lib)
+                      (and (member identifier (get-exports-list lib))
+                           (get-library-name lib)))
+                    (get-libraries pkg))))
+         (and (not (null? libs))
+              (cons (get-pkg-name pkg) libs))))
+     (get-library-index))))
+
 (define (info name . version)
   (pretty-print (get-package-remote-metadata (get-index) name)))
 
@@ -191,6 +207,7 @@
     info PACKAGE - list all metadata about specified PACKAGE
     local-status - list all installed packages
     index - pretty-prints winds packages index
+    suggest IDENTIFIER - suggest packages/libraries that export IDENTIFIER
 
     PACKAGE AUTHORING:
     build-local [DIR] - build local package using package.scm from DIR or \".\"
@@ -226,6 +243,7 @@
     (('info name) (info name))
     (('local-status) (local-status))
     (('index) (index))
+    (('suggest identifier) (pretty-print (suggest identifier)))
     (('build-local) (build-local))
     (('build-local dir) (build-local dir))    
     (('test-local) (test-local))

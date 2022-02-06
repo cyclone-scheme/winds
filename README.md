@@ -47,6 +47,7 @@ $ winds [-v] COMMAND [PACKAGES]
       info PACKAGE - list all metadata about specified PACKAGE
       local-status - list all installed packages
       index - pretty-prints winds packages index
+      suggest IDENTIFIER - suggest packages/libraries that export IDENTIFIER
   
       PACKAGE AUTHORING:
       build-local [DIR] - build local package using package.scm from DIR or \".\"

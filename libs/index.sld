@@ -16,7 +16,8 @@
           get-local-index
           local-index-contains?
           register-installed-package!
-          unregister-installed-package!)
+          unregister-installed-package!
+          get-library-index)
   (begin
     ;; Global index.scm has the following format:
     ;;
@@ -114,4 +115,32 @@
             (write (remove (lambda (pkg)
                              (equal? (car pkg) name))
                            local-index))))
-        (display (format "Package ~a successfuly uninstalled.~%" name))))))
+        (display (format "Package ~a successfuly uninstalled.~%" name))))
+
+    ;; Index with libraries and their exported symbols, sorted by package
+    ;;
+    ;; ((array-list                   ;; package1
+    ;;   (((cyclone array-list)       ;;   library1
+    ;;     (array-list?               ;;     symbol1
+    ;;      array-list-delete!        ;;     symbol2
+    ;;      ...))                     ;;     symbolN
+    ;;    ...))                       ;;   libraryN
+    ;;   
+    ;;  (base64                       ;; package2
+    ;;   (((cyclone base64)           ;;   library1
+    ;;     (base64-encode             ;;     symbol1
+    ;;      base64-encode-string      ;;     symbol2
+    ;;      ...))                     ;;     symbolN
+    ;;    ...))                       ;;   libraryN
+    ;;  ...)                          ;; packageN
+    (define *library-index-url*
+      "https://raw.githubusercontent.com/cyclone-scheme/winds/master/indexes/library-index.scm")
+
+    (define (get-library-index)
+      (let* ((tmp-dir (random-temp-dir))
+             (index-path (->path tmp-dir "library-index.scm")))
+        (make-dir! tmp-dir)
+        (download! *library-index-url* index-path)
+        (let* ((content (cdr (with-input-from-file index-path (lambda () (read))))))
+          (delete! tmp-dir)
+          content)))))
