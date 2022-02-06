@@ -69,6 +69,21 @@
        char-set:empty
        char-set:ascii
        char-set:full))
+    ((cyclone char-set ascii)
+     (char-set:lower-case
+       char-set:upper-case
+       char-set:title-case
+       char-set:letter
+       char-set:digit
+       char-set:letter+digit
+       char-set:graphic
+       char-set:printing
+       char-set:whitespace
+       char-set:iso-control
+       char-set:punctuation
+       char-set:symbol
+       char-set:hex-digit
+       char-set:blank))
     ((cyclone char-set extras)
      (char-set
        ucs-range->char-set
@@ -97,6 +112,14 @@
        char-set?
        immutable-char-set
        char-set-contains?))
+    ((cyclone char-set boundary)
+     (char-set:regional-indicator
+       char-set:extend-or-spacing-mark
+       char-set:hangul-l
+       char-set:hangul-v
+       char-set:hangul-t
+       char-set:hangul-lv
+       char-set:hangul-lvt))
     ((cyclone char-set full)
      (char-set:lower-case
        char-set:upper-case
@@ -111,30 +134,7 @@
        char-set:punctuation
        char-set:symbol
        char-set:hex-digit
-       char-set:blank))
-    ((cyclone char-set ascii)
-     (char-set:lower-case
-       char-set:upper-case
-       char-set:title-case
-       char-set:letter
-       char-set:digit
-       char-set:letter+digit
-       char-set:graphic
-       char-set:printing
-       char-set:whitespace
-       char-set:iso-control
-       char-set:punctuation
-       char-set:symbol
-       char-set:hex-digit
-       char-set:blank))
-    ((cyclone char-set boundary)
-     (char-set:regional-indicator
-       char-set:extend-or-spacing-mark
-       char-set:hangul-l
-       char-set:hangul-v
-       char-set:hangul-t
-       char-set:hangul-lv
-       char-set:hangul-lvt))))
+       char-set:blank))))
  (clojurian
    (((cyclone clojurian)
      (doto as-> and-> -> ->* ->> ->>* if-let if-let*))))
@@ -452,6 +452,22 @@
            iset-cursor-next
            iset-ref
            end-of-iset?))
+        ((cyclone iset iterators)
+         (iset-empty?
+           iset-fold
+           iset-fold-node
+           iset-for-each
+           iset-for-each-node
+           iset->list
+           iset-size
+           iset=
+           iset<=
+           iset>=
+           iset-cursor
+           iset-cursor?
+           iset-cursor-next
+           iset-ref
+           end-of-iset?))
         ((cyclone iset constructors)
          (iset iset-copy
                list->iset
@@ -471,6 +487,12 @@
                iset-squash-bits!
                iset-insert-left!
                iset-insert-right!))
+        ((cyclone iset optimize)
+         (iset-balance
+           iset-balance!
+           iset-optimize
+           iset-optimize!
+           iset->code))
         ((cyclone iset base)
          (%make-iset
            make-iset
@@ -486,29 +508,7 @@
            iset-end-set!
            iset-bits-set!
            iset-left-set!
-           iset-right-set!))
-        ((cyclone iset optimize)
-         (iset-balance
-           iset-balance!
-           iset-optimize
-           iset-optimize!
-           iset->code))
-        ((cyclone iset iterators)
-         (iset-empty?
-           iset-fold
-           iset-fold-node
-           iset-for-each
-           iset-for-each-node
-           iset->list
-           iset-size
-           iset=
-           iset<=
-           iset>=
-           iset-cursor
-           iset-cursor?
-           iset-cursor-next
-           iset-ref
-           end-of-iset?))))
+           iset-right-set!))))
  (json (((cyclone json)
          (json-write json-read json->scm scm->json))))
  (md5 (((cyclone crypto md5) (md5))))
@@ -812,10 +812,10 @@
  (temple
    (((cyclone web temple)
      (render get-parse-tree build-parse-tree))
-    ((cyclone web temple parser)
-     (parse *read-size* string-pos))
     ((cyclone web temple trace)
-     (trace set-trace-level!))))
+     (trace set-trace-level!))
+    ((cyclone web temple parser)
+     (parse *read-size* string-pos))))
  (uri (((cyclone uri)
         (uri? uri->string
               make-uri
