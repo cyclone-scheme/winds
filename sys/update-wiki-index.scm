@@ -27,16 +27,16 @@ Packages available:\n
                                 "|")
                    "|\n")))
 
-(define wiki-index "")
+(define *wiki-index* "")
 
 (define (update-wiki-index! pkg-name)
   (let ((info-row (if (srfi? pkg-name)
                       (parameterize ((*default-code-directory* "srfi"))
                         (get-info-row pkg-name))
                       (get-info-row pkg-name))))
-    (set! wiki-index (string-append wiki-index info-row))))
+    (set! *wiki-index* (string-append *wiki-index* info-row))))
 
 (define (write-wiki-index!) 
   (with-output-to-file *default-wiki-home-file*
     (lambda ()
-      (display (string-append home-header wiki-index home-footer)))))
+      (display (string-append home-header *wiki-index* home-footer)))))

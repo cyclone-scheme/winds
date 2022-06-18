@@ -14,7 +14,7 @@
         (libs common)
         (libs system-calls)
         (only (libs file) ->path path-strip-extension)
-        (only (libs util) ->string string-contains string->proper-symbol)
+        (only (libs util) levenshtein ->string string-contains string->proper-symbol)
         (libs index)
         (libs metadata)
         (libs package)
@@ -161,20 +161,16 @@
   (get-index))
 
 (define (suggest identifier)
-  (let ((get-pkg-name car)
-        (get-libraries cadr)
-        (get-library-name car)
-        (get-exports-list cadr))
-    (filter-map
-     (lambda (pkg)
-       (let ((libs (filter-map
-                    (lambda (lib)
-                      (and (member identifier (get-exports-list lib))
-                           (get-library-name lib)))
-                    (get-libraries pkg))))
-         (and (not (null? libs))
-              (cons (get-pkg-name pkg) libs))))
-     (get-library-index))))
+  (define (valid-suggestion? candidate)
+    (let ((max-string-distance 3))
+      (<= (levenshtein (symbol->string identifier)
+                       (symbol->string candidate))
+          max-string-distance)))
+  (pretty-print
+   (filter-map (lambda (definition)
+                 (and (valid-suggestion? (car definition))
+                      definition))
+               (get-definition-index))))
 
 ;; CLI
 (define *banner*

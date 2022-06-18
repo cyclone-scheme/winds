@@ -17,6 +17,7 @@
 (include "sys/update-wiki-index.scm")
 (include "sys/update-packages-wiki.scm")
 (include "sys/update-library-index.scm")
+(include "sys/update-definition-index.scm")
 
 (define (file->string file)
   (with-input-from-file file
@@ -45,11 +46,14 @@
                 (update-wiki-index! pkg)
                 (update-package-wiki! pkg)
                 (update-library-index! pkg)
+                (update-definition-index! pkg)
                 (delete! (->path pkg)))
               *pkg-list*)
     (write-wiki-index!)
     (display (format "Wiki index updated.~%"))
     (write-library-index!)
-    (display (format "Library index updated.~%"))))
+    (display (format "Library index updated.~%"))
+    (write-definition-index!)
+    (display (format "Definition index updated.~%"))))
 
 (main)

@@ -1,10 +1,13 @@
 (define-library (libs util)
   (import (scheme base)
+          (cyclone foreign)
           (only (srfi 1) split-at)
           (only (scheme cyclone util) filter string-split))
+  (include-c-header "levenshtein.h")
   (export chain
           get-parameter-value
           get-parameter-all-occurrences
+          levenshtein
           remove
           ->string
           string-contains
@@ -14,6 +17,8 @@
           string->proper-symbol
           trim-trailing-slash)
   (begin
+    (c-define levenshtein int "levenshtein" string string)
+
     (define (remove pred lst)
       (filter (lambda (x) (not (pred x))) lst))
 
