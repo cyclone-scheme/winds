@@ -72,7 +72,7 @@ jobs:
         [[ -z $(git status -s) ]] || git commit -m "Updated library-index.scm on push"
 
     # Definition index
-    - name: Commit library index
+    - name: Commit definition index
       run: |
         git config --local user.email ${{ secrets.AUTOMATION_EMAIL }}
         git config --local user.name ${{ github.repository_owner }}
