@@ -166,11 +166,10 @@
       (<= (levenshtein (symbol->string identifier)
                        (symbol->string candidate))
           max-string-distance)))
-  (pretty-print
-   (filter-map (lambda (definition)
-                 (and (valid-suggestion? (car definition))
-                      definition))
-               (get-definition-index))))
+  (filter-map (lambda (definition)
+                (and (valid-suggestion? (car definition))
+                     definition))
+              (get-definition-index)))
 
 ;; CLI
 (define *banner*
