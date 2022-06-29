@@ -24,6 +24,9 @@
            "https://github.com/cyclone-scheme/clojurian/archive/v0.1.0.tar.gz"
            "82b1453e4afc5446c97ab1a7ca166a0df0fd0d21a1ba453c304ae1b707be09b9"))
  (csv
+  ("0.1.1" "https://github.com/cyclone-scheme/csv/raw/v0.1.0/package.scm"
+           "https://github.com/cyclone-scheme/csv/archive/v0.1.1.tar.gz"
+           "c12d9730a155f8a070783e35365378ae3a9ccc42bb5b562884cabf916d322c52")
   ("0.1.0" "https://github.com/cyclone-scheme/csv/raw/v0.1.0/package.scm"
            "https://github.com/cyclone-scheme/csv/archive/v0.1.0.tar.gz"
            "6c3b19fc416183afc07612aad6b8fb50277a1ca0bffec3ab96342d146d8e0c21"))
