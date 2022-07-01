@@ -42,23 +42,19 @@ jobs:
     # Update wiki index, packages wikis and library/definition indexes.
     # One command does all to avoid multiple iterations over all packages,
     # which could become too slow as the packages list grows.
-    - name: Update wiki and library index
+    - name: Update wiki and library + definition indexes
       run: |
         make sys-tasks
         make clean
 
     # Wiki index (already updated by 'make sys-tasks')
-    # Got from https://github.com/marketplace/actions/wiki-sync        
+    # Got from https://github.com/marketplace/actions/publish-to-github-wiki
     - name: Push wiki changes
-      uses: joeizzard/action-wiki-sync@master
-      run: git config --global --add safe.directory /wiki
+      uses: SwiftDocOrg/github-wiki-publish-action@v1
       with:
-          username: ${{ github.repository_owner }}
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-          wiki_folder: wiki
-          commit_username: ${{ github.repository_owner }}
-          commit_email: ${{ secrets.AUTOMATION_EMAIL }}
-          commit_message: 'Updated wiki'
+        path: "wiki"
+      env:
+        GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Clean wiki directory
       run: |
