@@ -24,6 +24,9 @@
            "https://github.com/cyclone-scheme/clojurian/archive/v0.1.0.tar.gz"
            "82b1453e4afc5446c97ab1a7ca166a0df0fd0d21a1ba453c304ae1b707be09b9"))
  (csv
+  ("0.1.1" "https://github.com/cyclone-scheme/csv/raw/v0.1.0/package.scm"
+           "https://github.com/cyclone-scheme/csv/archive/v0.1.1.tar.gz"
+           "c12d9730a155f8a070783e35365378ae3a9ccc42bb5b562884cabf916d322c52")
   ("0.1.0" "https://github.com/cyclone-scheme/csv/raw/v0.1.0/package.scm"
            "https://github.com/cyclone-scheme/csv/archive/v0.1.0.tar.gz"
            "6c3b19fc416183afc07612aad6b8fb50277a1ca0bffec3ab96342d146d8e0c21"))
@@ -74,6 +77,9 @@
            "https://github.com/cyclone-scheme/popen/archive/v0.4.0.tar.gz"
            "0150878619b5fcb90946fa2876f67b00e22328f6746afa6c041074cad1803bb6"))
  (python
+  ("0.3.0" "https://github.com/cyclone-scheme/python/raw/v0.3.0/package.scm"
+           "https://github.com/cyclone-scheme/python/archive/v0.3.0.tar.gz"
+           "8f0b2dfad4e79c9ae4d3b3a519a13130e932c8d2a280ad185abafb4c3b7e592d")
   ("0.2.0" "https://github.com/cyclone-scheme/python/raw/v0.2.0/package.scm"
            "https://github.com/cyclone-scheme/python/archive/v0.2.0.tar.gz"
            "2a425bb7793a616f222f63393a80953425aaf528b20258f2deeae49adfede29b"))
