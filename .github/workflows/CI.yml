@@ -37,7 +37,7 @@ jobs:
     # Pre-requisite
     - name: Clone wiki directory
       run: |
-        git clone https://github.com/cyclone-scheme/winds.wiki.git ~/wiki
+        git clone https://github.com/cyclone-scheme/winds.wiki.git /home/runner/wiki
 
     # Update wiki index, packages wikis and library/definition indexes.
     # One command does all to avoid multiple iterations over all packages,

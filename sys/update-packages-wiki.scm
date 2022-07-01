@@ -16,7 +16,7 @@
    "# Contributions from the community:\n\n"))
 
 (define (update-package-wiki! pkg-name)
-  (let* ((work-dir (->path *default-wiki-directory* pkg-name))
+  (let* ((work-dir (->path "." pkg-name))
          (doc-path (->path work-dir *default-doc-file*))
          (doc (if (file-exists? doc-path)
                   (file->string doc-path)
