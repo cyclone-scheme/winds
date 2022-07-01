@@ -37,13 +37,14 @@ jobs:
     # Pre-requisite
     - name: Clone wiki directory
       run: |
-        git clone https://github.com/cyclone-scheme/winds.wiki.git /home/runner/wiki
+        git clone https://github.com/cyclone-scheme/winds.wiki.git wiki
 
     # Update wiki index, packages wikis and library/definition indexes.
     # One command does all to avoid multiple iterations over all packages,
     # which could become too slow as the packages list grows.
     - name: Update wiki and library index
       run: |
+        git config --local --add safe.directory wiki
         make sys-tasks
         make clean
 
@@ -54,7 +55,7 @@ jobs:
       with:
           username: ${{ github.repository_owner }}
           access_token: ${{ secrets.GITHUB_TOKEN }}
-          wiki_folder: /home/runner/wiki
+          wiki_folder: wiki
           commit_username: ${{ github.repository_owner }}
           commit_email: ${{ secrets.AUTOMATION_EMAIL }}
           commit_message: 'Updated wiki'

@@ -2,7 +2,7 @@
 ;; - doc file must be "README.md"
 ;; - doc file must be in package base directory
 
-(define *default-wiki-directory* "/home/runner/wiki")
+(define *default-wiki-directory* "wiki")
 (define *default-wiki-file-extension* ".md")
 
 (define wiki-header
