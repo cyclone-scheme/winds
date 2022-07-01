@@ -54,7 +54,7 @@ jobs:
       with:
           username: ${{ github.repository_owner }}
           access_token: ${{ secrets.GITHUB_TOKEN }}
-          wiki_folder: wiki
+          wiki_folder: /home/runner/wiki
           commit_username: ${{ github.repository_owner }}
           commit_email: ${{ secrets.AUTOMATION_EMAIL }}
           commit_message: 'Updated wiki'
