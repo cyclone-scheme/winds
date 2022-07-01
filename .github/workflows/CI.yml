@@ -44,7 +44,6 @@ jobs:
     # which could become too slow as the packages list grows.
     - name: Update wiki and library index
       run: |
-        git config --global --add safe.directory /wiki
         make sys-tasks
         make clean
 
@@ -52,6 +51,7 @@ jobs:
     # Got from https://github.com/marketplace/actions/wiki-sync        
     - name: Push wiki changes
       uses: joeizzard/action-wiki-sync@master
+      run: git config --global --add safe.directory /wiki
       with:
           username: ${{ github.repository_owner }}
           access_token: ${{ secrets.GITHUB_TOKEN }}
