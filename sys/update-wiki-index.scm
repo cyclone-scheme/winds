@@ -13,7 +13,7 @@ Packages available:\n
   "\n\n*The above content was automatically generated on last Cyclone Winds update.*")
 
 (define (get-info-row pkg-name)
-  (let* ((work-dir (->path "." pkg-name))
+  (let* ((work-dir (->path *default-wiki-directory* pkg-name))
          (md-path (->path work-dir *default-metadata-file*))
          (pkg (metadata->pkg (cdr (with-input-from-file md-path (lambda () (read)))))))
     (string-append "|"

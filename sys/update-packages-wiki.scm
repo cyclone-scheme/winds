@@ -2,7 +2,7 @@
 ;; - doc file must be "README.md"
 ;; - doc file must be in package base directory
 
-(define *default-wiki-directory* "wiki")
+(define *default-wiki-directory* "/home/runner/wiki")
 (define *default-wiki-file-extension* ".md")
 
 (define wiki-header
@@ -16,7 +16,7 @@
    "# Contributions from the community:\n\n"))
 
 (define (update-package-wiki! pkg-name)
-  (let* ((work-dir (->path "." pkg-name))
+  (let* ((work-dir (->path *default-wiki-directory* pkg-name))
          (doc-path (->path work-dir *default-doc-file*))
          (doc (if (file-exists? doc-path)
                   (file->string doc-path)
