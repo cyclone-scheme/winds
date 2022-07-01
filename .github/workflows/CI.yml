@@ -49,6 +49,7 @@ jobs:
 
     # Wiki index (already updated by 'make sys-tasks') 
     - name: Push wiki changes
+    - run: |
         git config --local user.email ${{ secrets.AUTOMATION_EMAIL }}
         git config --local user.name ${{ github.repository_owner }}
         cd wiki
