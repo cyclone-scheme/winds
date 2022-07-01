@@ -1,4 +1,4 @@
-(define *default-wiki-directory* "~/wiki")
+(define *default-wiki-directory* "/home/runner/wiki")
 (define *default-wiki-home-file* (->path *default-wiki-directory* "Home.md"))
 (define *default-wiki-url* "https://github.com/cyclone-scheme/winds/wiki/")
 
