@@ -47,17 +47,15 @@ jobs:
         make sys-tasks
         make clean
 
-    # Wiki index (already updated by 'make sys-tasks')
-    # Got from https://github.com/marketplace/actions/publish-to-github-wiki
+    # Wiki index (already updated by 'make sys-tasks') 
     - name: Push wiki changes
-      uses: SwiftDocOrg/github-wiki-publish-action@v1
-      with:
-        path: "wiki"
-      env:
-        GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Clean wiki directory
-      run: |
+        git config --local user.email ${{ secrets.AUTOMATION_EMAIL }}
+        git config --local user.name ${{ github.repository_owner }}
+        cd wiki
+        git add -A
+        git commit -m "Updated wiki"
+        git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/cyclone-scheme/winds.wiki.git
+        cd ..
         rm -Rf wiki
 
     # Library index
