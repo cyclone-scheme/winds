@@ -44,7 +44,7 @@ jobs:
     # which could become too slow as the packages list grows.
     - name: Update wiki and library index
       run: |
-        git config --local --add safe.directory wiki
+        git config --global --add safe.directory /wiki
         make sys-tasks
         make clean
 
