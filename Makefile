@@ -42,7 +42,7 @@ $(TESTS_BN) : % : %.scm
 $(SYS_BN) : 
 	$(CYCLONE) $(SYS_SRC)
 
-.PHONY: run-tests test clean install uninstall full
+.PHONY: run-tests test clean install uninstall full run-sys-tasks sys-tasks
 run-tests : $(TESTS_BN)
 	./$<
 
