@@ -54,7 +54,7 @@ jobs:
         git config --global user.name ${{ github.repository_owner }}
         cd wiki
         git add -A
-        git commit -m "Updated wiki"
+        git diff-index --quiet HEAD || git commit -m "Updated wiki"
         git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/cyclone-scheme/winds.wiki.git
         cd ..
         rm -Rf wiki
