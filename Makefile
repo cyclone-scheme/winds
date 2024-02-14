@@ -13,6 +13,7 @@ DEST_DIR   = $(PREFIX)/bin
 LIBS_DIR   = libs
 TESTS_DIR  = tests
 SYS_DIR    = sys
+BOOTSTRAP_DIR = ../cyclone-bootstrap
 
 # Files
 WINDS_SRC  = winds.scm
@@ -42,7 +43,7 @@ $(TESTS_BN) : % : %.scm
 $(SYS_BN) : 
 	$(CYCLONE) $(SYS_SRC)
 
-.PHONY: run-tests test clean install uninstall full run-sys-tasks sys-tasks
+.PHONY: run-tests test clean install uninstall full run-sys-tasks sys-tasks bootstrap
 run-tests : $(TESTS_BN)
 	./$<
 
@@ -67,3 +68,7 @@ uninstall :
 
 full : 
 	$(MAKE) clean; $(MAKE) && sudo $(MAKE) install && $(MAKE) test
+
+bootstrap: winds
+	cp winds.c $(BOOTSTRAP_DIR)/tools/winds/
+	cp libs/*.c $(BOOTSTRAP_DIR)/tools/winds/libs/
