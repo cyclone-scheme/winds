@@ -177,7 +177,7 @@
    "
   Winds - a package manager for Cyclone Scheme 
   https://github.com/cyclone-scheme/winds 
-  (c) 2022 - Cyclone Team 
+  (c) 2022-2024 Cyclone Team 
   Version ~a~%"
    *winds-version*))
 
